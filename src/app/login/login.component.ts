@@ -17,8 +17,12 @@ export class LoginComponent {
     this.loginService.login(this.email, this.password).subscribe({
       next: (response) => {
         console.log(response);
+            },
+            error: (err) => {
+        console.error('Login failed:', err);
+            }
 
       }
-    })
+    )
   }
 }
