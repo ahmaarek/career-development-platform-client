@@ -1,0 +1,33 @@
+.full-width {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+/* input field color */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background-color: white !important;
+    border-radius: 6px;
+}
+
+/* Label (first name, last name, etc.) color */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label{
+    color: grey !important;
+}
+
+/* The text written inside the the input field */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
+    color: black !important;
+}
+
+
+/* Cursor color */
+.mat-mdc-input-element {
+  caret-color: #6a1b9a !important;
+}
+
+/* error line underneath the input */
+.mdc-text-field--invalid .mdc-line-ripple::before {
+  background-color: #e53935 !important; 
+  height: 1px !important;               
+}
+

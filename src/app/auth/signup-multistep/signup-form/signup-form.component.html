@@ -1,0 +1,41 @@
+<div class="sign-up-container">
+  <div class="sign-up-card">
+    <h2>Sign up</h2>
+    <mat-horizontal-stepper #stepper [linear]="true">
+      <mat-step [stepControl]="getStep(0)" label="Personal Info">
+        <div class="step-content">
+          <app-personal-info [formGroup]="getStep(0)"></app-personal-info>
+        </div>
+        <div>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <mat-step [stepControl]="getStep(1)" label="Contact Info">
+        <div class="step-content">
+          <app-contact-info [formGroup]="getStep(1)"></app-contact-info>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext>Next</button>
+          </div>
+        </div>
+
+      </mat-step>
+
+      <mat-step [stepControl]="getStep(2)" label="Credentials">
+        <div class="step-content">
+          <app-credentials [formGroup]="getStep(2)"></app-credentials>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button color="primary" (click)="onSubmit()" [disabled]="formSteps.invalid">Signup</button>
+          </div>
+        </div>
+
+      </mat-step>
+    </mat-horizontal-stepper>
+    <div class="login-section">
+      <p>Already have an account?</p>
+      <button class="login-btn" (click)="goToLogin()">Login</button>
+    </div>
+  </div>
+</div>
