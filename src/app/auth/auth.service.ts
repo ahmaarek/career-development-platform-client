@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap } from 'rxjs';
+import { User } from './user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
+    private userSubject = new BehaviorSubject<User | null>(null);
+    user$ = this.userSubject.asObservable();
 
     constructor(private http: HttpClient) { }
 
@@ -24,7 +28,14 @@ export class AuthService {
         return this.http.post<any>(loginUrl, {
             email,
             password
-        })
+        }).pipe(
+            switchMap((response) => {
+                // Assuming the response contains user data
+                const user = new User(response.data.email, response.data.id, response.data.token);
+                this.userSubject.next(user);
+                return this.user$; // Return the updated user observable
+            })
+        )
     }
 
 }
