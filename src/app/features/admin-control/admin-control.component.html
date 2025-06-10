@@ -1,0 +1,23 @@
+<div class="admin-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <!-- Admin Info -->
+    <div class="admin-info">
+      <img src="assets/user-icon.png" alt="Admin" />
+      <span class="admin-name">{{ adminName }}</span>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <nav class="admin-nav">
+      <button routerLink="user-management" routerLinkActive="active">User Management</button>
+      <button routerLink="career-package-management" routerLinkActive="active">Career Package</button>
+      <button routerLink="learning-management" routerLinkActive="active">Learning Management</button>
+      <button routerLink="dashboard-management" routerLinkActive="active">Dashboard Management</button>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="admin-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

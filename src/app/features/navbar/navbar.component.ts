@@ -1,16 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
   dropdownOpen = false;
-  role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = 'EMPLOYEE';
+  role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = 'ADMIN';
   userName: string = 'John Doe';
 
   constructor(private router: Router) {}
@@ -20,7 +20,7 @@ export class NavbarComponent {
   }
 
   logout() {
-    localStorage.clear(); // or use authService.logout()
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 }
