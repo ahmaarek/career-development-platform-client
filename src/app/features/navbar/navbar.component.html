@@ -1,0 +1,39 @@
+<nav class="navbar">
+  <!-- Logo -->
+  <div class="navbar-logo">
+    <img src="assets/logo.png" alt="Logo" />
+  </div>
+
+  <!-- Main Links -->
+  <div class="navbar-links">
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/learning-and-wiki" routerLinkActive="active">Learning & Wiki</a>
+    <a routerLink="/career-package" routerLinkActive="active">Career Package</a>
+  </div>
+
+  <!-- Role-based Links + User -->
+  <div class="navbar-actions">
+    <ng-container *ngIf="role === 'ADMIN'">
+      <a routerLink="/admin/scoreboard">Admin Panel</a>
+    </ng-container>
+    <ng-container *ngIf="role === 'MANAGER'">
+      <a routerLink="/manager/review">Review Center</a>
+    </ng-container>
+    <ng-container *ngIf="role === 'EMPLOYEE'">
+      <a routerLink="/my-profile">My Profile</a>
+    </ng-container>
+
+    <!-- User Icon -->
+    <div class="user-icon" (click)="toggleDropdown()" tabindex="0">
+      <img src="assets/user-icon.png" alt="User" class="user-icon" />
+      <div class="dropdown-menu" *ngIf="dropdownOpen">
+        <div class="dropdown-user-info">
+          <img src="assets/user-icon.png" alt="User" />
+          <span>{{ userName }}</span>
+        </div>
+        <hr />
+        <button (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>

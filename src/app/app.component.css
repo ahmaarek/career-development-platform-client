@@ -1,5 +1,5 @@
 
-main{
+/* main{
     
     background-color: #F5F5F5;
     font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@ main{
     border-radius: 8px;
     
 
-}
+} */
 
 .container::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
