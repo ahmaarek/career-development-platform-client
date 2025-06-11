@@ -31,6 +31,7 @@ export class LoginComponent {
       this.authService.login(email!, password!).subscribe({
         next: (response) => {
           console.log('Login successful:', response);
+          this.router.navigateByUrl('/home', { replaceUrl: true });
         },
         error: (err) => {
           console.error('Login failed:', err.message);
