@@ -1,1 +1,51 @@
-<p>user-management works!</p>
+
+<div class="user-section">
+
+  <!-- EMPLOYEES DROPDOWN -->
+  <div class="role-header" (click)="toggle('EMPLOYEE')">
+    <h2>Employees</h2>
+    <span>{{ showEmployees ? '▲' : '▼' }}</span>
+  </div>
+
+  @if (showEmployees) {
+    @for (user of users; track user.id) {
+      @if (user.role === 'USER') {
+        <div class="user-card">
+          <div class="user-info">
+            <img [src]="user.photoUrl" alt="User" />
+            <span>{{ user.name }}</span>
+          </div>
+          <div class="user-actions">
+            <button (click)="assignManager(user)">Assign Manager</button>
+            <button (click)="editUser(user)">Edit</button>
+            <button class="danger" (click)="deleteUser(user)">Delete</button>
+          </div>
+        </div>
+      }
+    }
+  }
+
+  <!-- MANAGERS DROPDOWN -->
+  <div class="role-header" (click)="toggle('MANAGER')">
+    <h2>Managers</h2>
+    <span>{{ showManagers ? '▲' : '▼' }}</span>
+  </div>
+
+  @if (showManagers) {
+    @for (user of users; track user.id) {
+      @if (user.role === 'MANAGER') {
+        <div class="user-card">
+          <div class="user-info">
+            <img [src]="user.photoUrl" alt="User" />
+            <span>{{ user.name }}</span>
+          </div>
+          <div class="user-actions">
+            <button (click)="editUser(user)">Edit</button>
+            <button class="danger" (click)="deleteUser(user)">Delete</button>
+          </div>
+        </div>
+      }
+    }
+  }
+
+</div>

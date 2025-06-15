@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, switchMap } from 'rxjs';
-import { User } from './user.model';
+import { UserAccount } from './user-account.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-    private userSubject = new BehaviorSubject<User | null>(null);
+    private userSubject = new BehaviorSubject<UserAccount | null>(null);
     user$ = this.userSubject.asObservable();
 
     constructor(private http: HttpClient) { }
@@ -31,7 +31,7 @@ export class AuthService {
         }).pipe(
             switchMap((response) => {
                 // Assuming the response contains user data
-                const user = new User(response.data.email, response.data.id, response.data.token);
+                const user = new UserAccount(response.data.email, response.data.id, response.data.token);
                 this.userSubject.next(user);
                 return this.user$; // Return the updated user observable
             })

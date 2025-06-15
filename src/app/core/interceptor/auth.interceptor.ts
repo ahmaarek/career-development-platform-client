@@ -11,6 +11,7 @@ export function tokenInterceptor(
 ) {
   const authService = inject(AuthService);
  
+
   return authService.user$.pipe(
     take(1),
     switchMap((user) => {
@@ -20,10 +21,10 @@ export function tokenInterceptor(
             Authorization: `Bearer ${user.token}`,
           },
         });
- 
+        console.log('Request with token:', requestWithToken);
         return next(requestWithToken);
       }
- 
+      console.log('Request without token:', request);
       return next(request);
     })
   );
