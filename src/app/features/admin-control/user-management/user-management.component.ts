@@ -1,13 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { UserService } from '../../user.service';
+import { UserService } from '../../../user/user.service';
+import { User } from '../../../user/user.model';
 
-interface User {
-  id: number;
-  name: string;
-  role: 'EMPLOYEE' | 'MANAGER' | 'USER';
-  photoUrl: string;
-}
 
 @Component({
   selector: 'app-user-management',
@@ -27,6 +22,14 @@ export class UserManagementComponent {
       next: (data) => this.users = data,
       error: (err) => console.error('Failed to fetch users:', err)
     });
+
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        console.log('Current user:', user);
+      }
+    
+    });
+    
   }
 
   toggle(role: 'EMPLOYEE' | 'MANAGER') {

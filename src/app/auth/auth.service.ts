@@ -33,6 +33,7 @@ export class AuthService {
                 // Assuming the response contains user data
                 const user = new UserAccount(response.data.email, response.data.id, response.data.token);
                 this.userSubject.next(user);
+                localStorage.setItem('token', response.data.token); // Store token in local storage
                 return this.user$; // Return the updated user observable
             })
         )
