@@ -1,0 +1,36 @@
+<div class="profile-container">
+  <h2>My Profile</h2>
+
+  <form *ngIf="user && form" [formGroup]="form" (ngSubmit)="saveChanges()">
+    <!-- Name -->
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" formControlName="name" [readonly]="!isEditing" />
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" [value]="user.email" readonly />
+    </div>
+
+    <!-- Role -->
+    <div class="form-group">
+      <label>Role</label>
+      <input type="text" [value]="user.role" readonly />
+    </div>
+
+    <!-- Photo URL -->
+    <div class="form-group">
+      <label>Photo URL</label>
+      <input type="text" formControlName="photoUrl" [readonly]="!isEditing" />
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group">
+      <button type="button" (click)="enableEdit()" *ngIf="!isEditing">Edit Profile</button>
+      <button type="button" (click)="cancelChanges()" *ngIf="isEditing">Cancel</button>
+      <button type="submit" *ngIf="isEditing">Save Changes</button>
+    </div>
+  </form>
+</div>

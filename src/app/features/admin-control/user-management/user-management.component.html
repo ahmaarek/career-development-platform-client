@@ -9,7 +9,7 @@
 
   @if (showEmployees) {
     @for (user of users; track user.id) {
-      @if (user.role === 'USER') {
+      @if (user.role === 'EMPLOYEE') {
         <div class="user-card">
           <div class="user-info">
             <img [src]="user.photoUrl" alt="User" />

@@ -4,39 +4,33 @@ import { SignupFormComponent } from './auth/signup-multistep/signup-form/signup-
 import { HomeComponent } from './features/home/home.component';
 import { AdminControlComponent } from './features/admin-control/admin-control.component';
 import { UserManagementComponent } from './features/admin-control/user-management/user-management.component';
+import { MyProfileComponent } from './features/my-profile/my-profile.component';
+import { MainLayoutComponent } from './layout/main/main-layout.component';
+import { AuthLayoutComponent } from './layout/auth/auth-layout.component';
 
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: 'login',
-        pathMatch: 'full'
-    },
-    {
-        path: 'login',
-        component: LoginComponent
-    },
-    {
-        path: 'signup',
-        component: SignupFormComponent
-    },
-    {
-        path: 'home',
-        component: HomeComponent,
-        // children: [
-        //     { path: 'dashboard', component: DashboardComponent },
-        //     { path: 'learning-and-wiki', component: LearningAndWikiComponent },
-        //     { path: 'career-package', component: CareerPackageComponent },
-        // ],
-    },
-    {
-        path: 'admin',
-        component: AdminControlComponent,
+        component: AuthLayoutComponent,
         children: [
-            { path: 'user-management', component: UserManagementComponent },
-            // { path: 'career-package-management', component: CareerPackageManagementComponent },
-            // { path: 'learning-management', component: LearningManagementComponent },
-            // { path: 'dashboard-management', component: DashboardManagementComponent },
-            // { path: '', redirectTo: 'user-management', pathMatch: 'full' }
+            { path: '', redirectTo: 'login', pathMatch: 'full' },
+            { path: 'login', component: LoginComponent },
+            { path: 'signup', component: SignupFormComponent }
+        ]
+    },
+    {
+        path: '',
+        component: MainLayoutComponent,
+        children: [
+            { path: 'dashboard', component: HomeComponent }, 
+            { path: 'my-profile', component: MyProfileComponent },
+            {
+                path: 'admin',
+                component: AdminControlComponent,
+                children: [
+                    { path: 'user-management', component: UserManagementComponent }
+                ]
+            }
         ]
     }
 ];

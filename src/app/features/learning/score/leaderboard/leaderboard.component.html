@@ -1,0 +1,30 @@
+<div class="leaderboard-container">
+  <h2>🏆 Top Learners</h2>
+
+  <table class="leaderboard-table" *ngIf="leaderboard.length > 0; else loading">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Photo</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Points</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of leaderboard; index as i">
+        <td>{{ i + 1 }}</td>
+        <td>
+          <img *ngIf="user.photoUrl" [src]="user.photoUrl" alt="User Photo" class="user-photo" />
+        </td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.points }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #loading>
+    <p>Loading leaderboard...</p>
+  </ng-template>
+</div>
