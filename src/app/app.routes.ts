@@ -7,6 +7,7 @@ import { UserManagementComponent } from './features/admin-control/user-managemen
 import { MyProfileComponent } from './features/my-profile/my-profile.component';
 import { MainLayoutComponent } from './layout/main/main-layout.component';
 import { AuthLayoutComponent } from './layout/auth/auth-layout.component';
+import { CareerPackageComponent } from './features/career-package/career-package.component';
 
 export const routes: Routes = [
     {
@@ -23,6 +24,7 @@ export const routes: Routes = [
         component: MainLayoutComponent,
         children: [
             { path: 'dashboard', component: HomeComponent }, 
+            { path: 'career-package', component: CareerPackageComponent }, 
             { path: 'my-profile', component: MyProfileComponent },
             {
                 path: 'admin',

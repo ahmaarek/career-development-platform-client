@@ -1,0 +1,215 @@
+<div class="career-package-container">
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <strong>Success:</strong> {{ successMessage }}
+    <button type="button" class="close-btn" (click)="clearMessages()">&times;</button>
+  </div>
+
+  <!-- Not Enrolled State -->
+  <div *ngIf="!isLoading && !isEnrolled" class="enrollment-section">
+    <div class="card">
+      <h2>Career Package Enrollment</h2>
+      <p>You are not currently enrolled in any career package. Please select a template to get started:</p>
+    </div>
+  </div>
+
+  <!-- Enrolled State -->
+  <div *ngIf="!isLoading && isEnrolled && userCareerPackage" class="career-package-content">
+    <!-- Package Header -->
+    <div class="card package-header">
+      <h2>{{ userCareerPackage.template.title }}</h2>
+      <p class="package-description">{{ userCareerPackage.template.description }}</p>
+      <div class="package-status">
+        <span class="status-label">Status:</span>
+        <span class="status-badge" [class]="'status-' + userCareerPackage.status">
+          {{ userCareerPackage.status }}
+        </span>
+      </div>
+      <div class="progress-section">
+        <div class="progress-label">Overall Progress: {{ getOverallCompletionPercentage() }}%</div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getOverallCompletionPercentage()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections -->
+    <div class="sections-container">
+      <div *ngFor="let section of userCareerPackage.template.sections" class="section-card card">
+        <!-- Section Header -->
+        <div class="section-header" (click)="toggleSection(section.id)">
+          <h3>{{ section.title }}</h3>
+          <div class="section-meta">
+            <span class="section-progress">{{ getSectionCompletionPercentage(section) }}% Complete</span>
+            <span class="expand-icon" [class.expanded]="isSectionExpanded(section.id)">▼</span>
+          </div>
+        </div>
+
+        <!-- Section Progress Bar -->
+        <div class="section-progress-bar">
+          <div class="progress-fill" [style.width.%]="getSectionCompletionPercentage(section)"></div>
+        </div>
+
+        <!-- Section Content -->
+        <div class="section-content" [class.expanded]="isSectionExpanded(section.id)">
+          <!-- Section Instructions -->
+          <div *ngIf="section.instructions" class="section-instructions">
+            <h4>Instructions:</h4>
+            <p>{{ section.instructions }}</p>
+          </div>
+
+          <!-- Section Requirements -->
+          <div *ngIf="section.requirements" class="section-requirements">
+            <h4>Requirements:</h4>
+            <p>{{ section.requirements }}</p>
+          </div>
+
+          <!-- Section Fields -->
+          <form [formGroup]="sectionForms[section.id]" *ngIf="sectionForms[section.id]" class="section-form">
+            <div *ngFor="let field of section.fields" class="field-group">
+              <label class="form-label" [for]="'field_' + field.id">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-asterisk">*</span>
+              </label>
+
+              <!-- Text Input -->
+              <input 
+                *ngIf="field.fieldType === 'TEXT' || field.fieldType === 'EMAIL' || field.fieldType === 'NUMBER'"
+                [type]="field.fieldType.toLowerCase()"
+                [id]="'field_' + field.id"
+                [formControlName]="field.fieldKey"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
+                [placeholder]="'Enter ' + field.label.toLowerCase()"
+                [disabled]="isPackageSubmitted()"
+              />
+
+              <!-- Textarea -->
+              <textarea 
+                *ngIf="field.fieldType === 'TEXTAREA'"
+                [id]="'field_' + field.id"
+                [formControlName]="field.fieldKey"
+                class="form-control textarea"
+                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
+                rows="4"
+                [placeholder]="'Enter ' + field.label.toLowerCase()"
+                [disabled]="isPackageSubmitted()"
+              ></textarea>
+
+              <!-- Select Dropdown -->
+              <select 
+                *ngIf="field.fieldType === 'SELECT'"
+                [id]="'field_' + field.id"
+                [formControlName]="field.fieldKey"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
+                [disabled]="isPackageSubmitted()"
+              >
+                <option value="">Select {{ field.label.toLowerCase() }}</option>
+                <!-- Add options based on your requirements -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+              </select>
+
+              <!-- Date Input -->
+              <input 
+                *ngIf="field.fieldType === 'DATE'"
+                type="date"
+                [id]="'field_' + field.id"
+                [formControlName]="field.fieldKey"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
+                [disabled]="isPackageSubmitted()"
+              />
+
+              <!-- Validation Error Message -->
+              <div *ngIf="isFieldInvalid(section.id, field.fieldKey)" class="field-error">
+                {{ getFieldErrorMessage(section.id, field.fieldKey, field.label) }}
+              </div>
+
+              <!-- Field Status Indicator (no submit button) -->
+              <div class="field-status-container" *ngIf="getExistingFieldResponse(section.id, field.id)">
+                <span class="field-status submitted">
+                  ✓ Saved
+                </span>
+              </div>
+            </div>
+
+            <!-- Section Submit Button -->
+            <div class="section-submit-container" *ngIf="!isPackageSubmitted()">
+              <button 
+                type="button" 
+                class="btn btn-lg btn-primary section-submit-btn"
+                (click)="submitSection(section)"
+                [disabled]="isSectionSubmitDisabled(section.id)"
+              >
+                <span *ngIf="!isLoading">{{ getSectionSubmitButtonText(section) }}</span>
+                <span *ngIf="isLoading">Submitting...</span>
+              </button>
+              
+              <!-- Section Status Indicator -->
+              <div *ngIf="isSectionSubmitted(section.id)" class="section-status-indicator">
+                <span class="section-status submitted">
+                  ✓ Section Submitted
+                </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit All Section -->
+    <div class="submit-all-section card">
+      <div class="submit-all-header">
+        <h3>Package Submission</h3>
+        <div class="submission-status">
+          <span class="status-label">Current Status:</span>
+          <span class="status-message" [class]="'status-' + userCareerPackage?.status">
+            {{ getSubmissionStatusMessage() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="submit-all-content">
+        <div *ngIf="!isPackageSubmitted()" class="submit-instructions">
+          <p><strong>Ready to submit your career package?</strong></p>
+          <p>Once submitted, your package will be marked as "Under Review" and you won't be able to make further changes until the review is complete.</p>
+          <p>Please ensure all sections are completed before submitting.</p>
+        </div>
+
+        <div *ngIf="isPackageSubmitted()" class="submitted-message">
+          <p><strong>✓ Package Submitted</strong></p>
+          <p>Your career package has been submitted and is currently under review. You will be notified once the review is complete.</p>
+        </div>
+
+        <div class="submit-all-actions">
+          <button 
+            *ngIf="!isPackageSubmitted()"
+            type="button" 
+            class="btn btn-lg btn-success submit-all-btn"
+            (click)="submitCompleteCareerPackage()"
+            [disabled]="!canSubmitCompletePackage()"
+          >
+            <span *ngIf="!isLoading">Submit Complete Package for Review</span>
+            <span *ngIf="isLoading">Submitting...</span>
+          </button>
+
+          <div *ngIf="!canSubmitCompletePackage() && !isPackageSubmitted()" class="submit-requirements">
+            <p class="text-warning">
+              <strong>⚠ Requirements not met</strong><br>
+              Please ensure at least one field is completed in each section before submitting.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
