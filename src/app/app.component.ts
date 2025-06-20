@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from './auth/auth.service';
 
 
 @Component({
@@ -10,4 +11,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'career-development-platform';
+  authService = inject(AuthService);
+
+  ngOnInit() {
+    
+    this.authService.autoLogin();
+  }
 }

@@ -5,7 +5,7 @@ import { UserService } from '../../user/user.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -14,11 +14,17 @@ export class NavbarComponent {
   role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = 'ADMIN';
   userName: string = 'John Doe';
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService) { }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
+    console.log('NavbarComponent initialized');
+    const userString = localStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+    const token = user?._token || "";
+
+
     if (token) {
+      console.log('Token found, fetching current user');
       this.userService.getCurrentUser().subscribe({
         next: (user) => {
           this.role = user.role;
@@ -40,4 +46,3 @@ export class NavbarComponent {
     this.router.navigate(['/login']);
   }
 }
-

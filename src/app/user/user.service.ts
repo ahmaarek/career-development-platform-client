@@ -14,6 +14,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(): User | null {
+    console.log('getUser called',this.userSubject.value);
     return this.userSubject.value;
   }
 
@@ -23,8 +24,12 @@ export class UserService {
   }
 
   getUserById(id: string): Observable<User> {
+    const userString = localStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+    const token = user?._token || "";
+
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${token}`
     });
 
     const url = `${this.apiUrl}/${id}`;
@@ -41,10 +46,15 @@ export class UserService {
   }
 
   getCurrentUser(): Observable<User> {
+    const userString = localStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+    const token = user?._token || "";
+
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${token}`
     });
 
+    console.log('Fetched current user:', user);
     const userRequest$ = this.http.get<User>(`${this.apiUrl}/by-token`, { headers });
 
     userRequest$.subscribe({
@@ -62,8 +72,13 @@ export class UserService {
   }
 
   updateUser(id: string, updatedData: Partial<User>): Observable<User> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    const userString = localStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+    const token = user?._token || "";
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
     return this.http.put<User>(`${this.apiUrl}/${id}`, updatedData, { headers });
   }
 
