@@ -1,51 +1,121 @@
-
 <div class="user-section">
 
-  <!-- EMPLOYEES DROPDOWN -->
+  <!-- EMPLOYEES -->
   <div class="role-header" (click)="toggle('EMPLOYEE')">
     <h2>Employees</h2>
-    <span>{{ showEmployees ? '▲' : '▼' }}</span>
+    <span>{{ roleVisibility['EMPLOYEE'] ? '▲' : '▼' }}</span>
   </div>
-
-  @if (showEmployees) {
-    @for (user of users; track user.id) {
-      @if (user.role === 'EMPLOYEE') {
-        <div class="user-card">
-          <div class="user-info">
-            <img [src]="user.photoUrl" alt="User" />
-            <span>{{ user.name }}</span>
-          </div>
-          <div class="user-actions">
-            <button (click)="assignManager(user)">Assign Manager</button>
-            <button (click)="editUser(user)">Edit</button>
-            <button class="danger" (click)="deleteUser(user)">Delete</button>
-          </div>
+  @if (roleVisibility['EMPLOYEE']) {
+    @for (user of employees; track user.id) {
+      <div class="user-card">
+        <div class="user-info">
+          <img [src]="user.photoUrl" alt="User" />
+          <span>{{ user.name }}</span>
         </div>
-      }
+        <div class="user-actions">
+          <button class="assign-btn" (click)="assignManager(user)">Assign Manager</button>
+          <button class="edit-btn" (click)="editUser(user)">Edit role</button>
+        </div>
+      </div>
     }
   }
 
-  <!-- MANAGERS DROPDOWN -->
+  <!-- MANAGERS -->
   <div class="role-header" (click)="toggle('MANAGER')">
     <h2>Managers</h2>
-    <span>{{ showManagers ? '▲' : '▼' }}</span>
+    <span>{{ roleVisibility['MANAGER'] ? '▲' : '▼' }}</span>
   </div>
-
-  @if (showManagers) {
-    @for (user of users; track user.id) {
-      @if (user.role === 'MANAGER') {
-        <div class="user-card">
-          <div class="user-info">
-            <img [src]="user.photoUrl" alt="User" />
-            <span>{{ user.name }}</span>
-          </div>
-          <div class="user-actions">
-            <button (click)="editUser(user)">Edit</button>
-            <button class="danger" (click)="deleteUser(user)">Delete</button>
-          </div>
+  @if (roleVisibility['MANAGER']) {
+    @for (user of managers; track user.id) {
+      <div class="user-card">
+        <div class="user-info">
+          <img [src]="user.photoUrl" alt="User" />
+          <span>{{ user.name }}</span>
         </div>
-      }
+        <div class="user-actions">
+          <button class="assign-btn" (click)="viewEmployees(user)">View Employees</button>
+        </div>
+      </div>
     }
+  }
+
+  <!-- ADMINS -->
+  <div class="role-header" (click)="toggle('ADMIN')">
+    <h2>Admins</h2>
+    <span>{{ roleVisibility['ADMIN'] ? '▲' : '▼' }}</span>
+  </div>
+  @if (roleVisibility['ADMIN']) {
+    @for (user of admins; track user.id) {
+      <div class="user-card">
+        <div class="user-info">
+          <img [src]="user.photoUrl" alt="User" />
+          <span>{{ user.name }}</span>
+        </div>
+        <div class="user-actions">
+          <button class="edit-btn" (click)="editUser(user)">Edit role</button>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- MODALS -->
+
+  <!-- Assign Manager Modal -->
+  @if (selectedEmployee) {
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h3>Select a Manager for {{ selectedEmployee.name }}</h3>
+        @if (managers.length > 0) {
+          @for (manager of managers; track manager.id) {
+            <div class="manager-option">
+              <span>{{ manager.name }}</span>
+              <button (click)="selectManager(manager)">Select</button>
+            </div>
+          }
+        } @else {
+          <p>No managers available.</p>
+        }
+        <button class="cancel-btn" (click)="closeEmployeeModal()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- View Employees Modal -->
+  @if (selectedManager) {
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h3>Employees managed by {{ selectedManager.name }}</h3>
+        @if (employeesManagedBySelected.length > 0) {
+          @for (emp of employeesManagedBySelected; track emp.id) {
+            <div class="manager-option">
+              <span>{{ emp.name }}</span>
+            </div>
+          }
+        } @else {
+          <p>This manager doesn't manage any employees yet.</p>
+        }
+        <button class="cancel-btn" (click)="closeManagerModal()">Close</button>
+      </div>
+    </div>
+  }
+
+  <!-- Edit Role Modal -->
+  @if (selectedUserForRoleEdit) {
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h3>Edit Role for {{ selectedUserForRoleEdit.name }}</h3>
+        <label for="role">Select Role:</label>
+        <select id="role" [(ngModel)]="selectedRole">
+          <option value="EMPLOYEE">EMPLOYEE</option>
+          <option value="MANAGER">MANAGER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <div class="modal-actions">
+          <button class="save-btn" (click)="saveRoleChange()">Save</button>
+          <button class="cancel-btn" (click)="cancelRoleEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
   }
 
 </div>
