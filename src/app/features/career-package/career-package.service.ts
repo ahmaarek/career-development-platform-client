@@ -69,6 +69,7 @@ export class CareerPackageService {
     }))
   };
 
+  console.log('Updating section response:', body);
   return this.http.put<UserSectionResponse>(
     `${this.baseUrl}/user-section-response/${sectionResponseId}`,
     body
@@ -81,8 +82,7 @@ export class CareerPackageService {
   submitCompleteCareerPackage(userCareerPackage: UserCareerPackage): Observable<UserCareerPackage> {
     const submissionData = {
       id: userCareerPackage.id,
-      status: PackageStatus.UNDER_REVIEW,
-      sectionResponses: userCareerPackage.sectionResponses
+      status: PackageStatus.UNDER_REVIEW
     };
 
     return this.http.patch<UserCareerPackage>(`${this.baseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
@@ -91,6 +91,20 @@ export class CareerPackageService {
       );
   }
 
+  getAllCareerPackageTemplates(): Observable<CareerPackageTemplate[]> {
+    return this.http.get<CareerPackageTemplate[]>(`${this.baseUrl}/career-package-template`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updatePackage(id: string, updatedPkg: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/career-package-template/${id}/sync`, updatedPkg);
+  }
+
+  createNewPackage(request: { title: string; description: string }): Observable<CareerPackageTemplate> {
+  return this.http.post<CareerPackageTemplate>(`${this.baseUrl}/career-package-template`, request);
+}
  
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred!';

@@ -14,9 +14,9 @@ import { User } from '../../../user/user.model';
 export class UserManagementComponent {
   users: User[] = [];
   roleVisibility: Record<string, boolean> = {
-    EMPLOYEE: true,
-    MANAGER: true,
-    ADMIN: true,
+    EMPLOYEE: false,
+    MANAGER: false,
+    ADMIN: false,
   };
 
   selectedEmployee: User | null = null;

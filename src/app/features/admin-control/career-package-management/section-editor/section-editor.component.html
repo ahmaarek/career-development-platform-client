@@ -1,0 +1,92 @@
+<div class="section-editor-container">
+
+  <div class="section-header">
+    @if (isEditing) {
+      <label class="form-label">Section title</label>
+      <input [(ngModel)]="section.title" class="section-title-input" placeholder="Section Title" />
+    } @else {
+      <h4>{{ section.title }}</h4>
+    }
+
+    @if (isEditing) {
+      <button class="btn btn-danger btn-small" (click)="onDeleteSection()">🗑️ Delete</button>
+    }
+  </div>
+
+  <!-- Section details -->
+  @if (isEditing) {
+    <label class="form-label">Instructions</label>
+    <textarea [(ngModel)]="section.instructions" class="section-textarea" placeholder="Add instructions..."></textarea>
+
+    <label class="form-label">Requirements</label>
+    <textarea [(ngModel)]="section.requirements" class="section-textarea" placeholder="Add requirements..."></textarea>
+
+    <label class="form-label">Section Type</label>
+    <select [(ngModel)]="section.type" class="form-control">
+      <option value="LEARNING">Learning</option>
+      <option value="EXPERIENCE">Experience</option>
+      <option value="SKILL">Skill</option>
+      <option value="PROJECTS">Projects</option>
+    </select>
+
+    <button class="btn btn-success btn-small" (click)="onSectionEdit()">✔ Save</button>
+  }
+
+  @if (!isEditing) {
+    <p>{{ section.instructions }}</p>
+    @if (section.requirements) {
+      <p><strong>Requirements:</strong> {{ section.requirements }}</p>
+    }
+    <p><strong>Type:</strong> {{ section.type }}</p>
+  }
+
+  <h3>Fields</h3>
+
+  <!-- Fields details -->
+  @for (field of section.fields; track field.id) {
+    <div class="field-group">
+      @if (isEditing) {
+        <div class="field-inline">
+          <label class="form-label">Field label</label>
+          <input [(ngModel)]="field.label" class="form-control" placeholder="Field Label" />
+
+          <label class="form-label">Field type</label>
+          <select [(ngModel)]="field.fieldType" class="form-control">
+            <option value="TEXT">Text</option>
+            <option value="TEXTAREA">Textarea</option>
+            <option value="NUMBER">Number</option>
+          </select>
+
+          <button class="btn btn-success btn-small" (click)="onFieldEdit(field)">✔</button>
+          <button class="btn btn-danger btn-small" (click)="deleteField(section.fields.indexOf(field))">🗑️</button>
+        </div>
+      } @else {
+        <p>{{ field.label }} ({{ field.fieldType }})</p>
+      }
+    </div>
+  }
+
+  <!-- Pending fields details -->
+  @for (field of pendingNewFields; track field.label) {
+    <div class="field-group">
+      <div class="field-inline">
+        <label class="form-label">Field label</label>
+        <input [(ngModel)]="field.label" class="form-control" placeholder="Field Label" />
+
+        <label class="form-label">Field type</label>
+        <select [(ngModel)]="field.fieldType" class="form-control">
+          <option value="TEXT">Text</option>
+          <option value="TEXTAREA">Textarea</option>
+          <option value="NUMBER">Number</option>
+        </select>
+
+        <button class="btn btn-success btn-small" (click)="confirmAddField(field)">✔</button>
+        <button class="btn btn-danger btn-small" (click)="deletePendingField(pendingNewFields.indexOf(field))">🗑️</button>
+      </div>
+    </div>
+  }
+
+  @if (isEditing) {
+    <button (click)="addField()" class="btn btn-primary btn-small">+ Add Field</button>
+  }
+</div>

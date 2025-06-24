@@ -1,0 +1,80 @@
+.package-panel {
+  margin: 8px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f2f2f2; /* Matches the light gray background */
+}
+
+.package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #f2f2f2;
+  border: none;
+  font-size: 1rem;
+  color: #1a1a1a;
+  transition: background-color 0.2s;
+}
+
+.package-header:hover {
+  background-color: #e0e0e0;
+}
+
+.package-header .arrow {
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.package-body {
+  background-color: #ffffff;
+  padding: 16px;
+  margin: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.edit-button,
+.submit-button,
+.add-section-btn {
+  padding: 6px 12px;
+  margin: 10px 2px;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.edit-button {
+  background-color: #1976d2;
+  color: white;
+}
+
+.submit-button {
+  background-color: #4caf50;
+  color: white;
+}
+.add-section-btn {
+  background-color: #007bff; /* Bootstrap blue */
+  color: white;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.form-control {
+  padding: 10px;
+  border-radius: 6px;
+  border: 2px solid #e9ecef;
+  margin-bottom: 10px;
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545;
+}
+

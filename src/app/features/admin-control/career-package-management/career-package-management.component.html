@@ -1,0 +1,7 @@
+<div class="add-package-header">
+  <button class="btn btn-success btn-lg" (click)="addNewCareerPackage()">+ Add Career Package</button>
+</div>
+
+@for (pkg of careerPackages; track pkg.id) {
+  <app-career-package-panel [package]="pkg"></app-career-package-panel>
+}

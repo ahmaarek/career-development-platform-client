@@ -8,6 +8,7 @@ import { MyProfileComponent } from './features/my-profile/my-profile.component';
 import { MainLayoutComponent } from './layout/main/main-layout.component';
 import { AuthLayoutComponent } from './layout/auth/auth-layout.component';
 import { CareerPackageComponent } from './features/career-package/career-package.component';
+import { CareerPackagesComponent } from './features/admin-control/career-package-management/career-package-management.component';
 
 export const routes: Routes = [
     {
@@ -30,7 +31,8 @@ export const routes: Routes = [
                 path: 'admin',
                 component: AdminControlComponent,
                 children: [
-                    { path: 'user-management', component: UserManagementComponent }
+                    { path: 'user-management', component: UserManagementComponent },
+                    { path: 'career-package-management', component: CareerPackagesComponent }
                 ]
             }
         ]
