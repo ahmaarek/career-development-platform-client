@@ -9,6 +9,8 @@ import { MainLayoutComponent } from './layout/main/main-layout.component';
 import { AuthLayoutComponent } from './layout/auth/auth-layout.component';
 import { CareerPackageComponent } from './features/career-package/career-package.component';
 import { CareerPackagesComponent } from './features/admin-control/career-package-management/career-package-management.component';
+import { ManagerControlComponent } from './features/manager-control/manager-control.component';
+import { CareerPackageReviewComponent } from './features/manager-control/career-package-review/career-package-review.component';
 
 export const routes: Routes = [
     {
@@ -33,6 +35,13 @@ export const routes: Routes = [
                 children: [
                     { path: 'user-management', component: UserManagementComponent },
                     { path: 'career-package-management', component: CareerPackagesComponent }
+                ]
+            },
+            {
+                path: 'manager',
+                component: ManagerControlComponent,
+                children: [
+                    { path: 'career-package-review', component: CareerPackageReviewComponent }
                 ]
             }
         ]

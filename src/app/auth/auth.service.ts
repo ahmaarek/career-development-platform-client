@@ -33,19 +33,19 @@ export class AuthService {
                 // Assuming the response contains user data
                 const user = new UserAccount(response.data.email, response.data.id, response.data.token);
                 this.userSubject.next(user);
-                localStorage.setItem('user', JSON.stringify(user)); // Store token in local storage
+                sessionStorage.setItem('user', JSON.stringify(user)); // Store token in local storage
                 return this.user$; // Return the updated user observable
             })
         )
     }
 
     autoLogin() {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') {
       return;
     }
 
     console.log('Auto-login triggered');
-    const userDataString = localStorage.getItem('user');
+    const userDataString = sessionStorage.getItem('user');
     if (!userDataString) {
       return;
     }

@@ -1,0 +1,39 @@
+@for (user of employees; track user.id) {
+  <div class="user-section">
+    <div class="user-header" (click)="toggleUser(user.id)">
+      <div class="user-header-info">
+        <img [src]="user.photoUrl || '/user-default-logo.webp'" alt="User" />
+        <strong>{{ user.name }}</strong>
+      </div>
+      <span>{{ expandedUsers[user.id] ? '▲' : '▼' }}</span>
+    </div>
+
+    @if (expandedUsers[user.id]) {
+      <div class="user-content">
+        <button class="assign-btn"
+                [disabled]="enrollmentStatus[user.id] === true"
+                (click)="openAssignModal(user.id)">
+          Assign Package
+        </button>
+      </div>
+    }
+
+    @if (assigningUserId === user.id) {
+      <div class="modal-overlay">
+        <div class="modal">
+          <h2>Assign Career Package</h2>
+          <label for="templateSelect">Select Package:</label>
+          <select id="templateSelect" [(ngModel)]="selectedTemplateId">
+            @for (template of careerPackageTemplates; track template.id) {
+              <option [value]="template.id">{{ template.title }}</option>
+            }
+          </select>
+          <div class="modal-actions">
+            <button class="save-btn" (click)="confirmAssign()">Confirm</button>
+            <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -1,7 +1,7 @@
 <nav class="navbar">
   <!-- Logo -->
   <div class="navbar-logo">
-    <img src="assets/logo.png" alt="Logo" />
+    <img src="/sumerge-logo.webp" alt="Logo" />
   </div>
 
   <!-- Main Links -->
@@ -17,7 +17,7 @@
       <a routerLink="/admin">Admin Panel</a>
     </ng-container>
     <ng-container *ngIf="role === 'MANAGER'">
-      <a routerLink="/manager/review">Review Center</a>
+      <a routerLink="/manager">Manage employees</a>
     </ng-container>
     <ng-container *ngIf="role === 'EMPLOYEE'">
       <a routerLink="/my-profile">My Profile</a>
@@ -25,10 +25,10 @@
 
     <!-- User Icon -->
     <div class="user-icon" (click)="toggleDropdown()" tabindex="0">
-      <img src="assets/user-icon.png" alt="User" class="user-icon" />
+      <img src="/user-default-logo.webp" alt="User" class="user-icon" />
       <div class="dropdown-menu" *ngIf="dropdownOpen">
         <div class="dropdown-user-info">
-          <img src="assets/user-icon.png" alt="User" />
+          <img src="/user-default-logo.webp" alt="User" />
           <span>{{ userName }}</span>
         </div>
         <hr />

@@ -15,7 +15,7 @@ import { UserSectionResponse } from './models/user-section-response.interface';
 })
 export class CareerPackageService {
   private readonly baseUrl = 'http://localhost:8083/api';
-  
+
   constructor(private http: HttpClient, private userService: UserService) { }
 
   checkUserEnrollment(userId: string): Observable<boolean> {
@@ -31,7 +31,7 @@ export class CareerPackageService {
       );
   }
 
-  
+
   getUserCareerPackage(userId: string): Observable<UserCareerPackage> {
     return this.http.get<UserCareerPackage>(`${this.baseUrl}/user-career-package/user/${userId}`)
       .pipe(
@@ -58,25 +58,25 @@ export class CareerPackageService {
       );
   }
 
-  
-  updateSectionResponse(sectionResponseId: string, sectionResponse: UserSectionResponse): Observable<UserSectionResponse> {
-  const body = {
-    userCareerPackageId: sectionResponse.userCareerPackageId,
-    sectionTemplateId: sectionResponse.sectionTemplateId,
-    fieldResponses: sectionResponse.fieldResponses.map(fr => ({
-      fieldTemplateId: fr.fieldTemplateId,
-      value: fr.value
-    }))
-  };
 
-  console.log('Updating section response:', body);
-  return this.http.put<UserSectionResponse>(
-    `${this.baseUrl}/user-section-response/${sectionResponseId}`,
-    body
-  ).pipe(
-    catchError(this.handleError)
-  );
-}
+  updateSectionResponse(sectionResponseId: string, sectionResponse: UserSectionResponse): Observable<UserSectionResponse> {
+    const body = {
+      userCareerPackageId: sectionResponse.userCareerPackageId,
+      sectionTemplateId: sectionResponse.sectionTemplateId,
+      fieldResponses: sectionResponse.fieldResponses.map(fr => ({
+        fieldTemplateId: fr.fieldTemplateId,
+        value: fr.value
+      }))
+    };
+
+    console.log('Updating section response:', body);
+    return this.http.put<UserSectionResponse>(
+      `${this.baseUrl}/user-section-response/${sectionResponseId}`,
+      body
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
 
 
   submitCompleteCareerPackage(userCareerPackage: UserCareerPackage): Observable<UserCareerPackage> {
@@ -103,19 +103,29 @@ export class CareerPackageService {
   }
 
   createNewPackage(request: { title: string; description: string }): Observable<CareerPackageTemplate> {
-  return this.http.post<CareerPackageTemplate>(`${this.baseUrl}/career-package-template`, request);
-}
- 
+    return this.http.post<CareerPackageTemplate>(`${this.baseUrl}/career-package-template`, request);
+  }
+
+  assignCareerPackage(request: {
+    userId: string;
+    reviewerId: string;
+    templateId: string;
+    status: string;
+  }): Observable<any> {
+
+    return this.http.post<CareerPackageTemplate>(`${this.baseUrl}/user-career-package/assign`, request);
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred!';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Error: ${error.error.message}`;
     } else {
       // Server-side error
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-      
+
       // Customize error messages based on status codes
       switch (error.status) {
         case 400:

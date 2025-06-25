@@ -1,0 +1,17 @@
+<div class="container">
+  <aside class="sidebar">
+    <div class="profile">
+      <img src="assets/manager-icon.png" alt="Manager" class="profile-icon" />
+      <h3>Manager User</h3>
+    </div>
+    <!-- Navigation Buttons -->
+    <nav class="manager-nav">
+      <button routerLink="career-package-review" routerLinkActive="active">Career Package Review</button>
+      <button routerLink="learning-review" routerLinkActive="active">Learning Review</button>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

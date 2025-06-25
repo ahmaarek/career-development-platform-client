@@ -14,7 +14,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(): User | null {
-    console.log('getUser called',this.userSubject.value);
+    console.log('getUser called', this.userSubject.value);
     return this.userSubject.value;
   }
 
@@ -24,7 +24,7 @@ export class UserService {
   }
 
   getUserById(id: string): Observable<User> {
-    const userString = localStorage.getItem("user");
+    const userString = sessionStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
     const token = user?._token || "";
 
@@ -46,7 +46,7 @@ export class UserService {
   }
 
   getCurrentUser(): Observable<User> {
-    const userString = localStorage.getItem("user");
+    const userString = sessionStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
     const token = user?._token || "";
 
@@ -72,7 +72,7 @@ export class UserService {
   }
 
   updateUser(id: string, updatedData: Partial<User>): Observable<User> {
-    const userString = localStorage.getItem("user");
+    const userString = sessionStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
     const token = user?._token || "";
 
@@ -80,6 +80,19 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
     return this.http.put<User>(`${this.apiUrl}/${id}`, updatedData, { headers });
+  }
+
+  getUsersByManagerId(managerId: string): Observable<User[]> {
+    const userString = sessionStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+    const token = user?._token || "";
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    console.log("🔐 Using token:", token);
+    return this.http.get<User[]>(`${this.apiUrl}/by-manager/${managerId}`, { headers });
   }
 
 }

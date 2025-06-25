@@ -18,7 +18,7 @@ export class NavbarComponent {
 
   ngOnInit(): void {
     console.log('NavbarComponent initialized');
-    const userString = localStorage.getItem("user");
+    const userString = sessionStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
     const token = user?._token || "";
 
@@ -42,7 +42,7 @@ export class NavbarComponent {
   }
 
   logout() {
-    localStorage.clear();
+    sessionStorage.clear();
     this.router.navigate(['/login']);
   }
 }
