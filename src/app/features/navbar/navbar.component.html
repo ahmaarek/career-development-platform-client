@@ -11,22 +11,54 @@
     <a routerLink="/career-package" routerLinkActive="active">Career Package</a>
   </div>
 
+  <!-- Notification Bell Icon -->
+  <div class="notification-icon" (click)="toggleNotificationDropdown()" tabindex="0">
+    <mat-icon>notifications</mat-icon>
+
+    @if (unreadCount > 0) {
+    <span class="notification-count">{{ unreadCount }}</span>
+    }
+
+    @if (notificationDropdownOpen) {
+    <div class="dropdown-menu notifications">
+      @if (notifications.length === 0) {
+      <div>No notifications</div>
+      } @else {
+      @for (notification of notifications; track notification.id) {
+      <div class="notification-item">
+        <div class="notification-content">
+          <strong>{{ notification.title }}</strong>
+          <p>{{ notification.message }}</p>
+          <small>{{ notification.createdAt | date:'short' }}</small>
+        </div>
+
+        @if (!notification.read) {
+        <button (click)="markAsRead(notification)" class="mark-read-btn">Mark as Read</button>
+        }
+      </div>
+      }
+      }
+    </div>
+    }
+  </div>
+
   <!-- Role-based Links + User -->
   <div class="navbar-actions">
-    <ng-container *ngIf="role === 'ADMIN'">
-      <a routerLink="/admin">Admin Panel</a>
-    </ng-container>
-    <ng-container *ngIf="role === 'MANAGER'">
-      <a routerLink="/manager">Manage employees</a>
-    </ng-container>
-    <ng-container *ngIf="role === 'EMPLOYEE'">
-      <a routerLink="/my-profile">My Profile</a>
-    </ng-container>
+    @if (role === 'ADMIN') {
+    <a routerLink="/admin">Admin Panel</a>
+    }
+    @if (role === 'MANAGER') {
+    <a routerLink="/manager">Manage employees</a>
+    }
+    @if (role === 'EMPLOYEE') {
+    <a routerLink="/my-profile">My Profile</a>
+    }
 
     <!-- User Icon -->
     <div class="user-icon" (click)="toggleDropdown()" tabindex="0">
       <img src="/user-default-logo.webp" alt="User" class="user-icon" />
-      <div class="dropdown-menu" *ngIf="dropdownOpen">
+      @if (dropdownOpen) {
+      <div class="dropdown-menu">
         <div class="dropdown-user-info">
           <img src="/user-default-logo.webp" alt="User" />
           <span>{{ userName }}</span>
@@ -34,6 +66,7 @@
         <hr />
         <button (click)="logout()">Logout</button>
       </div>
+      }
     </div>
   </div>
 </nav>
