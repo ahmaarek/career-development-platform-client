@@ -7,6 +7,7 @@ import { SectionType } from '../../../career-package/enums/section-type.enum';
 import { SectionEditorComponent } from '../section-editor/section-editor.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-career-package-panel',
@@ -28,7 +29,7 @@ export class CareerPackagePanelComponent {
   newFields: SectionFieldTemplate[] = [];
   deletedFieldIds: string[] = [];
 
-  constructor(private careerPackageService: CareerPackageService) {
+  constructor(private careerPackageService: CareerPackageService,private snackBar: MatSnackBar) {
     this.resetTrackingData();
    }
 
@@ -82,11 +83,23 @@ export class CareerPackagePanelComponent {
   updatePackageInfo(event: { title: string; description: string }) {
     this.package.title = event.title;
     this.package.description = event.description;
+    this.snackBar.open('Package details saved', 'Close', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success']
+    });
   }
 
   savePackageInfo(newTitle: string, newDescription: string): void {
     this.package.title = newTitle;
     this.package.description = newDescription;
+    this.snackBar.open('Package details saved', 'Close', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success']
+    });
   }
 
 

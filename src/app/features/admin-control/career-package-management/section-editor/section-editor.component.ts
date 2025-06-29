@@ -3,6 +3,7 @@ import { SectionTemplate } from '../../../career-package/models/section-template
 import { SectionFieldTemplate } from '../../../career-package/models/section-field-template.interface';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-section-editor',
@@ -14,7 +15,7 @@ import { CommonModule } from '@angular/common';
 export class SectionEditorComponent {
   @Input() section!: SectionTemplate;
   @Input() isEditing = false;
-  
+
   @Output() deleteSection = new EventEmitter<void>();
   @Output() sectionUpdated = new EventEmitter<SectionTemplate>();
   @Output() fieldUpdated = new EventEmitter<SectionFieldTemplate>();
@@ -23,7 +24,9 @@ export class SectionEditorComponent {
 
   pendingNewFields: SectionFieldTemplate[] = [];
 
-  
+  constructor(private snackBar: MatSnackBar) {
+  }
+
   addField() {
     const newField: SectionFieldTemplate = {
       id: '',
@@ -46,6 +49,13 @@ export class SectionEditorComponent {
     this.section.fields.push(field);
     this.pendingNewFields = this.pendingNewFields.filter(f => f !== field);
     this.fieldAdded.emit(field);
+    this.snackBar.open('Field saved', 'Close', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success']
+    });
+
   }
 
   deleteField(index: number) {
@@ -63,10 +73,22 @@ export class SectionEditorComponent {
 
   onSectionEdit() {
     if (this.section.id) this.sectionUpdated.emit(this.section);
+    this.snackBar.open('section saved', 'Close', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success']
+    });
   }
 
   onFieldEdit(field: SectionFieldTemplate) {
     if (field.id) this.fieldUpdated.emit(field);
+    this.snackBar.open('Field saved', 'Close', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success']
+    });
   }
-  
+
 }
