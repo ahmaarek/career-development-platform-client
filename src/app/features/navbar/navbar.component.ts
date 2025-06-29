@@ -51,9 +51,9 @@ export class NavbarComponent implements OnInit {
 
   fetchNotifications() {
     this.notificationService.getNotifications(this.userId).subscribe({
-      next: (data) => {
-        this.notifications = data;
-        this.unreadCount = data.filter((n: any) => !n.read).length;
+      next: (notifications) => {
+        this.notifications = notifications;
+        this.unreadCount = notifications.filter((n: any) => !n.read).length;
       },
       error: (err) => {
         console.error('Error loading notifications:', err);
@@ -79,7 +79,7 @@ export class NavbarComponent implements OnInit {
 
   toggleNotificationDropdown() {
     this.notificationDropdownOpen = !this.notificationDropdownOpen;
-    // Optionally mark all as read when opened
+    
   }
 
   logout() {
