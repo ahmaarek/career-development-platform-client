@@ -128,10 +128,6 @@
                 [disabled]="isPackageSubmitted()"
               />
 
-              <!-- Validation Error Message -->
-              <div *ngIf="isFieldInvalid(section.id, field.fieldKey)" class="field-error">
-                {{ getFieldErrorMessage(section.id, field.fieldKey, field.label) }}
-              </div>
 
               <!-- Field Status Indicator (no submit button) -->
               <div class="field-status-container" *ngIf="getExistingFieldResponse(section.id, field.id)">
@@ -171,7 +167,7 @@
         <h3>Package Submission</h3>
         <div class="submission-status">
           <span class="status-label">Current Status:</span>
-          <span class="status-message" [class]="'status-' + userCareerPackage?.status">
+          <span class="status-message" [class]="'status-' + userCareerPackage.status">
             {{ getSubmissionStatusMessage() }}
           </span>
         </div>

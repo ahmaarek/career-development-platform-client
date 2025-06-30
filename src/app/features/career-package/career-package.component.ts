@@ -55,9 +55,7 @@ export class CareerPackageComponent implements OnInit {
 
   }
 
-  /*
-    Check if user is enrolled and load appropriate data
-  */
+  
   private checkEnrollmentAndLoadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -77,9 +75,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  /**
-   * Load user's career package data
-   */
+  
   private loadUserCareerPackage(): void {
     this.careerPackageService.getUserCareerPackage(this.currentUserId).subscribe({
       next: (userPackage) => {
@@ -95,9 +91,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  /**
-   * Initialize forms for each section
-   */
+  
   private initializeSectionForms(): void {
     if (!this.userCareerPackage) return;
 
@@ -108,13 +102,13 @@ export class CareerPackageComponent implements OnInit {
         const existingResponse = this.getExistingFieldResponse(section.id, field.id);
         const initialValue = existingResponse ? existingResponse.value : '';
 
-        // Add validators based on field requirements
+        //Add validators based on field requirements
         const validators = [];
         if (field.required) {
           validators.push(Validators.required);
         }
 
-        // Add specific validators based on field type
+        //Add specific validators based on field type
         switch (field.fieldType) {
           case 'email':
             validators.push(Validators.email);
@@ -141,9 +135,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  /**
-   * Get existing field response for a specific field (public method for template)
-   */
+  
   getExistingFieldResponse(sectionId: string, fieldId: string): UserFieldResponse | null {
     if (!this.userCareerPackage) return null;
 
@@ -182,9 +174,7 @@ export class CareerPackageComponent implements OnInit {
     return totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
   }
 
-  /**
-   * Get overall package completion percentage
-   */
+  
   getOverallCompletionPercentage(): number {
     if (!this.userCareerPackage) return 0;
 
@@ -204,87 +194,101 @@ export class CareerPackageComponent implements OnInit {
   }
 
   submitSection(section: SectionTemplate): void {
-  if (!this.userCareerPackage) return;
+    if (!this.userCareerPackage) return;
 
-  const form = this.sectionForms[section.id];
-  if (!form) return;
+    const form = this.sectionForms[section.id];
+    if (!form) return;
 
-  const invalidFields = this.getInvalidFieldsInSection(section);
-  if (invalidFields.length > 0) {
-    this.errorMessage = `Please fix the following fields before submitting: ${invalidFields.join(', ')}`;
-    Object.keys(form.controls).forEach(key => {
-      const control = form.get(key);
-      if (control && control.invalid) {
-        control.markAsTouched();
-      }
-    });
-    return;
+    const invalidFields = this.getInvalidFieldsInSection(section);
+    if (invalidFields.length > 0) {
+      this.errorMessage = `Please fix the following fields before submitting: ${invalidFields.join(', ')}`;
+      Object.keys(form.controls).forEach(key => {
+        const control = form.get(key);
+        if (control && control.invalid) {
+          control.markAsTouched();
+        }
+      });
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+
+    // Check if section response already exists
+    const existingSectionResponse = this.userCareerPackage.sectionResponses?.find(
+      resp => resp.sectionTemplateId === section.id
+    );
+
+    if (existingSectionResponse && existingSectionResponse.id) {
+
+      let existingResponsesMap: Record<string, string | undefined> = {};
+      existingResponsesMap = Object.fromEntries(
+        existingSectionResponse.fieldResponses.map(resp => [resp.fieldTemplateId, resp.id])
+      );
+
+      const fieldResponses: UserFieldResponse[] = section.fields.map(field => {
+        const value = form.get(field.fieldKey)?.value || '';
+        const id = existingResponsesMap[field.id]; // field.id is fieldTemplateId
+
+        return {
+          id,
+          fieldTemplateId: field.id,
+          value
+        };
+      });
+      // Update existing section response
+      this.careerPackageService.updateSectionResponse(
+        existingSectionResponse.id,
+        {
+          userCareerPackageId: this.userCareerPackage.id,
+          sectionTemplateId: section.id,
+          fieldResponses: fieldResponses
+        }
+      ).subscribe({
+        next: (updatedResponse) => {
+          this.updateLocalSectionResponse(section.id, updatedResponse);
+          this.successMessage = `${section.title} section updated successfully!`;
+          this.isLoading = false;
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (error) => {
+          this.errorMessage = error.message;
+          this.isLoading = false;
+        }
+      });
+
+    } else {
+
+      const fieldResponses: UserFieldResponse[] = section.fields.map(field => {
+        const value = form.get(field.fieldKey)?.value || '';
+        return {
+          fieldTemplateId: field.id,
+          value
+        };
+      });
+
+      // Create new section response
+      this.careerPackageService.submitCompleteSection(
+        this.userCareerPackage.id,
+        section.id,
+        fieldResponses
+      ).subscribe({
+        next: (newSectionResponse) => {
+          this.addLocalSectionResponse(newSectionResponse);
+          this.successMessage = `${section.title} section submitted successfully!`;
+          this.isLoading = false;
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: (error) => {
+          this.errorMessage = error.message;
+          this.isLoading = false;
+        }
+      });
+    }
   }
 
-  this.isLoading = true;
-  this.errorMessage = '';
 
-  
-  const fieldResponses: UserFieldResponse[] = section.fields.map(field => {
-    const value = form.get(field.fieldKey)?.value || '';
-    return {
-      fieldTemplateId: field.id,
-      value
-    };
-  });
-
-  // Check if section response already exists
-  const existingSectionResponse = this.userCareerPackage.sectionResponses?.find(
-    resp => resp.sectionTemplateId === section.id
-  );
-
-  if (existingSectionResponse && existingSectionResponse.id) {
-    // Update existing section response
-    this.careerPackageService.updateSectionResponse(
-      existingSectionResponse.id,
-      {
-        userCareerPackageId: this.userCareerPackage.id,
-        sectionTemplateId: section.id,
-        fieldResponses: fieldResponses
-      }
-    ).subscribe({
-      next: (updatedResponse) => {
-        this.updateLocalSectionResponse(section.id,updatedResponse);
-        this.successMessage = `${section.title} section updated successfully!`;
-        this.isLoading = false;
-        setTimeout(() => this.successMessage = '', 3000);
-      },
-      error: (error) => {
-        this.errorMessage = error.message;
-        this.isLoading = false;
-      }
-    });
-
-  } else {
-    // Create new section response
-    this.careerPackageService.submitCompleteSection(
-      this.userCareerPackage.id,
-      section.id,
-      fieldResponses
-    ).subscribe({
-      next: (newSectionResponse) => {
-        this.addLocalSectionResponse(newSectionResponse);
-        this.successMessage = `${section.title} section submitted successfully!`;
-        this.isLoading = false;
-        setTimeout(() => this.successMessage = '', 3000);
-      },
-      error: (error) => {
-        this.errorMessage = error.message;
-        this.isLoading = false;
-      }
-    });
-  }
-}
-
-
-  /**
-   * Check if section submit button should be disabled
-   */
   isSectionSubmitDisabled(sectionId: string): boolean {
     if (this.isLoading) return true;
 
@@ -304,9 +308,7 @@ export class CareerPackageComponent implements OnInit {
     return hasRequiredEmptyFields;
   }
 
-  /**
-   * Get the text for section submit button
-   */
+  
   getSectionSubmitButtonText(section: SectionTemplate): string {
     if (!this.userCareerPackage) return 'Submit Section';
 
@@ -317,9 +319,7 @@ export class CareerPackageComponent implements OnInit {
     return existingSectionResponse && existingSectionResponse.id ? 'Update Section' : 'Submit Section';
   }
 
-  /**
-   * Check if section has been submitted
-   */
+  
   isSectionSubmitted(sectionId: string): boolean {
     if (!this.userCareerPackage) return false;
 
@@ -330,9 +330,7 @@ export class CareerPackageComponent implements OnInit {
     return !!(sectionResponse && sectionResponse.id);
   }
 
-  /**
-   * Get invalid fields in a section
-   */
+  
   private getInvalidFieldsInSection(section: SectionTemplate): string[] {
     const form = this.sectionForms[section.id];
     if (!form) return [];
@@ -349,9 +347,7 @@ export class CareerPackageComponent implements OnInit {
     return invalidFields;
   }
 
-  /**
-   * Update local section response after successful API call
-   */
+  
   private updateLocalSectionResponse(sectionId: string, updatedSectionResponse: UserSectionResponse): void {
     if (!this.userCareerPackage) return;
 
@@ -364,9 +360,7 @@ export class CareerPackageComponent implements OnInit {
     }
   }
 
-  /**
-   * Add new section response to local data after successful API call
-   */
+  
   private addLocalSectionResponse(newSectionResponse: UserSectionResponse): void {
     if (!this.userCareerPackage) return;
 
@@ -375,17 +369,14 @@ export class CareerPackageComponent implements OnInit {
     );
 
     if (existingIndex !== -1) {
-      // Replace existing section response
       this.userCareerPackage.sectionResponses[existingIndex] = newSectionResponse;
     } else {
-      // Add new section response
+      
       this.userCareerPackage.sectionResponses.push(newSectionResponse);
     }
   }
 
-  /**
-   * Check if a field is invalid and has been touched
-   */
+  
   isFieldInvalid(sectionId: string, fieldKey: string): boolean {
     const form = this.sectionForms[sectionId];
     if (!form) return false;
@@ -394,35 +385,31 @@ export class CareerPackageComponent implements OnInit {
     return !!(control && control.invalid && control.touched);
   }
 
-  /**
-   * Get validation error message for a field
-   */
-  getFieldErrorMessage(sectionId: string, fieldKey: string, fieldLabel: string): string {
-    const form = this.sectionForms[sectionId];
-    if (!form) return '';
+  
+  // getFieldErrorMessage(sectionId: string, fieldKey: string, fieldLabel: string): string {
+  //   const form = this.sectionForms[sectionId];
+  //   if (!form) return '';
 
-    const control = form.get(fieldKey);
-    if (!control || !control.errors) return '';
+  //   const control = form.get(fieldKey);
+  //   if (!control || !control.errors) return '';
 
-    if (control.errors['required']) {
-      return `${fieldLabel} is required.`;
-    }
-    if (control.errors['email']) {
-      return `Please enter a valid email address.`;
-    }
-    if (control.errors['pattern']) {
-      return `Please enter a valid number.`;
-    }
-    if (control.errors['minlength']) {
-      return `${fieldLabel} must be at least ${control.errors['minlength'].requiredLength} characters long.`;
-    }
+  //   if (control.errors['required']) {
+  //     return `${fieldLabel} is required.`;
+  //   }
+  //   if (control.errors['email']) {
+  //     return `Please enter a valid email address.`;
+  //   }
+  //   if (control.errors['pattern']) {
+  //     return `Please enter a valid number.`;
+  //   }
+  //   if (control.errors['minlength']) {
+  //     return `${fieldLabel} must be at least ${control.errors['minlength'].requiredLength} characters long.`;
+  //   }
 
-    return 'Please enter a valid value.';
-  }
+  //   return 'Please enter a valid value.';
+  // }
 
-  /**
-   * Check if submit button should be disabled for a field
-   */
+  
   isSubmitDisabled(sectionId: string, fieldKey: string): boolean {
     const form = this.sectionForms[sectionId];
     if (!form) return true;
@@ -431,9 +418,7 @@ export class CareerPackageComponent implements OnInit {
     return !!(control && (control.invalid || this.isLoading));
   }
 
-  /**
-   * Check if the entire career package can be submitted
-   */
+  
   canSubmitCompletePackage(): boolean {
     if (!this.userCareerPackage || this.isLoading) return false;
 
@@ -456,17 +441,12 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  /**
-   * Submit the complete career package with all section responses
-   */
+  
   submitCompleteCareerPackage(): void {
     if (!this.userCareerPackage || !this.canSubmitCompletePackage()) return;
 
     this.isLoading = true;
     this.errorMessage = '';
-
-    // Collect all current form data and update section responses
-    this.collectAllFormData();
 
     // Submit the complete package
     this.careerPackageService.submitCompleteCareerPackage(this.userCareerPackage).subscribe({
@@ -483,9 +463,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  /**
-   * Collect all form data and update the userCareerPackage object
-   */
+
   private collectAllFormData(): void {
     if (!this.userCareerPackage) return;
 
@@ -537,9 +515,6 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  /**
-   * Get the submission status message
-   */
   getSubmissionStatusMessage(): string {
     if (!this.userCareerPackage) return '';
 
@@ -557,9 +532,6 @@ export class CareerPackageComponent implements OnInit {
     }
   }
 
-  /**
-   * Check if package is submitted (under review or completed)
-   */
   isPackageSubmitted(): boolean {
     if (!this.userCareerPackage) return false;
     return this.userCareerPackage.status === PackageStatus.UNDER_REVIEW ||
