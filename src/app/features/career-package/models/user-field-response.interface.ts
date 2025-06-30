@@ -1,6 +1,6 @@
 export interface UserFieldResponse {
-  id?: string; // UUID as string
-  sectionResponseId?: string; // UUID as string
+  id?: string;
+  sectionResponseId?: string; 
   fieldTemplateId: string;
   value: string;
 }

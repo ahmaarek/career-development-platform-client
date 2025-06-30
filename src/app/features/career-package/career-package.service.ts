@@ -8,6 +8,7 @@ import { UserFieldResponse } from './models/user-field-response.interface';
 import { PackageStatus } from './enums/package-status.enum';
 import { UserService } from '../../user/user.service';
 import { UserSectionResponse } from './models/user-section-response.interface';
+import { idText } from 'typescript';
 
 
 @Injectable({
@@ -68,6 +69,15 @@ export class CareerPackageService {
         value: fr.value
       }))
     };
+  const body = {
+    userCareerPackageId: sectionResponse.userCareerPackageId,
+    sectionTemplateId: sectionResponse.sectionTemplateId,
+    fieldResponses: sectionResponse.fieldResponses.map(fr => ({
+      id: fr.id,
+      fieldTemplateId: fr.fieldTemplateId,
+      value: fr.value
+    }))
+  };
 
     console.log('Updating section response:', body);
     return this.http.put<UserSectionResponse>(
