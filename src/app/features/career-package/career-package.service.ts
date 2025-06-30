@@ -61,23 +61,16 @@ export class CareerPackageService {
 
 
   updateSectionResponse(sectionResponseId: string, sectionResponse: UserSectionResponse): Observable<UserSectionResponse> {
+
     const body = {
       userCareerPackageId: sectionResponse.userCareerPackageId,
       sectionTemplateId: sectionResponse.sectionTemplateId,
       fieldResponses: sectionResponse.fieldResponses.map(fr => ({
+        id: fr.id,
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value
       }))
     };
-  const body = {
-    userCareerPackageId: sectionResponse.userCareerPackageId,
-    sectionTemplateId: sectionResponse.sectionTemplateId,
-    fieldResponses: sectionResponse.fieldResponses.map(fr => ({
-      id: fr.id,
-      fieldTemplateId: fr.fieldTemplateId,
-      value: fr.value
-    }))
-  };
 
     console.log('Updating section response:', body);
     return this.http.put<UserSectionResponse>(

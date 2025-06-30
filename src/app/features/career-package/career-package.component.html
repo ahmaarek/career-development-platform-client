@@ -118,11 +118,6 @@
                 [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()" />
               }
 
-              @if (isFieldInvalid(section.id, field.fieldKey)) {
-              <div class="field-error">
-                {{ getFieldErrorMessage(section.id, field.fieldKey, field.label) }}
-              </div>
-              }
             </div>
             }
 
@@ -136,12 +131,6 @@
                 Submitting...
                 }
               </button>
-
-              @if (isSectionSubmitted(section.id)) {
-              <div class="section-status-indicator">
-                <span class="section-status submitted">✓ Section Submitted</span>
-              </div>
-              }
             </div>
             }
           </form>
@@ -158,7 +147,6 @@
         <div class="submission-status">
           <span class="status-label">Current Status:</span>
           <span class="status-message" [class]="'status-' + userCareerPackage.status">
-          <span class="status-message" [class]="'status-' + userCareerPackage.status">
             {{ getSubmissionStatusMessage() }}
           </span>
         </div>
@@ -167,7 +155,7 @@
       <div class="submit-all-content">
         @if (!isPackageSubmitted()) {
         <div class="submit-instructions">
-          <p><strong>Ready to submit your career package?</strong></p>
+          
           <p>Once submitted, your package will be marked as "Under Review" and you won't be able to make further changes
             until the review is complete.</p>
           <p>Please ensure all sections are completed before submitting.</p>
@@ -176,7 +164,7 @@
 
         @if (isPackageSubmitted()) {
         <div class="submitted-message">
-          <p><strong>✓ Package Submitted</strong></p>
+          <p><strong>Package Submitted</strong></p>
           <p>Your career package has been submitted and is currently under review. You will be notified once the review
             is complete.</p>
         </div>
@@ -197,8 +185,7 @@
           @if (!canSubmitCompletePackage() && !isPackageSubmitted()) {
           <div class="submit-requirements">
             <p class="text-warning">
-              <strong>⚠ Requirements not met</strong><br>
-              Please ensure at least one field is completed in each section before submitting.
+              <strong>Requirements not met</strong><br>
             </p>
           </div>
           }

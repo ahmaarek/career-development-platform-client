@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 import { CareerPackageService } from './career-package.service';
 import { UserService } from '../../user/user.service';
@@ -35,8 +34,7 @@ export class CareerPackageComponent implements OnInit {
   constructor(
     private careerPackageService: CareerPackageService,
     private userService: UserService,
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit(): void {
@@ -52,10 +50,8 @@ export class CareerPackageComponent implements OnInit {
       }
     });
 
-
   }
 
-  
   private checkEnrollmentAndLoadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -102,13 +98,9 @@ export class CareerPackageComponent implements OnInit {
         const existingResponse = this.getExistingFieldResponse(section.id, field.id);
         const initialValue = existingResponse ? existingResponse.value : '';
 
-        //Add validators based on field requirements
         const validators = [];
-        if (field.required) {
-          validators.push(Validators.required);
-        }
-
-        //Add specific validators based on field type
+        validators.push(Validators.required);
+        
         switch (field.fieldType) {
           case 'email':
             validators.push(Validators.email);
@@ -199,21 +191,13 @@ export class CareerPackageComponent implements OnInit {
     const form = this.sectionForms[section.id];
     if (!form) return;
 
-    const invalidFields = this.getInvalidFieldsInSection(section);
-    if (invalidFields.length > 0) {
-      this.errorMessage = `Please fix the following fields before submitting: ${invalidFields.join(', ')}`;
-      Object.keys(form.controls).forEach(key => {
-        const control = form.get(key);
-        if (control && control.invalid) {
-          control.markAsTouched();
-        }
-      });
+    if (form.invalid) {
+      this.errorMessage = 'Please fill in all required fields before submitting.';
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
-
 
     // Check if section response already exists
     const existingSectionResponse = this.userCareerPackage.sectionResponses?.find(
@@ -286,6 +270,7 @@ export class CareerPackageComponent implements OnInit {
         }
       });
     }
+    this.ngOnInit();
   }
 
 
@@ -295,7 +280,6 @@ export class CareerPackageComponent implements OnInit {
     const form = this.sectionForms[sectionId];
     if (!form) return true;
 
-    // Check if any required field is empty
     const section = this.userCareerPackage?.template.sections.find(s => s.id === sectionId);
     if (!section) return true;
 
@@ -317,34 +301,6 @@ export class CareerPackageComponent implements OnInit {
     );
 
     return existingSectionResponse && existingSectionResponse.id ? 'Update Section' : 'Submit Section';
-  }
-
-  
-  isSectionSubmitted(sectionId: string): boolean {
-    if (!this.userCareerPackage) return false;
-
-    const sectionResponse = this.userCareerPackage.sectionResponses.find(
-      sr => sr.sectionTemplateId === sectionId
-    );
-
-    return !!(sectionResponse && sectionResponse.id);
-  }
-
-  
-  private getInvalidFieldsInSection(section: SectionTemplate): string[] {
-    const form = this.sectionForms[section.id];
-    if (!form) return [];
-
-    const invalidFields: string[] = [];
-
-    section.fields.forEach(field => {
-      const control = form.get(field.fieldKey);
-      if (control && control.invalid) {
-        invalidFields.push(field.label);
-      }
-    });
-
-    return invalidFields;
   }
 
   
@@ -386,39 +342,6 @@ export class CareerPackageComponent implements OnInit {
   }
 
   
-  // getFieldErrorMessage(sectionId: string, fieldKey: string, fieldLabel: string): string {
-  //   const form = this.sectionForms[sectionId];
-  //   if (!form) return '';
-
-  //   const control = form.get(fieldKey);
-  //   if (!control || !control.errors) return '';
-
-  //   if (control.errors['required']) {
-  //     return `${fieldLabel} is required.`;
-  //   }
-  //   if (control.errors['email']) {
-  //     return `Please enter a valid email address.`;
-  //   }
-  //   if (control.errors['pattern']) {
-  //     return `Please enter a valid number.`;
-  //   }
-  //   if (control.errors['minlength']) {
-  //     return `${fieldLabel} must be at least ${control.errors['minlength'].requiredLength} characters long.`;
-  //   }
-
-  //   return 'Please enter a valid value.';
-  // }
-
-  
-  isSubmitDisabled(sectionId: string, fieldKey: string): boolean {
-    const form = this.sectionForms[sectionId];
-    if (!form) return true;
-
-    const control = form.get(fieldKey);
-    return !!(control && (control.invalid || this.isLoading));
-  }
-
-  
   canSubmitCompletePackage(): boolean {
     if (!this.userCareerPackage || this.isLoading) return false;
 
@@ -428,7 +351,7 @@ export class CareerPackageComponent implements OnInit {
       return false;
     }
 
-    // Check if at least one field has been filled in each section
+    
     return this.userCareerPackage.template.sections.every(section => {
       const sectionResponse = this.userCareerPackage!.sectionResponses.find(
         sr => sr.sectionTemplateId === section.id
@@ -436,8 +359,8 @@ export class CareerPackageComponent implements OnInit {
 
       if (!sectionResponse) return false;
 
-      // Check if at least one field in this section has a value
-      return sectionResponse.fieldResponses.some(fr => fr.value.trim() !== '');
+      // Check if all fields in the section have values
+      return sectionResponse.fieldResponses.every(fr => fr.value.trim() !== '');
     });
   }
 
@@ -460,58 +383,6 @@ export class CareerPackageComponent implements OnInit {
         this.errorMessage = error.message;
         this.isLoading = false;
       }
-    });
-  }
-
-
-  private collectAllFormData(): void {
-    if (!this.userCareerPackage) return;
-
-    this.userCareerPackage.template.sections.forEach(section => {
-      const form = this.sectionForms[section.id];
-      if (!form) return;
-
-      // Get or create section response
-      let sectionResponse = this.userCareerPackage!.sectionResponses.find(
-        sr => sr.sectionTemplateId === section.id
-      );
-
-      if (!sectionResponse) {
-        sectionResponse = {
-          id: undefined,
-          userCareerPackageId: this.userCareerPackage!.id,
-          sectionTemplateId: section.id,
-          fieldResponses: []
-        };
-        this.userCareerPackage!.sectionResponses.push(sectionResponse);
-      }
-
-      // Update field responses with current form values
-      section.fields.forEach(field => {
-        const fieldControl = form.get(field.fieldKey);
-        if (!fieldControl) return;
-
-        const fieldValue = fieldControl.value || '';
-
-        // Find existing field response or create new one
-        let fieldResponse = sectionResponse!.fieldResponses.find(
-          fr => fr.fieldTemplateId === field.id
-        );
-
-        if (fieldResponse) {
-          // Update existing field response
-          fieldResponse.value = fieldValue;
-        } else if (fieldValue.trim() !== '') {
-          // Create new field response only if there's a value
-          fieldResponse = {
-            id: undefined,
-            sectionResponseId: sectionResponse!.id,
-            fieldTemplateId: field.id,
-            value: fieldValue
-          };
-          sectionResponse!.fieldResponses.push(fieldResponse);
-        }
-      });
     });
   }
 
