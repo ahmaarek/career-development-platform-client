@@ -1,5 +1,6 @@
+
 .user-section {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   border-radius: 6px;
   overflow: hidden;
   background: #f9f9f9;
@@ -28,25 +29,33 @@
   object-fit: cover;
 }
 
+
 .user-content {
   padding: 12px 16px;
   background: white;
   border-top: 1px solid #ccc;
+  display: flex;
+  gap: 12px;
 }
 
-.assign-btn {
+
+.assign-btn,
+.view-btn {
   background-color: #007bff;
   color: white;
   border: none;
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
 }
 
-.assign-btn:disabled {
-  background-color: #ccc;
+.assign-btn:disabled,
+.view-btn:disabled {
+  background-color: #ccc !important;
   cursor: not-allowed;
 }
+
 
 .modal-overlay {
   position: fixed;
@@ -67,9 +76,23 @@
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
 
+
+.large-modal {
+  width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+
 .modal h2 {
   margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.modal h3 {
+  margin: 20px 0 10px;
+  font-size: 16px;
   font-weight: bold;
 }
 
@@ -78,6 +101,7 @@
   margin-bottom: 8px;
   font-weight: 500;
 }
+
 
 .modal select {
   width: 100%;
@@ -88,10 +112,23 @@
   margin-bottom: 20px;
 }
 
+
+.modal ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.modal li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 30px;
 }
 
 .modal-actions button {
@@ -103,19 +140,34 @@
   color: white;
 }
 
-.modal-actions .save-btn {
+
+.save-btn,
+.approve-btn {
   background-color: #28a745;
 }
 
-.modal-actions .save-btn:hover {
+.save-btn:hover,
+.approve-btn:hover {
   background-color: #218838;
 }
 
-.modal-actions .cancel-btn {
+.cancel-btn,
+.reject-btn {
   background-color: #dc3545;
 }
 
-.modal-actions .cancel-btn:hover {
+.cancel-btn:hover,
+.reject-btn:hover {
   background-color: #c82333;
 }
 
+.comment-btn {
+  background-color: #ffc107;
+  color: black;
+}
+
+
+button:disabled {
+  background-color: #aaa !important;
+  cursor: not-allowed;
+}

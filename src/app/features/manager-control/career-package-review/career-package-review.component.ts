@@ -18,6 +18,8 @@ export class CareerPackageReviewComponent implements OnInit {
   expandedUsers: Record<string, boolean> = {};
   enrollmentStatus: Record<string, boolean> = {};
   careerPackageTemplates: CareerPackageTemplate[] = [];
+  userPackages: Record<string, UserCareerPackage> = {};
+  reviewingUserId: string | null = null;
 
   assigningUserId: string | null = null;
   selectedTemplateId: string | null = null;
@@ -36,8 +38,13 @@ export class CareerPackageReviewComponent implements OnInit {
 
         // Check enrollment for each user
         users.forEach(user => {
-          this.careerPackageService.checkUserEnrollment(user.id).subscribe(status => {
-            this.enrollmentStatus[user.id] = status;
+          this.careerPackageService.getUserCareerPackage(user.id).subscribe(pkg => {
+            this.enrollmentStatus[user.id] = true;
+            this.userPackages[user.id] = pkg;
+          }, err => {
+            if (err.status === 404) {
+              this.enrollmentStatus[user.id] = false;
+            }
           });
         });
       });
@@ -56,9 +63,32 @@ export class CareerPackageReviewComponent implements OnInit {
     this.selectedTemplateId = defaultTemplate?.id || this.careerPackageTemplates[0]?.id;
   }
 
-  closeModal(): void {
+  closeAssignModal(): void {
     this.assigningUserId = null;
     this.selectedTemplateId = null;
+  }
+
+  openReviewModal(userId: string): void {
+    this.reviewingUserId = userId;
+  }
+
+  closeReviewModal(): void {
+    this.reviewingUserId = null;
+  }
+
+  addComment(userId: string): void {
+    // comment logic
+    console.log("Add comment for", userId);
+  }
+
+  approveSubmission(userId: string): void {
+    // Call service to mark as APPROVED
+    console.log("Approved", userId);
+  }
+
+  rejectSubmission(userId: string): void {
+    // Call service to mark as REJECTED
+    console.log("Rejected", userId);
   }
 
   confirmAssign(): void {
@@ -74,7 +104,7 @@ export class CareerPackageReviewComponent implements OnInit {
     this.careerPackageService.assignCareerPackage(request).subscribe({
       next: (response: UserCareerPackage) => {
         this.enrollmentStatus[this.assigningUserId!] = true;
-        this.closeModal();
+        this.closeAssignModal();
       },
       error: (error) => {
         console.error('Error assigning career package:', error);
@@ -83,5 +113,24 @@ export class CareerPackageReviewComponent implements OnInit {
   }
   toggleUser(userId: string): void {
     this.expandedUsers[userId] = !this.expandedUsers[userId];
+  }
+
+  getSectionTitle(sectionTemplateId: string): string {
+    for (const template of this.careerPackageTemplates) {
+      const found = template.sections.find(section => section.id === sectionTemplateId);
+      if (found) return found.title;
+    }
+    return 'Untitled Section';
+  }
+
+  getFieldLabel(sectionTemplateId: string, fieldTemplateId: string): string {
+    for (const template of this.careerPackageTemplates) {
+      const section = template.sections.find(s => s.id === sectionTemplateId);
+      if (section) {
+        const field = section.fields.find(f => f.id === fieldTemplateId);
+        if (field) return field.label;
+      }
+    }
+    return 'Unnamed Field';
   }
 }
