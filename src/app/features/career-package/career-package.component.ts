@@ -386,20 +386,23 @@ export class CareerPackageComponent implements OnInit {
         this.isLoading = false;
       }
     });
+
+    this.ngOnInit();
   }
 
   getSubmissionStatusMessage(): string {
     if (!this.userCareerPackage) return '';
 
     switch (this.userCareerPackage.status) {
-      case PackageStatus.NOT_STARTED:
-        return 'Package not started';
+
       case PackageStatus.IN_PROGRESS:
         return 'Package in progress';
       case PackageStatus.UNDER_REVIEW:
         return 'Package submitted and under review';
       case PackageStatus.APPROVED:
         return 'Package completed';
+        case PackageStatus.REJECTED:
+        return 'Package rejected';
       default:
         return '';
     }
@@ -407,8 +410,15 @@ export class CareerPackageComponent implements OnInit {
 
   isPackageSubmitted(): boolean {
     if (!this.userCareerPackage) return false;
-    return this.userCareerPackage.status === PackageStatus.UNDER_REVIEW ||
-      this.userCareerPackage.status === PackageStatus.APPROVED;
+    return this.userCareerPackage.status === PackageStatus.UNDER_REVIEW
+  }
+  isPackageApproved(): boolean {
+    if (!this.userCareerPackage) return false;
+    return this.userCareerPackage.status === PackageStatus.APPROVED
+  }
+  isPackageRejected(): boolean {
+    if (!this.userCareerPackage) return false;
+    return this.userCareerPackage.status === PackageStatus.REJECTED
   }
 }
 
