@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import { UserAccount } from './user-account.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,9 +13,8 @@ export class AuthService {
     constructor(private http: HttpClient) { }
 
     signUp(name: string, email: string, password: string): Observable<any> {
-        const signupUrl = 'http://localhost:8080/auth/signup';
 
-        return this.http.post<any>(signupUrl, {
+        return this.http.post<any>(environment.signUpUrl, {
             name,
             email,
             password
@@ -23,9 +23,8 @@ export class AuthService {
 
 
     login(email: string, password: string): Observable<any> {
-        const loginUrl = 'http://localhost:8080/auth/login';
 
-        return this.http.post<any>(loginUrl, {
+        return this.http.post<any>(environment.loginUrl, {
             email,
             password
         }).pipe(
