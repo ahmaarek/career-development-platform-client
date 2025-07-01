@@ -9,18 +9,18 @@ import { PackageStatus } from './enums/package-status.enum';
 import { UserService } from '../../user/user.service';
 import { UserSectionResponse } from './models/user-section-response.interface';
 import { idText } from 'typescript';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class CareerPackageService {
-  private readonly baseUrl = 'http://localhost:8083/api';
 
   constructor(private http: HttpClient, private userService: UserService) { }
 
   checkUserEnrollment(userId: string): Observable<boolean> {
-    return this.http.get<UserCareerPackage>(`${this.baseUrl}/user-career-package/user/${userId}`)
+    return this.http.get<UserCareerPackage>(`${environment.careerPackageBaseUrl}/user-career-package/user/${userId}`)
       .pipe(
         map(userPackage => !!userPackage),
         catchError(error => {
@@ -34,7 +34,7 @@ export class CareerPackageService {
 
 
   getUserCareerPackage(userId: string): Observable<UserCareerPackage> {
-    return this.http.get<UserCareerPackage>(`${this.baseUrl}/user-career-package/user/${userId}`)
+    return this.http.get<UserCareerPackage>(`${environment.careerPackageBaseUrl}/user-career-package/user/${userId}`)
       .pipe(
         catchError(this.handleError)
       );
@@ -53,7 +53,7 @@ export class CareerPackageService {
 
     console.log('Submitting complete section:', sectionResponseData);
 
-    return this.http.post<UserSectionResponse>(`${this.baseUrl}/user-section-response`, sectionResponseData)
+    return this.http.post<UserSectionResponse>(`${environment.careerPackageBaseUrl}/user-section-response`, sectionResponseData)
       .pipe(
         catchError(this.handleError)
       );
@@ -74,7 +74,7 @@ export class CareerPackageService {
 
     console.log('Updating section response:', body);
     return this.http.put<UserSectionResponse>(
-      `${this.baseUrl}/user-section-response/${sectionResponseId}`,
+      `${environment.careerPackageBaseUrl}/user-section-response/${sectionResponseId}`,
       body
     ).pipe(
       catchError(this.handleError)
@@ -88,25 +88,25 @@ export class CareerPackageService {
       status: PackageStatus.UNDER_REVIEW
     };
 
-    return this.http.patch<UserCareerPackage>(`${this.baseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
+    return this.http.patch<UserCareerPackage>(`${environment.careerPackageBaseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getAllCareerPackageTemplates(): Observable<CareerPackageTemplate[]> {
-    return this.http.get<CareerPackageTemplate[]>(`${this.baseUrl}/career-package-template`)
+    return this.http.get<CareerPackageTemplate[]>(`${environment.careerPackageBaseUrl}/career-package-template`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   updatePackage(id: string, updatedPkg: any): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/career-package-template/${id}/sync`, updatedPkg);
+    return this.http.patch(`${environment.careerPackageBaseUrl}/career-package-template/${id}/sync`, updatedPkg);
   }
 
   createNewPackage(request: { title: string; description: string }): Observable<CareerPackageTemplate> {
-    return this.http.post<CareerPackageTemplate>(`${this.baseUrl}/career-package-template`, request);
+    return this.http.post<CareerPackageTemplate>(`${environment.careerPackageBaseUrl}/career-package-template`, request);
   }
 
   assignCareerPackage(request: {
@@ -116,7 +116,7 @@ export class CareerPackageService {
     status: string;
   }): Observable<any> {
 
-    return this.http.post<CareerPackageTemplate>(`${this.baseUrl}/user-career-package/assign`, request);
+    return this.http.post<CareerPackageTemplate>(`${environment.careerPackageBaseUrl}/user-career-package/assign`, request);
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

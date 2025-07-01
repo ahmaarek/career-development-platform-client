@@ -2,12 +2,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import { User } from './user.model'; 
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8081/users';
   private userSubject = new BehaviorSubject<User | null>(null);
   public user$ = this.userSubject.asObservable();
 
@@ -20,7 +20,7 @@ export class UserService {
 
 
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+    return this.http.get<User[]>(environment.userBaseUrl);
   }
 
   getUserById(id: string): Observable<User> {
@@ -32,7 +32,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    const url = `${this.apiUrl}/${id}`;
+    const url = `${environment.userBaseUrl}/${id}`;
     return this.http.get<User>(url, { headers });
   }
 
@@ -41,7 +41,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    const url = `${this.apiUrl}/'by-email'/${email}`;
+    const url = `${environment.userBaseUrl}/'by-email'/${email}`;
     return this.http.get<User>(url, { headers });
   }
 
@@ -55,7 +55,7 @@ export class UserService {
     });
 
     console.log('Fetched current user:', user);
-    const userRequest$ = this.http.get<User>(`${this.apiUrl}/by-token`, { headers });
+    const userRequest$ = this.http.get<User>(`${environment.userBaseUrl}/by-token`, { headers });
 
     userRequest$.subscribe({
       next: (user) => {
@@ -79,7 +79,7 @@ export class UserService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    return this.http.put<User>(`${this.apiUrl}/${id}`, updatedData, { headers });
+    return this.http.put<User>(`${environment.userBaseUrl}/${id}`, updatedData, { headers });
   }
 
   getUsersByManagerId(managerId: string): Observable<User[]> {
@@ -92,7 +92,7 @@ export class UserService {
     });
 
     console.log("🔐 Using token:", token);
-    return this.http.get<User[]>(`${this.apiUrl}/by-manager/${managerId}`, { headers });
+    return this.http.get<User[]>(`${environment.userBaseUrl}/by-manager/${managerId}`, { headers });
   }
 
 }

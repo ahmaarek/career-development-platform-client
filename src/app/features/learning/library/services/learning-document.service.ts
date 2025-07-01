@@ -1,18 +1,18 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of, combineLatest, map, catchError } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearningDocumentService {
 
-  private readonly documentsUrl = 'http://localhost:8082/api/learning/files';
 
   constructor(private http: HttpClient) {}
 
   getAttachmentUrl(attachmentId: string): string {
-    return `${this.documentsUrl}/${attachmentId}`;
+    return `${environment.learningDocumentsUrl}/${attachmentId}`;
   }
 
   getProtectedAttachment(attachmentId: string): Observable<Blob> {
@@ -51,7 +51,7 @@ export class LearningDocumentService {
     formData.append('file', file);
     formData.append('userId', userId);
 
-    return this.http.post(`${this.documentsUrl}/upload/${type}`, formData, {
+    return this.http.post(`${environment.learningDocumentsUrl}/upload/${type}`, formData, {
       responseType: 'text'
     });
   }
