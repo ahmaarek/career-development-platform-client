@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterLink,MatIconModule],
+  imports: [CommonModule, RouterLink, MatIconModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -26,7 +26,7 @@ export class NavbarComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const userString = sessionStorage.getItem("user");
@@ -62,16 +62,29 @@ export class NavbarComponent implements OnInit {
   }
 
   markAsRead(notification: any) {
-  this.notificationService.markAsRead(notification.id).subscribe({
+    this.notificationService.markAsRead(notification.id).subscribe({
+      next: () => {
+        notification.read = true;
+        this.unreadCount = this.notifications.filter(n => !n.read).length;
+      },
+      error: err => {
+        console.error('Failed to mark notification as read:', err);
+      }
+    });
+  }
+
+  removeNotification(notification: any) {
+  this.notificationService.deleteNotification(notification.id).subscribe({
     next: () => {
-      notification.read = true;
+      this.notifications = this.notifications.filter(n => n.id !== notification.id);
       this.unreadCount = this.notifications.filter(n => !n.read).length;
     },
     error: err => {
-      console.error('Failed to mark notification as read:', err);
+      console.error('Failed to delete notification:', err);
     }
   });
 }
+
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -79,7 +92,7 @@ export class NavbarComponent implements OnInit {
 
   toggleNotificationDropdown() {
     this.notificationDropdownOpen = !this.notificationDropdownOpen;
-    
+
   }
 
   logout() {

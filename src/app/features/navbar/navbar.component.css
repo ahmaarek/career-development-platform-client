@@ -109,7 +109,7 @@
   font-weight: 600;
 }
 
-.dropdown-menu button:not(.mark-read-btn) {
+.dropdown-menu button:not(.mark-read-btn):not(.remove-btn) {
   width: 100%;
   padding: 8px;
   border: none;
@@ -187,5 +187,22 @@
 .mark-read-btn:hover {
   background-color: #c5c5c5;
 }
+
+.remove-btn {
+  margin-top: 4px;
+  padding: 4px 10px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background-color: #d32f2f;
+}
+
 
 

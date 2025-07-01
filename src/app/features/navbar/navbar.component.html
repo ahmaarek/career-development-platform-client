@@ -35,6 +35,7 @@
         @if (!notification.read) {
         <button (click)="markAsRead(notification)" class="mark-read-btn">Mark as Read</button>
         }
+        <button (click)="removeNotification(notification)" class="remove-btn">Remove</button>
       </div>
       }
       }

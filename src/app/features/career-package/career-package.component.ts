@@ -386,6 +386,7 @@ export class CareerPackageComponent implements OnInit {
         this.isLoading = false;
       }
     });
+    this.ngOnInit();
   }
 
   getSubmissionStatusMessage(): string {

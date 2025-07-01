@@ -13,7 +13,7 @@
     <button class="assign-btn" [disabled]="enrollmentStatus[user.id] === true" (click)="openAssignModal(user.id)">
       Assign Package
     </button>
-    <button class="view-btn" [disabled]="userPackages[user.id]?.status !== 'UNDER_REVIEW'"
+    <button class="view-btn" [disabled]="userPackages[user.id].status !== 'UNDER_REVIEW'"
       (click)="openReviewModal(user.id)">
       View Submission
     </button>

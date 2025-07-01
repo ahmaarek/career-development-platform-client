@@ -15,4 +15,8 @@ export class NotificationService {
   markAsRead(notificationId: string): Observable<void> {
     return this.http.patch<void>(`${environment.notificationBaseUrl}/${notificationId}/read`, {});
   }
+
+  deleteNotification(notificationId: string): Observable<void> {
+    return this.http.delete<void>(`${environment.notificationBaseUrl}/${notificationId}`);
+  }
 }
