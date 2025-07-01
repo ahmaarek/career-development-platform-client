@@ -20,10 +20,15 @@ export class CareerPackageReviewComponent implements OnInit {
   careerPackageTemplates: CareerPackageTemplate[] = [];
   userPackages: Record<string, UserCareerPackage> = {};
   reviewingUserId: string | null = null;
+  viewingUserId: string | null = null;
 
   assigningUserId: string | null = null;
   selectedTemplateId: string | null = null;
   managerId: string = "";
+
+  commentDraft: Record<string, string> = {};
+  savedComments: Record<string, string> = {};
+  showCommentBox: Record<string, boolean> = {};
 
   constructor(private userService: UserService, private careerPackageService: CareerPackageService) { }
 
@@ -39,8 +44,10 @@ export class CareerPackageReviewComponent implements OnInit {
         // Check enrollment for each user
         users.forEach(user => {
           this.careerPackageService.getUserCareerPackage(user.id).subscribe(pkg => {
-            this.enrollmentStatus[user.id] = true;
-            this.userPackages[user.id] = pkg;
+            if (pkg.status !== 'APPROVED') {
+              this.enrollmentStatus[user.id] = true;
+              this.userPackages[user.id] = pkg;
+            }
           }, err => {
             if (err.status === 404) {
               this.enrollmentStatus[user.id] = false;
@@ -76,15 +83,32 @@ export class CareerPackageReviewComponent implements OnInit {
     this.reviewingUserId = null;
   }
 
-  addComment(userId: string): void {
-    // comment logic
-    console.log("Add comment for", userId);
+  openViewModal(userId: string): void {
+    this.viewingUserId = userId;
   }
+
+  closeViewModal(): void {
+    this.viewingUserId = null;
+  }
+
+  addComment(userId: string): void {
+    this.showCommentBox[userId] = true;
+    if (!this.commentDraft[userId]) {
+      this.commentDraft[userId] = '';
+    }
+  }
+
+  submitComment(userId: string): void {
+    this.savedComments[userId] = this.commentDraft[userId];
+    this.userPackages[userId].reviewerComment = this.savedComments[userId];
+    this.showCommentBox[userId] = false;
+  }
+
 
   approveSubmission(userId: string): void {
     this.careerPackageService.ApproveCareerPackage(this.userPackages[userId]).subscribe({
       next: (response: UserCareerPackage) => {
-        this.userPackages[userId] = response;
+        delete this.userPackages[userId];
         this.enrollmentStatus[userId] = false;
         this.closeReviewModal();
       },
@@ -92,7 +116,6 @@ export class CareerPackageReviewComponent implements OnInit {
         console.error('Error approving career package:', error);
       }
     });
-    
   }
 
   rejectSubmission(userId: string): void {
@@ -106,7 +129,7 @@ export class CareerPackageReviewComponent implements OnInit {
         console.error('Error rejecting career package:', error);
       }
     });
-    
+
   }
 
   confirmAssign(): void {

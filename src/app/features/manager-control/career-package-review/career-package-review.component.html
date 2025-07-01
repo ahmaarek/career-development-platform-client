@@ -13,7 +13,11 @@
     <button class="assign-btn" [disabled]="enrollmentStatus[user.id] === true" (click)="openAssignModal(user.id)">
       Assign Package
     </button>
-    <button class="view-btn" [disabled]="userPackages[user.id].status !== 'UNDER_REVIEW'"
+    <button class="view-btn" [disabled]="userPackages[user.id]?.status === 'UNDER_REVIEW'"
+      (click)="openViewModal(user.id)">
+      View Progress
+    </button>
+    <button class="view-btn" [disabled]="userPackages[user.id]?.status !== 'UNDER_REVIEW'"
       (click)="openReviewModal(user.id)">
       View Submission
     </button>
@@ -44,16 +48,28 @@
       <h2>Career Package Review for {{ user.name }}</h2>
 
       @for (section of userPackages[user.id].sectionResponses; track section.id) {
-        <div class="section-block">
-          <h3>{{ getSectionTitle(section.sectionTemplateId) }}</h3>
-          <ul>
-            @for (field of section.fieldResponses; track field.fieldTemplateId) {
-              <li>
-                <strong>{{ getFieldLabel(section.sectionTemplateId,field.fieldTemplateId) }}:</strong> {{ field.value }}
-              </li>
-            }
-          </ul>
-        </div>
+      <div class="section-block">
+        <h3>{{ getSectionTitle(section.sectionTemplateId) }}</h3>
+        <ul>
+          @for (field of section.fieldResponses; track field.fieldTemplateId) {
+          <li>
+            <strong>{{ getFieldLabel(section.sectionTemplateId,field.fieldTemplateId) }}:</strong> {{ field.value }}
+          </li>
+          }
+        </ul>
+      </div>
+      }
+      @if (showCommentBox[user.id]) {
+      <div class="comment-box">
+        <textarea [(ngModel)]="commentDraft[user.id]" rows="4" placeholder="Write your comment here..."></textarea>
+        <button class="save-btn" (click)="submitComment(user.id)">Submit Comment</button>
+      </div>
+      }
+      @if (savedComments[user.id]) {
+      <div class="saved-comment">
+        <strong>Comment:</strong>
+        <p>{{ savedComments[user.id] }}</p>
+      </div>
       }
 
       <div class="modal-actions">
@@ -64,7 +80,39 @@
       </div>
     </div>
   </div>
-}
+  }
+
+  @if (viewingUserId === user.id) {
+   <div class="modal-overlay">
+    <div class="modal large-modal">
+      <h2>Career Package Review for {{ user.name }}</h2>
+
+      @for (section of userPackages[user.id].sectionResponses; track section.id) {
+      <div class="section-block">
+        <h3>{{ getSectionTitle(section.sectionTemplateId) }}</h3>
+        <ul>
+          @for (field of section.fieldResponses; track field.fieldTemplateId) {
+          <li>
+            <strong>{{ getFieldLabel(section.sectionTemplateId,field.fieldTemplateId) }}:</strong> {{ field.value }}
+          </li>
+          }
+        </ul>
+      </div>
+      }
+      @if (savedComments[user.id]) {
+      <div class="saved-comment">
+        <strong>Comment:</strong>
+        <p>{{ savedComments[user.id] }}</p>
+      </div>
+      }
+
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="closeViewModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+  }
 
 
 </div>
