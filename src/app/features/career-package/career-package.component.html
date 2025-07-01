@@ -146,7 +146,7 @@
       </div>
 
       <div class="submit-all-content">
-        @if (!isPackageSubmitted()) {
+        @if (!isPackageSubmitted() && !isPackageApproved()) {
         <div class="submit-instructions">
           
           <p>Once submitted, your package will be marked as "Under Review" and you won't be able to make further changes
@@ -162,9 +162,15 @@
             is complete.</p>
         </div>
         }
+        @if (isPackageApproved()) {
+        <div class="submitted-message">
+          <p><strong>Package Approved</strong></p>
+          <p>Your career package has been approved by your manager. Please contact him for promotion</p>
+        </div>
+        }
 
         <div class="submit-all-actions">
-          @if (!isPackageSubmitted()) {
+          @if (!isPackageSubmitted() && !isPackageApproved()) {
           <button type="button" class="btn btn-lg btn-success submit-all-btn" (click)="submitCompleteCareerPackage()"
             [disabled]="!canSubmitCompletePackage()">
             @if (!isLoading) {
