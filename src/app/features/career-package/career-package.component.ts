@@ -347,7 +347,7 @@ export class CareerPackageComponent implements OnInit {
 
     // Check if package is already submitted or under review
     if (this.userCareerPackage.status === PackageStatus.UNDER_REVIEW ||
-      this.userCareerPackage.status === PackageStatus.COMPLETED) {
+      this.userCareerPackage.status === PackageStatus.APPROVED) {
       return false;
     }
 
@@ -371,6 +371,7 @@ export class CareerPackageComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
+    console.log(this.userCareerPackage);
     // Submit the complete package
     this.careerPackageService.submitCompleteCareerPackage(this.userCareerPackage).subscribe({
       next: (updatedPackage) => {
@@ -396,7 +397,7 @@ export class CareerPackageComponent implements OnInit {
         return 'Package in progress';
       case PackageStatus.UNDER_REVIEW:
         return 'Package submitted and under review';
-      case PackageStatus.COMPLETED:
+      case PackageStatus.APPROVED:
         return 'Package completed';
       default:
         return '';

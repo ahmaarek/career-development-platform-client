@@ -8,6 +8,7 @@ export interface UserCareerPackage {
   reviewerId: string;
   status: PackageStatus;
   template: CareerPackageTemplate;
+  reviewerComment: string;
   sectionResponses: UserSectionResponse[];
 }
 
