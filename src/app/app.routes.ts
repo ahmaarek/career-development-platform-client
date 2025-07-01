@@ -11,6 +11,10 @@ import { CareerPackageComponent } from './features/career-package/career-package
 import { CareerPackagesComponent } from './features/admin-control/career-package-management/career-package-management.component';
 import { ManagerControlComponent } from './features/manager-control/manager-control.component';
 import { CareerPackageReviewComponent } from './features/manager-control/career-package-review/career-package-review.component';
+import { LibraryHomeComponent } from './features/learning/library/library-home/library-home.component';
+import { CreateEntryComponent } from './features/learning/library/create-entry/create-entry.component';
+import { LibraryContainerComponent } from './features/learning/library/library-container/library-container.component';
+import { TemplateBuilderComponent } from './features/learning/library/template-builder/template-builder.component';
 
 export const routes: Routes = [
     {
@@ -42,6 +46,15 @@ export const routes: Routes = [
                 component: ManagerControlComponent,
                 children: [
                     { path: 'career-package-review', component: CareerPackageReviewComponent }
+                ]
+            },
+            {
+                path: 'library', component: LibraryContainerComponent,
+                children:[
+                    {path: '', component: LibraryHomeComponent},
+                    {path: 'create', component: CreateEntryComponent},
+                    
+                    {path: 'learning-material/create', component: TemplateBuilderComponent}
                 ]
             }
         ]

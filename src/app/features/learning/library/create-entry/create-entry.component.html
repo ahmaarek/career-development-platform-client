@@ -1,0 +1,29 @@
+<div class="create-wrapper">
+  <h2>Create {{ entryType }}</h2>
+
+  <div class="type-toggle">
+    <button [class.active]="entryType === 'BLOG'" (click)="onTypeChange('BLOG')">Blog</button>
+    <button [class.active]="entryType === 'WIKI'" (click)="onTypeChange('WIKI')">Wiki</button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <label>
+      Title:
+      <input formControlName="title" placeholder="Enter title" />
+    </label>
+
+    <label>
+      Content:
+      <textarea formControlName="content" placeholder="Write your content..."></textarea>
+    </label>
+
+    <label>
+      Attachment (optional):
+      <input type="file" (change)="onFileChange($event)" />
+    </label>
+
+    <button type="submit" [disabled]="isSubmitting || form.invalid">
+      {{ isSubmitting ? 'Submitting...' : 'Create' }}
+    </button>
+  </form>
+</div>
