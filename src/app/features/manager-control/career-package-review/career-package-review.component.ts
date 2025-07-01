@@ -92,12 +92,21 @@ export class CareerPackageReviewComponent implements OnInit {
         console.error('Error approving career package:', error);
       }
     });
-    console.log("Approved", userId);
+    
   }
 
   rejectSubmission(userId: string): void {
-    // Call service to mark as REJECTED
-    console.log("Rejected", userId);
+    this.careerPackageService.RejectCareerPackage(this.userPackages[userId]).subscribe({
+      next: (response: UserCareerPackage) => {
+        this.userPackages[userId] = response;
+        this.enrollmentStatus[userId] = true;
+        this.closeReviewModal();
+      },
+      error: (error) => {
+        console.error('Error rejecting career package:', error);
+      }
+    });
+    
   }
 
   confirmAssign(): void {

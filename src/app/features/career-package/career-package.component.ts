@@ -61,10 +61,12 @@ export class CareerPackageComponent implements OnInit {
         this.isEnrolled = isEnrolled;
 
         if (isEnrolled) {
+          
           this.loadUserCareerPackage();
         }
       },
       error: (error) => {
+        console.log('User is enrolled in a career package');
         this.errorMessage = error.message;
         this.isLoading = false;
       }
@@ -346,8 +348,7 @@ export class CareerPackageComponent implements OnInit {
     if (!this.userCareerPackage || this.isLoading) return false;
 
     // Check if package is already submitted or under review
-    if (this.userCareerPackage.status === PackageStatus.UNDER_REVIEW ||
-      this.userCareerPackage.status === PackageStatus.APPROVED) {
+    if (this.userCareerPackage.status === PackageStatus.UNDER_REVIEW) {
       return false;
     }
 
@@ -407,7 +408,7 @@ export class CareerPackageComponent implements OnInit {
   isPackageSubmitted(): boolean {
     if (!this.userCareerPackage) return false;
     return this.userCareerPackage.status === PackageStatus.UNDER_REVIEW ||
-      this.userCareerPackage.status === PackageStatus.COMPLETED;
+      this.userCareerPackage.status === PackageStatus.APPROVED;
   }
 }
 
