@@ -1,0 +1,51 @@
+<h2>Create Learning Material</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <label>Title:
+    <input formControlName="title" />
+  </label>
+
+  <label>Description:
+    <textarea formControlName="description"></textarea>
+  </label>
+
+  <div formArrayName="sections">
+    <div *ngFor="let section of sections.controls; let i = index" [formGroupName]="i" class="section-card">
+      <h3>Section {{ i + 1 }}</h3>
+
+      <label>Title:
+        <input formControlName="title" />
+      </label>
+
+      <label>Type:
+        <select formControlName="type">
+          <option *ngFor="let type of sectionTypeOptions" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+      </label>
+
+      <label>Instructions:
+        <textarea formControlName="instructions"></textarea>
+      </label>
+
+      <label>Content:
+        <textarea formControlName="content"></textarea>
+      </label>
+
+      <label>
+        Requires Submission:
+        <input type="checkbox" formControlName="requiresSubmission" />
+      </label>
+
+      <label>Attachment (optional):
+        <input type="file" (change)="onFileChange($event, i)" />
+      </label>
+
+      <button type="button" (click)="removeSection(i)">Remove Section</button>
+    </div>
+  </div>
+
+  <button type="button" (click)="addSection()">Add Section</button>
+  <button type="submit">Create Learning Material</button>
+</form>

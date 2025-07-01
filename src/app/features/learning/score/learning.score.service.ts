@@ -8,7 +8,7 @@ import { LearningScore } from './learning.score.model'; // Adjust the import pat
 })
 export class LearningScoreService {
 
-  private scoresUrl = 'http://localhost:8082/api/scores';
+  private scoresUrl = 'http://localhost:8082/api/learning/scores';
   constructor(private http: HttpClient) {}
 
   getLeaderboard(): Observable<LearningScore[]> {
