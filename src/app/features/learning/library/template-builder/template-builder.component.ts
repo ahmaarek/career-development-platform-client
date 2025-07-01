@@ -42,7 +42,7 @@ export class TemplateBuilderComponent {
   addSection(): void {
     const sectionGroup = this.fb.group({
       title: ['', Validators.required],
-      type: ['CONTENT'], // default section type
+      type: [this.sectionTypeOptions[0], Validators.required],
       instructions: [''],
       content: [''],
       requiresSubmission: [false],
@@ -77,7 +77,7 @@ export class TemplateBuilderComponent {
       .subscribe((attachmentIds: (string | null)[]) => {
 
         formValue.sections.forEach((section: SectionFormModel, i: number) => {
-          section.attachmentId = attachmentIds[i] ?? undefined; // ✅ Fix here
+          section.attachmentId = attachmentIds[i] ?? undefined;
           delete section.attachment;
         });
 

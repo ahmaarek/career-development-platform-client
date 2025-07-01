@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { BlogWikiDTO } from '../models/blog-wiki.model';
 import { BlogWikiService } from '../services/blog-wiki.service';
 import { CommonModule } from '@angular/common';
-import { EndsWithPipe } from '../pipes/ends-with.pipe';
 import { UserService } from '../../../../user/user.service';
 import { User } from '../../../../user/user.model';
 import { RouterLink } from '@angular/router';

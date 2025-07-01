@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LearningScore } from './learning.score.model'; // Adjust the import path as necessary
+import { LearningScore } from './learning.score.model';
 
 @Injectable({
   providedIn: 'root'
