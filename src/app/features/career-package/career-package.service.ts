@@ -85,7 +85,41 @@ export class CareerPackageService {
   submitCompleteCareerPackage(userCareerPackage: UserCareerPackage): Observable<UserCareerPackage> {
     const submissionData = {
       id: userCareerPackage.id,
+      userId: userCareerPackage.userId,
+      reviewerId: userCareerPackage.reviewerId,
       status: PackageStatus.UNDER_REVIEW
+    };
+
+    console.log('Submitting complete career package:', submissionData);
+
+    return this.http.patch<UserCareerPackage>(`${this.baseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  ApproveCareerPackage(userCareerPackage: UserCareerPackage): Observable<UserCareerPackage> {
+    const submissionData = {
+      id: userCareerPackage.id,
+      userId: userCareerPackage.userId,
+      reviewerId: userCareerPackage.reviewerId,
+      status: PackageStatus.APPROVED,
+      reviewerComment: userCareerPackage.reviewerComment
+    };
+
+    return this.http.patch<UserCareerPackage>(`${this.baseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  RejectCareerPackage(userCareerPackage: UserCareerPackage): Observable<UserCareerPackage> {
+    const submissionData = {
+      id: userCareerPackage.id,
+      userId: userCareerPackage.userId,
+      reviewerId: userCareerPackage.reviewerId,
+      status: PackageStatus.REJECTED,
+      reviewerComment: userCareerPackage.reviewerComment
     };
 
     return this.http.patch<UserCareerPackage>(`${this.baseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
