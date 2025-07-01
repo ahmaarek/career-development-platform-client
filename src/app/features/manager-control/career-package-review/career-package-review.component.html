@@ -62,7 +62,7 @@
       @if (showCommentBox[user.id]) {
       <div class="comment-box">
         <textarea [(ngModel)]="commentDraft[user.id]" rows="4" placeholder="Write your comment here..."></textarea>
-        <button class="save-btn" (click)="submitComment(user.id)">Submit Comment</button>
+        <button class="save-comment-btn" (click)="submitComment(user.id)">Submit Comment</button>
       </div>
       }
       @if (savedComments[user.id]) {
@@ -99,13 +99,6 @@
         </ul>
       </div>
       }
-      @if (savedComments[user.id]) {
-      <div class="saved-comment">
-        <strong>Comment:</strong>
-        <p>{{ savedComments[user.id] }}</p>
-      </div>
-      }
-
       <div class="modal-actions">
         <button class="cancel-btn" (click)="closeViewModal()">Close</button>
       </div>

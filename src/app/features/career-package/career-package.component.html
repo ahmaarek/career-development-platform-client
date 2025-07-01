@@ -133,6 +133,17 @@
       }
     </div>
 
+    <!-- Reviewer Comment Section -->
+    <div class="card reviewer-comment-section">
+      <h3>Reviewer Comment</h3>
+      @if (userCareerPackage.reviewerComment && userCareerPackage.reviewerComment !== 'null') {
+      <p>{{ userCareerPackage.reviewerComment }}</p>
+      } @else {
+      <p class="no-comment">No comments yet.</p>
+      }
+    </div>
+
+
     <!-- Submit All Section -->
     <div class="submit-all-section card">
       <div class="submit-all-header">
@@ -148,7 +159,7 @@
       <div class="submit-all-content">
         @if (!isPackageSubmitted() && !isPackageApproved()) {
         <div class="submit-instructions">
-          
+
           <p>Once submitted, your package will be marked as "Under Review" and you won't be able to make further changes
             until the review is complete.</p>
           <p>Please ensure all sections are completed before submitting.</p>

@@ -142,12 +142,14 @@
 
 
 .save-btn,
-.approve-btn {
+.approve-btn,
+.save-comment-btn {
   background-color: #28a745;
 }
 
 .save-btn:hover,
-.approve-btn:hover {
+.approve-btn:hover,
+.save-comment-btn:hover {
   background-color: #218838;
 }
 
@@ -192,5 +194,14 @@ button:disabled {
   border-left: 4px solid #007acc;
   padding: 0.5rem;
   margin: 0.75rem 0;
+}
+
+.save-comment-btn{
+  padding: 8px 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
 }
 
