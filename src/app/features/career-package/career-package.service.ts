@@ -60,7 +60,10 @@ export class CareerPackageService {
   }
 
 
-  updateSectionResponse(sectionResponseId: string, sectionResponse: UserSectionResponse): Observable<UserSectionResponse> {
+  updateSectionResponse(
+    sectionResponseId: string,
+    sectionResponse: UserSectionResponse & { newFieldResponses?: UserFieldResponse[] }
+  ): Observable<UserSectionResponse> {
 
     const body = {
       userCareerPackageId: sectionResponse.userCareerPackageId,
@@ -69,10 +72,15 @@ export class CareerPackageService {
         id: fr.id,
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value
+      })),
+      newFieldResponses: (sectionResponse.newFieldResponses || []).map(fr => ({
+        fieldTemplateId: fr.fieldTemplateId,
+        value: fr.value
       }))
     };
 
     console.log('Updating section response:', body);
+
     return this.http.put<UserSectionResponse>(
       `${environment.careerPackageBaseUrl}/user-section-response/${sectionResponseId}`,
       body
@@ -80,6 +88,7 @@ export class CareerPackageService {
       catchError(this.handleError)
     );
   }
+
 
 
   submitCompleteCareerPackage(userCareerPackage: UserCareerPackage): Observable<UserCareerPackage> {

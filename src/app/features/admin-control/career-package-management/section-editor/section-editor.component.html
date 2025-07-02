@@ -18,9 +18,6 @@
     <label class="form-label">Instructions</label>
     <textarea [(ngModel)]="section.instructions" class="section-textarea" placeholder="Add instructions..."></textarea>
 
-    <label class="form-label">Requirements</label>
-    <textarea [(ngModel)]="section.requirements" class="section-textarea" placeholder="Add requirements..."></textarea>
-
     <label class="form-label">Section Type</label>
     <select [(ngModel)]="section.type" class="form-control">
       <option value="LEARNING">Learning</option>
@@ -34,9 +31,6 @@
 
   @if (!isEditing) {
     <p>{{ section.instructions }}</p>
-    @if (section.requirements) {
-      <p><strong>Requirements:</strong> {{ section.requirements }}</p>
-    }
     <p><strong>Type:</strong> {{ section.type }}</p>
   }
 

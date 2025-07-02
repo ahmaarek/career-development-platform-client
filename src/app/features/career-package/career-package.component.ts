@@ -61,7 +61,7 @@ export class CareerPackageComponent implements OnInit {
         this.isEnrolled = isEnrolled;
 
         if (isEnrolled) {
-          
+
           this.loadUserCareerPackage();
         }
       },
@@ -73,7 +73,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  
+
   private loadUserCareerPackage(): void {
     this.careerPackageService.getUserCareerPackage(this.currentUserId).subscribe({
       next: (userPackage) => {
@@ -89,7 +89,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  
+
   private initializeSectionForms(): void {
     if (!this.userCareerPackage) return;
 
@@ -102,7 +102,7 @@ export class CareerPackageComponent implements OnInit {
 
         const validators = [];
         validators.push(Validators.required);
-        
+
         switch (field.fieldType) {
           case 'email':
             validators.push(Validators.email);
@@ -129,7 +129,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  
+
   getExistingFieldResponse(sectionId: string, fieldId: string): UserFieldResponse | null {
     if (!this.userCareerPackage) return null;
 
@@ -168,7 +168,7 @@ export class CareerPackageComponent implements OnInit {
     return totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
   }
 
-  
+
   getOverallCompletionPercentage(): number {
     if (!this.userCareerPackage) return 0;
 
@@ -201,51 +201,58 @@ export class CareerPackageComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Check if section response already exists
     const existingSectionResponse = this.userCareerPackage.sectionResponses?.find(
       resp => resp.sectionTemplateId === section.id
     );
 
     if (existingSectionResponse && existingSectionResponse.id) {
-
-      let existingResponsesMap: Record<string, string | undefined> = {};
-      existingResponsesMap = Object.fromEntries(
+      const existingResponsesMap: Record<string, string | undefined> = Object.fromEntries(
         existingSectionResponse.fieldResponses.map(resp => [resp.fieldTemplateId, resp.id])
       );
 
-      const fieldResponses: UserFieldResponse[] = section.fields.map(field => {
-        const value = form.get(field.fieldKey)?.value || '';
-        const id = existingResponsesMap[field.id]; // field.id is fieldTemplateId
+      const fieldResponses: UserFieldResponse[] = [];
+      const newFieldResponses: UserFieldResponse[] = [];
 
-        return {
-          id,
+      section.fields.forEach(field => {
+        const value = form.get(field.fieldKey)?.value || '';
+        const existingId = existingResponsesMap[field.id];
+
+        const response: UserFieldResponse = {
           fieldTemplateId: field.id,
           value
         };
+
+        if (existingId) {
+          response.id = existingId;
+          fieldResponses.push(response);
+        } else {
+          newFieldResponses.push(response);
+        }
       });
-      // Update existing section response
+
       this.careerPackageService.updateSectionResponse(
         existingSectionResponse.id,
         {
           userCareerPackageId: this.userCareerPackage.id,
           sectionTemplateId: section.id,
-          fieldResponses: fieldResponses
+          fieldResponses: fieldResponses,
+          newFieldResponses: newFieldResponses
         }
       ).subscribe({
-        next: (updatedResponse) => {
+        next: updatedResponse => {
           this.updateLocalSectionResponse(section.id, updatedResponse);
           this.successMessage = `${section.title} section updated successfully!`;
           this.isLoading = false;
           setTimeout(() => this.successMessage = '', 3000);
         },
-        error: (error) => {
+        error: error => {
           this.errorMessage = error.message;
           this.isLoading = false;
         }
       });
 
     } else {
-
+      // First-time submission
       const fieldResponses: UserFieldResponse[] = section.fields.map(field => {
         const value = form.get(field.fieldKey)?.value || '';
         return {
@@ -254,26 +261,27 @@ export class CareerPackageComponent implements OnInit {
         };
       });
 
-      // Create new section response
       this.careerPackageService.submitCompleteSection(
         this.userCareerPackage.id,
         section.id,
         fieldResponses
       ).subscribe({
-        next: (newSectionResponse) => {
+        next: newSectionResponse => {
           this.addLocalSectionResponse(newSectionResponse);
           this.successMessage = `${section.title} section submitted successfully!`;
           this.isLoading = false;
           setTimeout(() => this.successMessage = '', 3000);
         },
-        error: (error) => {
+        error: error => {
           this.errorMessage = error.message;
           this.isLoading = false;
         }
       });
     }
+
     this.ngOnInit();
   }
+
 
 
   isSectionSubmitDisabled(sectionId: string): boolean {
@@ -294,7 +302,7 @@ export class CareerPackageComponent implements OnInit {
     return hasRequiredEmptyFields;
   }
 
-  
+
   getSectionSubmitButtonText(section: SectionTemplate): string {
     if (!this.userCareerPackage) return 'Submit Section';
 
@@ -305,7 +313,7 @@ export class CareerPackageComponent implements OnInit {
     return existingSectionResponse && existingSectionResponse.id ? 'Update Section' : 'Submit Section';
   }
 
-  
+
   private updateLocalSectionResponse(sectionId: string, updatedSectionResponse: UserSectionResponse): void {
     if (!this.userCareerPackage) return;
 
@@ -318,7 +326,7 @@ export class CareerPackageComponent implements OnInit {
     }
   }
 
-  
+
   private addLocalSectionResponse(newSectionResponse: UserSectionResponse): void {
     if (!this.userCareerPackage) return;
 
@@ -329,12 +337,12 @@ export class CareerPackageComponent implements OnInit {
     if (existingIndex !== -1) {
       this.userCareerPackage.sectionResponses[existingIndex] = newSectionResponse;
     } else {
-      
+
       this.userCareerPackage.sectionResponses.push(newSectionResponse);
     }
   }
 
-  
+
   isFieldInvalid(sectionId: string, fieldKey: string): boolean {
     const form = this.sectionForms[sectionId];
     if (!form) return false;
@@ -343,7 +351,7 @@ export class CareerPackageComponent implements OnInit {
     return !!(control && control.invalid && control.touched);
   }
 
-  
+
   canSubmitCompletePackage(): boolean {
     if (!this.userCareerPackage || this.isLoading) return false;
 
@@ -352,7 +360,7 @@ export class CareerPackageComponent implements OnInit {
       return false;
     }
 
-    
+
     return this.userCareerPackage.template.sections.every(section => {
       const sectionResponse = this.userCareerPackage!.sectionResponses.find(
         sr => sr.sectionTemplateId === section.id
@@ -365,7 +373,7 @@ export class CareerPackageComponent implements OnInit {
     });
   }
 
-  
+
   submitCompleteCareerPackage(): void {
     if (!this.userCareerPackage || !this.canSubmitCompletePackage()) return;
 
@@ -400,7 +408,7 @@ export class CareerPackageComponent implements OnInit {
         return 'Package submitted and under review';
       case PackageStatus.APPROVED:
         return 'Package completed';
-        case PackageStatus.REJECTED:
+      case PackageStatus.REJECTED:
         return 'Package rejected';
       default:
         return '';

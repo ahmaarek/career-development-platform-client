@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../user/user.service';
 import { NotificationService } from '../notification/notification.service';
+import { Notification } from '../notification/notification.model';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -15,12 +16,13 @@ import { MatIconModule } from '@angular/material/icon';
 export class NavbarComponent implements OnInit {
   dropdownOpen = false;
   notificationDropdownOpen = false;
-  role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = 'ADMIN';
+  role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = null as any;
   userName: string = 'John Doe';
 
-  notifications: any[] = [];
+  notifications: Notification[] = [];
   unreadCount: number = 0;
   userId!: string;
+  senderNames: Record<string, string> = {};
 
   constructor(
     private router: Router,
@@ -50,16 +52,33 @@ export class NavbarComponent implements OnInit {
   }
 
   fetchNotifications() {
-    this.notificationService.getNotifications(this.userId).subscribe({
-      next: (notifications) => {
-        this.notifications = notifications;
-        this.unreadCount = notifications.filter((n: any) => !n.read).length;
-      },
-      error: (err) => {
-        console.error('Error loading notifications:', err);
-      }
-    });
-  }
+  this.notificationService.getNotifications(this.userId).subscribe({
+    next: (notifications) => {
+      this.notifications = notifications;
+      this.unreadCount = notifications.filter(n => !n.read).length;
+
+      const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
+
+      uniqueSenderIds.forEach(senderId => {
+        if (!this.senderNames[senderId]) {
+          this.userService.getUserById(senderId).subscribe({
+            next: user => {
+              this.senderNames[senderId] = user.name;
+            },
+            error: err => {
+              console.error(`Failed to fetch sender name for ID ${senderId}`, err);
+              this.senderNames[senderId] = 'Unknown';
+            }
+          });
+        }
+      });
+    },
+    error: (err) => {
+      console.error('Error loading notifications:', err);
+    }
+  });
+}
+
 
   markAsRead(notification: any) {
     this.notificationService.markAsRead(notification.id).subscribe({
@@ -74,16 +93,16 @@ export class NavbarComponent implements OnInit {
   }
 
   removeNotification(notification: any) {
-  this.notificationService.deleteNotification(notification.id).subscribe({
-    next: () => {
-      this.notifications = this.notifications.filter(n => n.id !== notification.id);
-      this.unreadCount = this.notifications.filter(n => !n.read).length;
-    },
-    error: err => {
-      console.error('Failed to delete notification:', err);
-    }
-  });
-}
+    this.notificationService.deleteNotification(notification.id).subscribe({
+      next: () => {
+        this.notifications = this.notifications.filter(n => n.id !== notification.id);
+        this.unreadCount = this.notifications.filter(n => !n.read).length;
+      },
+      error: err => {
+        console.error('Failed to delete notification:', err);
+      }
+    });
+  }
 
 
   toggleDropdown() {

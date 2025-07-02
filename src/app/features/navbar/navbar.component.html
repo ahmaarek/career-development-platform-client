@@ -12,36 +12,42 @@
   </div>
 
   <!-- Notification Bell Icon -->
-  <div class="notification-icon" (click)="toggleNotificationDropdown()" tabindex="0">
-    <mat-icon>notifications</mat-icon>
+<div class="notification-icon" (click)="toggleNotificationDropdown()" tabindex="0">
+  <mat-icon>notifications</mat-icon>
 
-    @if (unreadCount > 0) {
+  @if (unreadCount > 0) {
     <span class="notification-count">{{ unreadCount }}</span>
-    }
+  }
 
-    @if (notificationDropdownOpen) {
+  @if (notificationDropdownOpen) {
     <div class="dropdown-menu notifications">
       @if (notifications.length === 0) {
-      <div>No notifications</div>
+        <div>No notifications</div>
       } @else {
-      @for (notification of notifications; track notification.id) {
-      <div class="notification-item">
-        <div class="notification-content">
-          <strong>{{ notification.title }}</strong>
-          <p>{{ notification.message }}</p>
-          <small>{{ notification.createdAt | date:'short' }}</small>
-        </div>
+        @for (notification of notifications; track notification.id) {
+          <div class="notification-item">
+            
+            <!-- Display Sender Name if available -->
+            <div class="notification-sender">
+              <small><strong>From: {{ senderNames[notification.senderId] || 'Unknown Sender' }}</strong></small>
+            </div>
 
-        @if (!notification.read) {
-        <button (click)="markAsRead(notification)" class="mark-read-btn">Mark as Read</button>
+            <div class="notification-content">
+              <p>{{ notification.message }}</p>
+              <small>{{ notification.createdAt | date:'short' }}</small>
+            </div>
+
+            @if (!notification.read) {
+              <button (click)="markAsRead(notification)" class="mark-read-btn">Mark as Read</button>
+            }
+            <button (click)="removeNotification(notification)" class="remove-btn">Remove</button>
+          </div>
         }
-        <button (click)="removeNotification(notification)" class="remove-btn">Remove</button>
-      </div>
-      }
       }
     </div>
-    }
-  </div>
+  }
+</div>
+
 
   <!-- Role-based Links + User -->
   <div class="navbar-actions">

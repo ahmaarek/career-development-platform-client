@@ -51,8 +51,8 @@ export class CareerPackagePanelComponent {
       requirements: '',
       fields: []
     };
-    this.package.sections.push(newSection);
-    this.newSections.push(newSection);
+    this.package.sections.unshift(newSection); //add to the beginning of the sections array
+    this.newSections.unshift(newSection); 
   }
 
   deleteSection(index: number) {
