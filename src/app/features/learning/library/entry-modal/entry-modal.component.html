@@ -1,0 +1,13 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal">
+  <h2>{{ entry.title }}</h2>
+  <p>{{ entry.content }}</p>
+
+  <ng-container *ngIf="entry.attachmentId && attachmentType">
+    <img *ngIf="attachmentType === 'image'" [src]="attachmentUrl" />
+    <video *ngIf="attachmentType === 'video'" [src]="attachmentUrl" controls></video>
+    <a *ngIf="attachmentType === 'document'" [href]="attachmentUrl" target="_blank">Open Document</a>
+  </ng-container>
+
+  <button (click)="onClose()" class="close-btn">Close</button>
+</div>

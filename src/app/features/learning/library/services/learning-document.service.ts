@@ -8,11 +8,11 @@ import { environment } from '../../../../../environments/environment';
 })
 export class LearningDocumentService {
 
-
+  private readonly learningDocumentsUrl = environment.learningServiceBaseUrl+ '/files';
   constructor(private http: HttpClient) {}
 
   getAttachmentUrl(attachmentId: string): string {
-    return `${environment.learningDocumentsUrl}/${attachmentId}`;
+    return `${this.learningDocumentsUrl}/${attachmentId}`;
   }
 
   getProtectedAttachment(attachmentId: string): Observable<Blob> {
@@ -51,7 +51,7 @@ export class LearningDocumentService {
     formData.append('file', file);
     formData.append('userId', userId);
 
-    return this.http.post(`${environment.learningDocumentsUrl}/upload/${type}`, formData, {
+    return this.http.post(`${this.learningDocumentsUrl}/upload/${type}`, formData, {
       responseType: 'text'
     });
   }

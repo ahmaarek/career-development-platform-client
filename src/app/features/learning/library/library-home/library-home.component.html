@@ -1,83 +1,64 @@
 <div class="tabs">
-    <button (click)="selectedType = 'blogs'">Blogs</button>
-    <button (click)="selectedType = 'wikis'">Wikis</button>
-    <button (click)="selectedType = 'learning'">Learning Materials</button>
+  <button (click)="selectedType = 'blogs'">Blogs</button>
+  <button (click)="selectedType = 'wikis'">Wikis</button>
+  <button (click)="selectedType = 'learning'">Learning Materials</button>
 </div>
 <ng-container *ngIf="currentUser">
-    <a *ngIf="isAdmin()" routerLink="/library/create">Create Blog or Wiki</a>
-    <a *ngIf="isAdmin()" routerLink="/library/learning-material/create">Create Learning Material</a>
+  <a *ngIf="getUserRole()==='ADMIN'" routerLink="/library/create">Create Blog or Wiki</a>
+  <a *ngIf="getUserRole()==='ADMIN'" routerLink="/library/learning-material/create">Create Learning Material</a>
+  <a *ngIf="getUserRole()==='MANAGER'" routerLink="/library/learning-material/review-submissions">Review Submissions</a>
 </ng-container>
 
 <div *ngIf="selectedType === 'blogs'">
-    <h2>Blogs</h2>
-    <ul class="entry-list">
-        <li *ngFor="let blog of blogs" (click)="openEntry(blog)">
-            {{ blog.title }}
-        </li>
-    </ul>
-</div>
-
-<div *ngIf="selectedType === 'wikis'">
-    <h2>Wikis</h2>
-    <ul class="entry-list">
-        <li *ngFor="let wiki of wikis" (click)="openEntry(wiki)">
-            {{ wiki.title }}
-        </li>
-    </ul>
-</div>
-<div *ngIf="selectedType === 'learning'">
-  <h2>Learning Materials</h2>
+  <h2>Blogs</h2>
   <ul class="entry-list">
-    <li *ngFor="let material of learningMaterials" (click)="openLearningTemplate(material)">
-      {{ material.title }}
-      <small style="display:block; font-weight: normal; color: #555;">{{ material.description }}</small>
+    <li *ngFor="let blog of blogs" (click)="openEntry(blog)">
+      {{ blog.title }}
     </li>
   </ul>
 </div>
 
-<!-- Learning Material Modal -->
-<div class="modal-backdrop" *ngIf="selectedLearningMaterial" (click)="closeLearningModal()"></div>
-<div class="modal" *ngIf="selectedLearningMaterial">
-  <h2>{{ selectedLearningMaterial.title }}</h2>
-  <p>{{ selectedLearningMaterial.description }}</p>
+<div *ngIf="selectedType === 'wikis'">
+  <h2>Wikis</h2>
+  <ul class="entry-list">
+    <li *ngFor="let wiki of wikis" (click)="openEntry(wiki)">
+      {{ wiki.title }}
+    </li>
+  </ul>
+</div>
+<div *ngIf="selectedType === 'learning'" class="learning-container">
+  <aside class="sidebar">
+    <button [class.active]="viewingUnsubmitted" (click)="setSubmissionView(true)">Unsubmitted</button>
+    <button [class.active]="!viewingUnsubmitted" (click)="setSubmissionView(false)">Submitted</button>
+  </aside>
 
-  <div *ngFor="let section of selectedLearningMaterial.sections; let i = index">
-    <h3>{{ section.title }}</h3>
-    <p><strong>Instructions:</strong> {{ section.instructions }}</p>
+  <div class="learning-list">
+    <h2 *ngIf="viewingUnsubmitted">Unsubmitted Learning Materials</h2>
+    <h2 *ngIf="!viewingUnsubmitted">Submitted Learning Materials</h2>
 
-    <div *ngIf="section.content">
-      <p><strong>Content:</strong> {{ section.content }}</p>
-    </div>
-
-  <ng-container *ngIf="sectionsAttachmentData[i]">
-    <img *ngIf="sectionsAttachmentData[i].type === 'image'" [src]="sectionsAttachmentData[i].url" />
-    <video *ngIf="sectionsAttachmentData[i].type === 'video'" [src]="sectionsAttachmentData[i].url" controls></video>
-    <a *ngIf="sectionsAttachmentData[i].type === 'document'" [href]="sectionsAttachmentData[i].url" target="_blank">Open Document</a>
-  </ng-container>
-
-    <div *ngIf="section.requiresSubmission">
-      <label>Submit Answer:</label>
-      <textarea rows="3"></textarea>
-      <input type="file" />
-    </div>
-
-    <hr />
+    <ul class="entry-list">
+      <li *ngFor="let material of (viewingUnsubmitted ? unsubmittedMaterials : submittedMaterials)"
+        (click)="viewingUnsubmitted ? openLearningTemplate(material) : openSubmittedModal(material)">
+        {{ material.title }}
+        <small style="display:block; font-weight: normal; color: #555;">
+          {{ material.description }}
+        </small>
+      </li>
+    </ul>
   </div>
-
-  <button (click)="closeLearningModal()">Close</button>
 </div>
 
-<div class="modal-backdrop" *ngIf="selectedEntry" (click)="closeModal()"></div>
-<div class="modal" *ngIf="selectedEntry">
-    <h2>{{ selectedEntry.title }}</h2>
-    <p>{{ selectedEntry.content }}</p>
 
-    <ng-container *ngIf="selectedEntry.attachmentId && attachmentType">
-        <img *ngIf="attachmentType === 'image'" [src]="attachmentUrl" />
-        <video *ngIf="attachmentType === 'video'" [src]="attachmentUrl" controls></video>
-        <a *ngIf="attachmentType === 'document'" [href]="getAttachmentUrl(selectedEntry.attachmentId)"
-            target="_blank">Open Document</a>
-    </ng-container>
+<app-learning-template-modal *ngIf="selectedLearningMaterial && currentUser && !selectedSubmittedSubmission" [template]="selectedLearningMaterial"
+  [currentUser]="currentUser" (close)="closeLearningModal()" (submitted)="loadLearningMaterials()" />
 
-    <button (click)="closeModal()">Close</button>
-</div>
+<app-entry-modal *ngIf="selectedEntry" [entry]="selectedEntry" [attachmentType]="attachmentType"
+  [attachmentUrl]="attachmentUrl" (close)="closeModal()">
+</app-entry-modal>
+
+<app-submitted-learning-modal
+  *ngIf="selectedSubmittedSubmission && selectedLearningMaterial"
+  [submission]="selectedSubmittedSubmission"
+  (close)="closeSubmittedModal()"
+></app-submitted-learning-modal>
+

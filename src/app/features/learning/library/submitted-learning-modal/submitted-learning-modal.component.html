@@ -1,0 +1,28 @@
+<div class="modal-backdrop" (click)="onCloseClicked()"></div>
+<div class="modal">
+  <h2>Submission Review</h2>
+  <p *ngIf="submission.status">Status: <strong>{{ submission.status }}</strong></p>
+
+<div *ngFor="let section of template?.sections">
+  <h3>{{ section.title }}</h3>
+
+  <ng-container *ngIf="getResponseForSection(section.id!) as response">
+    <p><strong>Your Response:</strong></p>
+    <p style="white-space: pre-line;">{{ response.userInput || 'No response provided.' }}</p>
+
+    <ng-container *ngIf="attachmentUrls[response.sectionTemplateId]">
+      <img *ngIf="attachmentUrls[response.sectionTemplateId].type === 'image'" [src]="attachmentUrls[response.sectionTemplateId].url" />
+      <video *ngIf="attachmentUrls[response.sectionTemplateId].type === 'video'" [src]="attachmentUrls[response.sectionTemplateId].url" controls></video>
+      <a *ngIf="attachmentUrls[response.sectionTemplateId].type === 'document'" [href]="attachmentUrls[response.sectionTemplateId].url" target="_blank">Open Document</a>
+    </ng-container>
+  </ng-container>
+
+  <hr />
+</div>
+
+
+  <hr />
+
+
+  <button class="close-btn" (click)="onCloseClicked()">Close</button>
+</div>

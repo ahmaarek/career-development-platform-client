@@ -9,13 +9,15 @@ import { environment } from '../../../../environments/environment';
 })
 export class LearningScoreService {
 
+
+  private readonly learningScoresUrl = environment.learningServiceBaseUrl + '/scores';
   constructor(private http: HttpClient) {}
 
   getLeaderboard(): Observable<LearningScore[]> {
-    return this.http.get<LearningScore[]>(`${environment.learningScoresUrl}/leaderboard`);
+    return this.http.get<LearningScore[]>(`${this.learningScoresUrl}/leaderboard`);
   }
 
   getUserScore(userId: string): Observable<LearningScore> {
-    return this.http.get<LearningScore>(`${environment.learningScoresUrl}/user/${userId}`);
+    return this.http.get<LearningScore>(`${this.learningScoresUrl}/user/${userId}`);
   }
 }
