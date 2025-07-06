@@ -14,35 +14,39 @@
 
 
 <div *ngIf="getFilteredSubmissions().length === 0" class="placeholder">
-  No submissions found for the selected filters.
+    No submissions found for the selected filters.
 </div>
 
 <ng-container *ngFor="let submission of getFilteredSubmissions()">
-  <div *ngIf="templates[submission.templateId]" class="submission-card">
-      <h3>
-          {{ templates[submission.templateId].title || 'Loading title...' }}
-          <span class="status-badge" [ngClass]="submission.status">{{ submission.status }}</span>
-          <p class="submitter">
-              Submitted by:
-              <strong>
-                  {{ users[submission.id!].user?.name || users[submission.id!].user?.email || 'Unknown User' }}
-              </strong>
-      </h3>
+    <div *ngIf="templates[submission.templateId]" class="submission-card">
+        <h3>
+            {{ templates[submission.templateId].title || 'Loading title...' }}
+            <span class="status-badge" [ngClass]="submission.status">{{ submission.status }}</span>
+            <p class="submitter">
+                Submitted by:
+                <strong>
+                    {{ users[submission.id!].user?.name || users[submission.id!].user?.email || 'Unknown User' }}
+                </strong>
 
-      <div *ngFor="let response of submission.sectionResponses">
-          <h4>{{ getSectionTitle(submission.templateId, response.sectionTemplateId) }}</h4>
-          <p style="white-space: pre-line">{{ response.userInput || 'No input provided.' }}</p>
+                <span class="points-badge" *ngIf="templates[submission.templateId]?.points">
+                    ⭐ {{ templates[submission.templateId].points }} points
+                </span>
+        </h3>
 
-          <ng-container *ngIf="attachments[submission.id!]?.[response.sectionTemplateId] as data">
-              <img *ngIf="data.type === 'image'" [src]="data.url" />
-              <video *ngIf="data.type === 'video'" [src]="data.url" controls></video>
-              <a *ngIf="data.type === 'document'" [href]="data.url" target="_blank">Open Document</a>
-          </ng-container>
-      </div>
+        <div *ngFor="let response of submission.sectionResponses">
+            <h4>{{ getSectionTitle(submission.templateId, response.sectionTemplateId) }}</h4>
+            <p style="white-space: pre-line">{{ response.userInput || 'No input provided.' }}</p>
 
-      <div class="review-actions" *ngIf="submission.status === 'PENDING'">
-          <button (click)="reviewSubmission(submission.id!, true)" class="approve">Accept</button>
-          <button (click)="reviewSubmission(submission.id!, false)" class="reject">Reject</button>
-      </div>
-  </div>
+            <ng-container *ngIf="attachments[submission.id!]?.[response.sectionTemplateId] as data">
+                <img *ngIf="data.type === 'image'" [src]="data.url" />
+                <video *ngIf="data.type === 'video'" [src]="data.url" controls></video>
+                <a *ngIf="data.type === 'document'" [href]="data.url" target="_blank">Open Document</a>
+            </ng-container>
+        </div>
+
+        <div class="review-actions" *ngIf="submission.status === 'PENDING'">
+            <button (click)="reviewSubmission(submission.id!, true)" class="approve">Accept</button>
+            <button (click)="reviewSubmission(submission.id!, false)" class="reject">Reject</button>
+        </div>
+    </div>
 </ng-container>

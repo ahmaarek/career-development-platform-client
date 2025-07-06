@@ -102,6 +102,7 @@ export class LibraryHomeComponent implements OnInit {
       const submittedIds = new Set(submissions.map(sub => sub.templateId));
       this.submittedMaterials = templates.filter(t => submittedIds.has(t.id!));
       this.unsubmittedMaterials = templates.filter(t => !submittedIds.has(t.id!));
+      console.log('Submitted materials:', this.unsubmittedMaterials);
     });
   }
 

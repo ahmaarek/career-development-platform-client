@@ -40,6 +40,18 @@
 }
 
 
+.points-badge {
+  display: inline-block;
+  background-color: #ffe599;
+  color: #5c3d00;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
 .status-badge.APPROVED {
   background-color: #28a745;
   color: #fff;

@@ -111,6 +111,33 @@ a[routerLink]:hover {
   flex-grow: 1;
 }
 
+.points-badge {
+  display: inline-block;
+  background-color: #ffe599;
+  color: #5c3d00;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+
+.material-description {
+  display: block;
+  font-weight: normal;
+  color: #555;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.entry-list li .points-badge {
+  margin-top: 6px;
+  display: inline-block;
+}
+
+
 
 /* Animation */
 @keyframes fadeIn {

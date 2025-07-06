@@ -28,6 +28,7 @@ export class TemplateBuilderComponent {
     this.form = this.fb.group({
       title: ['', Validators.required],
       description: [''],
+      points: [0, [Validators.required, Validators.min(0)]],
       sections: this.fb.array([])
     });
     this.userService.getCurrentUser().subscribe(user => {
@@ -69,6 +70,7 @@ export class TemplateBuilderComponent {
     const formValue = this.form.value as {
       title: string;
       description: string;
+      points: number;
       sections: SectionFormModel[];
     };
 
@@ -84,6 +86,7 @@ export class TemplateBuilderComponent {
         const finalPayload = {
           title: formValue.title,
           description: formValue.description,
+          points: formValue.points,
           sections: formValue.sections
         };
 

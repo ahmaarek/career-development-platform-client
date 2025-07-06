@@ -13,6 +13,23 @@
   height: 32px;
 }
 
+.user-points {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 1rem;
+  padding: 6px 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #007bff;
+}
+
+.user-points mat-icon {
+  font-size: 18px;
+  color: #ffc107;
+}
+
+
 .navbar-links {
   display: flex;
   gap: 12px;

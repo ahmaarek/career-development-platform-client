@@ -40,25 +40,26 @@
       <li *ngFor="let material of (viewingUnsubmitted ? unsubmittedMaterials : submittedMaterials)"
         (click)="viewingUnsubmitted ? openLearningTemplate(material) : openSubmittedModal(material)">
         {{ material.title }}
-        <small style="display:block; font-weight: normal; color: #555;">
+        <small class="material-description">
           {{ material.description }}
         </small>
+
+        <span class="points-badge" *ngIf="material.points">
+          ⭐ {{ material.points }} points
+        </span>
       </li>
     </ul>
   </div>
 </div>
 
 
-<app-learning-template-modal *ngIf="selectedLearningMaterial && currentUser && !selectedSubmittedSubmission" [template]="selectedLearningMaterial"
-  [currentUser]="currentUser" (close)="closeLearningModal()" (submitted)="loadLearningMaterials()" />
+<app-learning-template-modal *ngIf="selectedLearningMaterial && currentUser && !selectedSubmittedSubmission"
+  [template]="selectedLearningMaterial" [currentUser]="currentUser" (close)="closeLearningModal()"
+  (submitted)="loadLearningMaterials()" />
 
 <app-entry-modal *ngIf="selectedEntry" [entry]="selectedEntry" [attachmentType]="attachmentType"
   [attachmentUrl]="attachmentUrl" (close)="closeModal()">
 </app-entry-modal>
 
-<app-submitted-learning-modal
-  *ngIf="selectedSubmittedSubmission && selectedLearningMaterial"
-  [submission]="selectedSubmittedSubmission"
-  (close)="closeSubmittedModal()"
-></app-submitted-learning-modal>
-
+<app-submitted-learning-modal *ngIf="selectedSubmittedSubmission && selectedLearningMaterial"
+  [submission]="selectedSubmittedSubmission" (close)="closeSubmittedModal()"></app-submitted-learning-modal>

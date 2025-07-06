@@ -5,6 +5,7 @@ import { UserService } from '../../user/user.service';
 import { NotificationService } from '../notification/notification.service';
 import { Notification } from '../notification/notification.model';
 import { MatIconModule } from '@angular/material/icon';
+import { LearningScoreService } from '../learning/score/learning.score.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +19,7 @@ export class NavbarComponent implements OnInit {
   notificationDropdownOpen = false;
   role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = null as any;
   userName: string = 'John Doe';
+  currentPoints: number = 0;
 
   notifications: Notification[] = [];
   unreadCount: number = 0;
@@ -27,7 +29,8 @@ export class NavbarComponent implements OnInit {
   constructor(
     private router: Router,
     private userService: UserService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private learningScoreService: LearningScoreService
   ) { }
 
   ngOnInit(): void {
@@ -43,6 +46,14 @@ export class NavbarComponent implements OnInit {
           this.userId = user.id;
 
           this.fetchNotifications();
+          this.learningScoreService.getUserScore(this.userId).subscribe({
+            next: (score) => {
+              this.currentPoints = score.points;
+            },
+            error: (err) => {
+              console.error('Failed to fetch user score:', err);
+            }
+          });
         },
         error: (err) => {
           console.error('Failed to fetch current user:', err);
