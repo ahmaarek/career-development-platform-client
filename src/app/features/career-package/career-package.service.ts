@@ -43,12 +43,12 @@ export class CareerPackageService {
   submitCompleteSection(
     userCareerPackageId: string,
     sectionTemplateId: string,
-    fieldResponses: UserFieldResponse[]
+    fieldSubmissions: UserFieldResponse[]
   ): Observable<UserSectionResponse> {
     const sectionResponseData = {
       userCareerPackageId: userCareerPackageId,
       sectionTemplateId: sectionTemplateId,
-      fieldSubmissions: fieldResponses
+      fieldSubmissions: fieldSubmissions
     };
 
     console.log('Submitting complete section:', sectionResponseData);
@@ -62,18 +62,18 @@ export class CareerPackageService {
 
   updateSectionResponse(
     sectionResponseId: string,
-    sectionResponse: UserSectionResponse & { newFieldResponses?: UserFieldResponse[] }
+    sectionResponse: UserSectionResponse & { newFieldSubmissions?: UserFieldResponse[] }
   ): Observable<UserSectionResponse> {
 
     const body = {
       userCareerPackageId: sectionResponse.userCareerPackageId,
       sectionTemplateId: sectionResponse.sectionTemplateId,
-      fieldResponses: sectionResponse.fieldSubmissions.map(fr => ({
+      fieldSubmissions: sectionResponse.fieldSubmissions.map(fr => ({
         id: fr.id,
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value
       })),
-      newFieldResponses: (sectionResponse.newFieldResponses || []).map(fr => ({
+      newFieldSubmissions: (sectionResponse.newFieldSubmissions || []).map(fr => ({
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value
       }))

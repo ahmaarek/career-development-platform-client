@@ -31,7 +31,7 @@
 }
 
 button[mat-button] {
-    background-color: #8c62b1 !important;
+    background-color: #007bff !important;
     color: white !important;
     border-radius: 6px !important;
     padding: 10px 24px !important;
@@ -56,7 +56,7 @@ button:not(:disabled):hover {
 }
 
 .login-btn {
-    background-color: #8c62b1;
+    background-color: #007bff;
     color: white;
     font-weight: bold;
     border: none;
@@ -91,7 +91,7 @@ button:not(:disabled):hover {
 
 /* The icon (1,2,3) beside the label in the header */
 .mat-step-icon-selected {
-    background-color: #8c62b1 !important;
+    background-color: #007bff !important;
 }
 
 /* The color of the number inside the icon */

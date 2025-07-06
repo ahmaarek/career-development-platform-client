@@ -7,6 +7,13 @@
   </div>
   }
 
+  @if (errorMessage) {
+  <div class="alert alert-error">
+    <strong>Error:</strong> {{ errorMessage }}
+    <button type="button" class="close-btn" (click)="clearMessages()">&times;</button>
+  </div>
+  }
+
   @if (successMessage) {
   <div class="alert alert-success">
     <strong>Success:</strong> {{ successMessage }}
@@ -47,90 +54,125 @@
     <!-- Sections -->
     <div class="sections-container">
       @for (section of userCareerPackage.template.sections; track section.id) {
+      @if (section.type === 'LEARNING') {
       <div class="section-card card">
         <!-- Section Header -->
         <div class="section-header" (click)="toggleSection(section.id)">
           <h3>{{ section.title }}</h3>
           <div class="section-meta">
-            <span class="section-progress">{{ getSectionCompletionPercentage(section) }}% Complete</span>
+            <span class="section-progress">{{ getLearningSectionCompletionPercentage() }}% Complete</span>
             <span class="expand-icon" [class.expanded]="isSectionExpanded(section.id)">▼</span>
           </div>
         </div>
 
-        <!-- Section Progress Bar -->
-        <div class="section-progress-bar">
-          <div class="progress-fill" [style.width.%]="getSectionCompletionPercentage(section)"></div>
-        </div>
-
         <!-- Section Content -->
         <div class="section-content" [class.expanded]="isSectionExpanded(section.id)">
-
-          @if (section.instructions) {
-          <div class="section-instructions">
-            <h4>Instructions:</h4>
-            <p>{{ section.instructions }}</p>
-          </div>
-          }
-
-          @if (sectionForms[section.id]) {
-          <form [formGroup]="sectionForms[section.id]" class="section-form">
-            @for (field of section.fields; track field.id) {
-            <div class="field-group">
-              <label class="form-label" [for]="'field_' + field.id">
-                {{ field.label }}
-                @if (field.required) {
-                <span class="required-asterisk">*</span>
-                }
-              </label>
-
-              @if (field.fieldType === 'TEXT' || field.fieldType === 'EMAIL' || field.fieldType === 'NUMBER') {
-              <input [type]="field.fieldType.toLowerCase()" [id]="'field_' + field.id"
-                [formControlName]="field.fieldKey" class="form-control"
-                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
-                [placeholder]="'Enter ' + field.label.toLowerCase()" [disabled]="isPackageSubmitted()" />
-              }
-
-              @if (field.fieldType === 'TEXTAREA') {
-              <textarea [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control textarea"
-                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" rows="4"
-                [placeholder]="'Enter ' + field.label.toLowerCase()" [disabled]="isPackageSubmitted()">
-                        </textarea>
-              }
-
-              @if (field.fieldType === 'SELECT') {
-              <select [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control"
-                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()">
-                <option value="">Select {{ field.label.toLowerCase() }}</option>
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
-              </select>
-              }
-
-              @if (field.fieldType === 'DATE') {
-              <input type="date" [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control"
-                [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()" />
-              }
-
-            </div>
+          @if (learningTemplates!.length > 0) {
+          <ul>
+            @for (item of learningTemplates; track item.template.id) {
+            <li class="learning-item">
+              <strong>{{ item.template.title }}</strong>
+              <span class="learning-status status-badge" [class]="'status-' + item.status.toLowerCase()">
+                {{ item.status }}
+              </span>
+            </li>
             }
-
-            @if (!isPackageSubmitted()) {
-            <div class="section-submit-container">
-              <button type="button" class="btn btn-lg btn-primary section-submit-btn" (click)="submitSection(section)"
-                [disabled]="isSectionSubmitDisabled(section.id)">
-                @if (!isLoading) {
-                {{ getSectionSubmitButtonText(section) }}
-                } @else {
-                Submitting...
-                }
-              </button>
-            </div>
-            }
-          </form>
+          </ul>
+          } @else {
+          <p>No learning materials available.</p>
           }
         </div>
       </div>
+      } @else {
+      <div class="section-card card">
+        
+          <!-- Section Header -->
+          <div class="section-header" (click)="toggleSection(section.id)">
+            <h3>{{ section.title }}</h3>
+            <div class="section-meta">
+              <span class="section-progress">{{ getSectionCompletionPercentage(section) }}% Complete</span>
+              <span class="expand-icon" [class.expanded]="isSectionExpanded(section.id)">▼</span>
+            </div>
+          </div>
+
+          <!-- Section Progress Bar -->
+          <div class="section-progress-bar">
+            <div class="progress-fill" [style.width.%]="getSectionCompletionPercentage(section)"></div>
+          </div>
+
+          <!-- Section Content -->
+          <div class="section-content" [class.expanded]="isSectionExpanded(section.id)">
+
+            @if (section.instructions) {
+            <div class="section-instructions">
+              <h4>Instructions:</h4>
+              <p>{{ section.instructions }}</p>
+            </div>
+            }
+
+            @if (sectionForms[section.id]) {
+            <form [formGroup]="sectionForms[section.id]" class="section-form">
+              @for (field of section.fields; track field.id) {
+              <div class="field-group">
+                <label class="form-label" [for]="'field_' + field.id">
+                  {{ field.label }}
+                  @if (field.required) {
+                  <span class="required-asterisk">*</span>
+                  }
+                </label>
+
+                @if (field.fieldType === 'TEXT' || field.fieldType === 'EMAIL' || field.fieldType === 'NUMBER') {
+                <input [type]="field.fieldType.toLowerCase()" [id]="'field_' + field.id"
+                  [formControlName]="field.fieldKey" class="form-control"
+                  [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
+                  [placeholder]="'Enter ' + field.label.toLowerCase()" [disabled]="isPackageSubmitted()" />
+                }
+
+                @if (field.fieldType === 'TEXTAREA') {
+                <textarea [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control textarea"
+                  [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" rows="4"
+                  [placeholder]="'Enter ' + field.label.toLowerCase()" [disabled]="isPackageSubmitted()">
+                        </textarea>
+                }
+
+                @if (field.fieldType === 'SELECT') {
+                <select [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control"
+                  [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()">
+                  <option value="">Select {{ field.label.toLowerCase() }}</option>
+                  <option value="option1">Option 1</option>
+                  <option value="option2">Option 2</option>
+                </select>
+                }
+
+                @if (field.fieldType === 'DATE') {
+                <input type="date" [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control"
+                  [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()" />
+                }
+
+              </div>
+              }
+
+              @if (!isPackageSubmitted()) {
+              <div class="section-submit-container">
+                <button type="button" class="btn btn-lg btn-primary section-submit-btn" (click)="submitSection(section)"
+                  [disabled]="isSectionSubmitDisabled(section.id)">
+                  @if (!isLoading) {
+                  {{ getSectionSubmitButtonText(section) }}
+                  } @else {
+                  Submitting...
+                  }
+                </button>
+              </div>
+              }
+            </form>
+            }
+          </div>
+        
+      </div>
       }
+      }
+
+
     </div>
 
     <!-- Reviewer Comment Section -->
