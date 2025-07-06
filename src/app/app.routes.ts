@@ -16,6 +16,7 @@ import { CreateEntryComponent } from './features/learning/library/create-entry/c
 import { LibraryContainerComponent } from './features/learning/library/library-container/library-container.component';
 import { TemplateBuilderComponent } from './features/learning/library/template-builder/template-builder.component';
 import { ReviewSubmissionsComponent } from './features/learning/library/review-submissions/review-submissions.component';
+import { LearningManagementComponent } from './features/admin-control/learning-management/learning-management.component';
 
 export const routes: Routes = [
     {
@@ -39,14 +40,16 @@ export const routes: Routes = [
                 component: AdminControlComponent,
                 children: [
                     { path: 'user-management', component: UserManagementComponent },
-                    { path: 'career-package-management', component: CareerPackagesComponent }
+                    { path: 'career-package-management', component: CareerPackagesComponent },
+                    {path: 'learning-management', component: LearningManagementComponent} 
                 ]
             },
             {
                 path: 'manager',
                 component: ManagerControlComponent,
                 children: [
-                    { path: 'career-package-review', component: CareerPackageReviewComponent }
+                    { path: 'career-package-review', component: CareerPackageReviewComponent },
+                    {path: 'learning-review', component: ReviewSubmissionsComponent}
                 ]
             },
             {

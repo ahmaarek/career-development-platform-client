@@ -3,11 +3,6 @@
   <button (click)="selectedType = 'wikis'">Wikis</button>
   <button (click)="selectedType = 'learning'">Learning Materials</button>
 </div>
-<ng-container *ngIf="currentUser">
-  <a *ngIf="getUserRole()==='ADMIN'" routerLink="/library/create">Create Blog or Wiki</a>
-  <a *ngIf="getUserRole()==='ADMIN'" routerLink="/library/learning-material/create">Create Learning Material</a>
-  <a *ngIf="getUserRole()==='MANAGER'" routerLink="/library/learning-material/review-submissions">Review Submissions</a>
-</ng-container>
 
 <div *ngIf="selectedType === 'blogs'">
   <h2>Blogs</h2>
