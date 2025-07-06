@@ -9,6 +9,20 @@
     <textarea formControlName="description"></textarea>
   </label>
 
+  <label>Career Package:
+    <select formControlName="careerPackageTemplate" required>
+      <option value="" disabled selected>Select a package</option>
+      <option *ngFor="let careerPackageTemplate of careerPackageTemplates" [value]="careerPackageTemplate.id">
+        {{ careerPackageTemplate.title }}
+      </option>
+    </select>
+  </label>
+
+
+  <label for="points">Points</label>
+  <input type="number" id="points" formControlName="points" required />
+
+
   <div formArrayName="sections">
     <div *ngFor="let section of sections.controls; let i = index" [formGroupName]="i" class="section-card">
       <h3>Section {{ i + 1 }}</h3>
@@ -33,8 +47,6 @@
         <textarea formControlName="content"></textarea>
       </label>
 
-      <label for="points">Points</label>
-      <input type="number" id="points" formControlName="points" required />
 
       <label>
         Requires Submission:
@@ -49,6 +61,8 @@
     </div>
   </div>
 
-  <button type="button" (click)="addSection()">Add Section</button>
-  <button type="submit">Create Learning Material</button>
+  <button type="button" class="add-section-btn" (click)="addSection()">Add Section</button>
+  <button   type="submit"
+  [disabled]="form.invalid"
+  [class.disabled]="form.invalid">Create Learning Material</button>
 </form>

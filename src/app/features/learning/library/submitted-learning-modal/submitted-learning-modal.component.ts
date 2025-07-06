@@ -24,7 +24,6 @@ export class SubmittedLearningModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.submission.sectionResponses.forEach(response => {
-      console.log('Processing response for section:', response);
       if (response.documentId) {
         this.documentService.getAttachmentBlobAndType(response.documentId).subscribe(data => {
           this.attachmentUrls[response.sectionTemplateId] = {

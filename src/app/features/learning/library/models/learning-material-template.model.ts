@@ -5,5 +5,6 @@ id?: string;
 title: string;
 points: number;
 description: string;
+careerPackageId?: string;
 sections: LearningSectionTemplate[];
 }

@@ -70,7 +70,6 @@ export class CreateEntryComponent {
           next: (res) => createEntry(res),
           error: (error) => {
             alert('Failed to upload attachment.');
-            console.log(error)
             this.isSubmitting = false;
           }
         });

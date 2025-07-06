@@ -22,12 +22,11 @@ import { SubmittedLearningModalComponent } from '../submitted-learning-modal/sub
   selector: 'app-library-home',
   templateUrl: './library-home.component.html',
   styleUrls: ['./library-home.component.css'],
-  imports: [CommonModule, RouterLink, FormsModule, LearningTemplateModalComponent, EntryModalComponent, SubmittedLearningModalComponent],
+  imports: [CommonModule, FormsModule, LearningTemplateModalComponent, EntryModalComponent, SubmittedLearningModalComponent],
 })
 export class LibraryHomeComponent implements OnInit {
   blogs: BlogWikiDTO[] = [];
   wikis: BlogWikiDTO[] = [];
-  learningMaterials: LearningMaterialTemplate[] = [];
   selectedLearningMaterial: LearningMaterialTemplate | null = null;
   selectedType: 'blogs' | 'wikis' | 'learning' | null = null;
   currentUser: User | null = null;
@@ -102,7 +101,6 @@ export class LibraryHomeComponent implements OnInit {
       const submittedIds = new Set(submissions.map(sub => sub.templateId));
       this.submittedMaterials = templates.filter(t => submittedIds.has(t.id!));
       this.unsubmittedMaterials = templates.filter(t => !submittedIds.has(t.id!));
-      console.log('Submitted materials:', this.unsubmittedMaterials);
     });
   }
 
@@ -176,7 +174,6 @@ export class LibraryHomeComponent implements OnInit {
           this.closeLearningModal();
         },
         error: (err) => {
-          console.error('Submission error:', err);
           alert('Failed to submit.');
         }
       });
@@ -192,8 +189,6 @@ export class LibraryHomeComponent implements OnInit {
     this.learningDocumentService.getProtectedAttachment(attachmentId).subscribe(blob => {
       this.attachmentUrl = URL.createObjectURL(blob);
     });
-    console.log('Attachment type:', this.attachmentType);
-    console.log('Blob URL:', this.attachmentUrl);
   }
 
   loadAttachmentsForSections(sections: LearningSectionTemplate[]): void {
@@ -219,8 +214,6 @@ export class LibraryHomeComponent implements OnInit {
     this.selectedSubmittedSubmission = null;
     this.submittedSectionMap = {};
     this.submittedAttachmentData = {};
-    console.log('Closed submitted modal');
-    console.log('selected submittion submission', this.selectedSubmittedSubmission);
   }
 
   closeLearningModal(): void {
