@@ -48,7 +48,7 @@ export class CareerPackageService {
     const sectionResponseData = {
       userCareerPackageId: userCareerPackageId,
       sectionTemplateId: sectionTemplateId,
-      fieldResponses: fieldResponses
+      fieldSubmissions: fieldResponses
     };
 
     console.log('Submitting complete section:', sectionResponseData);
@@ -68,7 +68,7 @@ export class CareerPackageService {
     const body = {
       userCareerPackageId: sectionResponse.userCareerPackageId,
       sectionTemplateId: sectionResponse.sectionTemplateId,
-      fieldResponses: sectionResponse.fieldResponses.map(fr => ({
+      fieldResponses: sectionResponse.fieldSubmissions.map(fr => ({
         id: fr.id,
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value

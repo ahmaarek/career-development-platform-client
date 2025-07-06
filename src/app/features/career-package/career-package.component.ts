@@ -133,13 +133,13 @@ export class CareerPackageComponent implements OnInit {
   getExistingFieldResponse(sectionId: string, fieldId: string): UserFieldResponse | null {
     if (!this.userCareerPackage) return null;
 
-    const sectionResponse = this.userCareerPackage.sectionResponses.find(
+    const sectionResponse = this.userCareerPackage.sectionSubmissions.find(
       sr => sr.sectionTemplateId === sectionId
     );
 
     if (!sectionResponse) return null;
 
-    return sectionResponse.fieldResponses.find(
+    return sectionResponse.fieldSubmissions.find(
       fr => fr.fieldTemplateId === fieldId
     ) || null;
   }
@@ -156,14 +156,14 @@ export class CareerPackageComponent implements OnInit {
   getSectionCompletionPercentage(section: SectionTemplate): number {
     if (!this.userCareerPackage) return 0;
 
-    const sectionResponse = this.userCareerPackage.sectionResponses.find(
+    const sectionResponse = this.userCareerPackage.sectionSubmissions.find(
       sr => sr.sectionTemplateId === section.id
     );
 
     if (!sectionResponse) return 0;
 
     const totalFields = section.fields.length;
-    const completedFields = sectionResponse.fieldResponses.filter(fr => fr.value.trim() !== '').length;
+    const completedFields = sectionResponse.fieldSubmissions.filter(fr => fr.value.trim() !== '').length;
 
     return totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
   }
@@ -201,13 +201,13 @@ export class CareerPackageComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const existingSectionResponse = this.userCareerPackage.sectionResponses?.find(
+    const existingSectionResponse = this.userCareerPackage.sectionSubmissions?.find(
       resp => resp.sectionTemplateId === section.id
     );
 
     if (existingSectionResponse && existingSectionResponse.id) {
       const existingResponsesMap: Record<string, string | undefined> = Object.fromEntries(
-        existingSectionResponse.fieldResponses.map(resp => [resp.fieldTemplateId, resp.id])
+        existingSectionResponse.fieldSubmissions.map(resp => [resp.fieldTemplateId, resp.id])
       );
 
       const fieldResponses: UserFieldResponse[] = [];
@@ -235,7 +235,7 @@ export class CareerPackageComponent implements OnInit {
         {
           userCareerPackageId: this.userCareerPackage.id,
           sectionTemplateId: section.id,
-          fieldResponses: fieldResponses,
+          fieldSubmissions: fieldResponses,
           newFieldResponses: newFieldResponses
         }
       ).subscribe({
@@ -261,6 +261,7 @@ export class CareerPackageComponent implements OnInit {
         };
       });
 
+      console.log(fieldResponses);
       this.careerPackageService.submitCompleteSection(
         this.userCareerPackage.id,
         section.id,
@@ -306,7 +307,7 @@ export class CareerPackageComponent implements OnInit {
   getSectionSubmitButtonText(section: SectionTemplate): string {
     if (!this.userCareerPackage) return 'Submit Section';
 
-    const existingSectionResponse = this.userCareerPackage.sectionResponses.find(
+    const existingSectionResponse = this.userCareerPackage.sectionSubmissions.find(
       sr => sr.sectionTemplateId === section.id
     );
 
@@ -317,12 +318,12 @@ export class CareerPackageComponent implements OnInit {
   private updateLocalSectionResponse(sectionId: string, updatedSectionResponse: UserSectionResponse): void {
     if (!this.userCareerPackage) return;
 
-    const sectionResponseIndex = this.userCareerPackage.sectionResponses.findIndex(
+    const sectionResponseIndex = this.userCareerPackage.sectionSubmissions.findIndex(
       sr => sr.sectionTemplateId === sectionId
     );
 
     if (sectionResponseIndex !== -1) {
-      this.userCareerPackage.sectionResponses[sectionResponseIndex] = updatedSectionResponse;
+      this.userCareerPackage.sectionSubmissions[sectionResponseIndex] = updatedSectionResponse;
     }
   }
 
@@ -330,15 +331,15 @@ export class CareerPackageComponent implements OnInit {
   private addLocalSectionResponse(newSectionResponse: UserSectionResponse): void {
     if (!this.userCareerPackage) return;
 
-    const existingIndex = this.userCareerPackage.sectionResponses.findIndex(
+    const existingIndex = this.userCareerPackage.sectionSubmissions.findIndex(
       sr => sr.sectionTemplateId === newSectionResponse.sectionTemplateId
     );
 
     if (existingIndex !== -1) {
-      this.userCareerPackage.sectionResponses[existingIndex] = newSectionResponse;
+      this.userCareerPackage.sectionSubmissions[existingIndex] = newSectionResponse;
     } else {
 
-      this.userCareerPackage.sectionResponses.push(newSectionResponse);
+      this.userCareerPackage.sectionSubmissions.push(newSectionResponse);
     }
   }
 
@@ -362,14 +363,14 @@ export class CareerPackageComponent implements OnInit {
 
 
     return this.userCareerPackage.template.sections.every(section => {
-      const sectionResponse = this.userCareerPackage!.sectionResponses.find(
+      const sectionResponse = this.userCareerPackage!.sectionSubmissions.find(
         sr => sr.sectionTemplateId === section.id
       );
 
       if (!sectionResponse) return false;
 
       // Check if all fields in the section have values
-      return sectionResponse.fieldResponses.every(fr => fr.value.trim() !== '');
+      return sectionResponse.fieldSubmissions.every(fr => fr.value.trim() !== '');
     });
   }
 

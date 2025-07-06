@@ -4,6 +4,6 @@ export interface UserSectionResponse {
   id?: string;
   userCareerPackageId?: string;
   sectionTemplateId: string;
-  fieldResponses: UserFieldResponse[];
+  fieldSubmissions: UserFieldResponse[];
 }
 

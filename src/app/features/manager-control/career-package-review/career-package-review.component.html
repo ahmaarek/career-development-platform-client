@@ -47,11 +47,11 @@
     <div class="modal large-modal">
       <h2>Career Package Review for {{ user.name }}</h2>
 
-      @for (section of userPackages[user.id].sectionResponses; track section.id) {
+      @for (section of userPackages[user.id].sectionSubmissions; track section.id) {
       <div class="section-block">
         <h3>{{ getSectionTitle(section.sectionTemplateId) }}</h3>
         <ul>
-          @for (field of section.fieldResponses; track field.fieldTemplateId) {
+          @for (field of section.fieldSubmissions; track field.fieldTemplateId) {
           <li>
             <strong>{{ getFieldLabel(section.sectionTemplateId,field.fieldTemplateId) }}:</strong> {{ field.value }}
           </li>
@@ -87,11 +87,11 @@
     <div class="modal large-modal">
       <h2>Career Package Review for {{ user.name }}</h2>
 
-      @for (section of userPackages[user.id].sectionResponses; track section.id) {
+      @for (section of userPackages[user.id].sectionSubmissions; track section.id) {
       <div class="section-block">
         <h3>{{ getSectionTitle(section.sectionTemplateId) }}</h3>
         <ul>
-          @for (field of section.fieldResponses; track field.fieldTemplateId) {
+          @for (field of section.fieldSubmissions; track field.fieldTemplateId) {
           <li>
             <strong>{{ getFieldLabel(section.sectionTemplateId,field.fieldTemplateId) }}:</strong> {{ field.value }}
           </li>

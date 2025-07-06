@@ -9,6 +9,6 @@ export interface UserCareerPackage {
   status: PackageStatus;
   template: CareerPackageTemplate;
   reviewerComment: string;
-  sectionResponses: UserSectionResponse[];
+  sectionSubmissions: UserSectionResponse[];
 }
 
