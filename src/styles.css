@@ -174,8 +174,16 @@ body {
 }
 
 
-.snackbar-success , .snackbar-error{
-  background-color: #bb44f0;
+.snackbar-success{
+  background-color: #155724;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  
+}
+
+.snackbar-error{
+  background-color: #721c24;
   color: white;
   font-weight: bold;
   text-align: center;

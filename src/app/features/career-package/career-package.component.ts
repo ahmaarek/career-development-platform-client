@@ -95,8 +95,6 @@ export class CareerPackageComponent implements OnInit {
   }
 
 
-
-
   private checkEnrollmentAndLoadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -108,6 +106,9 @@ export class CareerPackageComponent implements OnInit {
         if (isEnrolled) {
 
           this.loadUserCareerPackage();
+        }
+        else{
+          this.isLoading = false;
         }
       },
       error: (error) => {
