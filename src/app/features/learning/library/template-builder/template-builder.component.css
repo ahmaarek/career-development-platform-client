@@ -7,6 +7,16 @@ form {
   background-color: #f9f9f9;
 }
 
+[formArrayName="sections"] {
+  margin-top: 2rem;
+}
+
+
+button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 h2 {
   text-align: center;
   margin-bottom: 2rem;
@@ -81,3 +91,32 @@ input[type="checkbox"] {
   transform: scale(1.2);
   vertical-align: middle;
 }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+label {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+input[type="number"] {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="number"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  outline: none;
+}
+

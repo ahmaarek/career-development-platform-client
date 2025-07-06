@@ -21,6 +21,11 @@ export class LearningMaterialTemplateService {
     return this.http.get<LearningMaterialTemplate[]>(this.learningTemplatesUrl);
   }
 
+
+  getTemplatesByCareerPackageId(id: string): Observable<LearningMaterialTemplate[]> {
+    return this.http.get<LearningMaterialTemplate[]>(`${this.learningTemplatesUrl}/career-package/${id}`);
+  }
+
   getTemplateById(id: string): Observable<LearningMaterialTemplate> {
     return this.http.get<LearningMaterialTemplate>(`${this.learningTemplatesUrl}/${id}`);
   }

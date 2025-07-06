@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, NgForm, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { LearningMaterialTemplateService } from '../services/learning-material-template.service';
 import { CommonModule } from '@angular/common';
 import { SectionType } from '../models/section-type.model';
@@ -7,6 +7,8 @@ import { UserService } from '../../../../user/user.service';
 import { User } from '../../../../user/user.model';
 import { SectionFormModel } from '../models/section-form.model';
 import { LearningDocumentService } from '../services/learning-document.service';
+import { CareerPackageService } from '../../../career-package/career-package.service';
+import { CareerPackageTemplate } from '../../../career-package/models/career-package-template.interface';
 
 
 @Component({
@@ -19,26 +21,39 @@ export class TemplateBuilderComponent {
   form: FormGroup;
   currentUser: User | null = null;
   sectionTypeOptions = Object.values(SectionType);
-
+  careerPackageTemplates: CareerPackageTemplate[] | null = null;
 
   constructor(private fb: FormBuilder,
     private learningMaterialTemplateService: LearningMaterialTemplateService,
     private userService: UserService,
-    private learningDocumentService: LearningDocumentService) {
+    private learningDocumentService: LearningDocumentService,
+    private careerPackageService: CareerPackageService) {
     this.form = this.fb.group({
       title: ['', Validators.required],
       description: [''],
+      careerPackageTemplate: [null, Validators.required],
       points: [0, [Validators.required, Validators.min(0)]],
-      sections: this.fb.array([])
+      sections: this.fb.array([], this.minLengthArray(1)) 
     });
     this.userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
+    });
+    this.careerPackageService.getAllCareerPackageTemplates().subscribe(templates => {
+      this.careerPackageTemplates = templates;
     });
   }
 
   get sections(): FormArray {
     return this.form.get('sections') as FormArray;
   }
+
+
+  minLengthArray(min: number) {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control as FormArray;
+    return value && value.length >= min ? null : { minLengthArray: true };
+  };
+}
 
   addSection(): void {
     const sectionGroup = this.fb.group({
@@ -71,6 +86,7 @@ export class TemplateBuilderComponent {
       title: string;
       description: string;
       points: number;
+      careerPackageTemplate: string;
       sections: SectionFormModel[];
     };
 
@@ -87,6 +103,7 @@ export class TemplateBuilderComponent {
           title: formValue.title,
           description: formValue.description,
           points: formValue.points,
+          careerPackageId: formValue.careerPackageTemplate,
           sections: formValue.sections
         };
 
@@ -97,7 +114,6 @@ export class TemplateBuilderComponent {
             this.sections.clear();
           },
           error: (err) => {
-            console.error('Error submitting material:', err);
             alert('Submission failed.');
           }
         });
