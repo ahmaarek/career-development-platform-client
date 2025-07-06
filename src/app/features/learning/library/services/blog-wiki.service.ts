@@ -8,21 +8,22 @@ import { environment } from '../../../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class BlogWikiService {
 
+    private readonly blogWikiUrl = environment.learningServiceBaseUrl + '/content';
     constructor(private http: HttpClient) { }
 
     getBlogs(): Observable<BlogWikiDTO[]> {
-        return this.http.get<BlogWikiDTO[]>(`${environment.blogWikiUrl}/blogs`);
+        return this.http.get<BlogWikiDTO[]>(`${this.blogWikiUrl}/blogs`);
     }
 
     getWikis(): Observable<BlogWikiDTO[]> {
-        return this.http.get<BlogWikiDTO[]>(`${environment.blogWikiUrl}/wikis`);
+        return this.http.get<BlogWikiDTO[]>(`${this.blogWikiUrl}/wikis`);
     }
 
     createEntry(type: 'BLOG' | 'WIKI', entry: { title: string, content: string, attachmentId?: string }): Observable<any> {
         if (type == "BLOG")
-            return this.http.post(`${environment.blogWikiUrl}/blogs`, entry);
+            return this.http.post(`${this.blogWikiUrl}/blogs`, entry);
         else
-            return this.http.post(`${environment.blogWikiUrl}/wikis`, entry);
+            return this.http.post(`${this.blogWikiUrl}/wikis`, entry);
     }
 
 }

@@ -15,6 +15,7 @@ import { LibraryHomeComponent } from './features/learning/library/library-home/l
 import { CreateEntryComponent } from './features/learning/library/create-entry/create-entry.component';
 import { LibraryContainerComponent } from './features/learning/library/library-container/library-container.component';
 import { TemplateBuilderComponent } from './features/learning/library/template-builder/template-builder.component';
+import { ReviewSubmissionsComponent } from './features/learning/library/review-submissions/review-submissions.component';
 
 export const routes: Routes = [
     {
@@ -53,7 +54,7 @@ export const routes: Routes = [
                 children:[
                     {path: '', component: LibraryHomeComponent},
                     {path: 'create', component: CreateEntryComponent},
-                    
+                    {path : 'learning-material/review-submissions', component: ReviewSubmissionsComponent},
                     {path: 'learning-material/create', component: TemplateBuilderComponent}
                 ]
             }

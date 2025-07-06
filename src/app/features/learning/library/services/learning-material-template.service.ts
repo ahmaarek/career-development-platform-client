@@ -9,19 +9,20 @@ import { environment } from '../../../../../environments/environment';
 })
 export class LearningMaterialTemplateService {
 
+  private readonly learningTemplatesUrl = environment.learningServiceBaseUrl + '/templates';
   constructor(private http: HttpClient) { }
 
 
   createTemplate(template: LearningMaterialTemplate): Observable<LearningMaterialTemplate> {
-    return this.http.post<LearningMaterialTemplate>(environment.learningTemplatesUrl, template);
+    return this.http.post<LearningMaterialTemplate>(this.learningTemplatesUrl, template);
   }
 
   getAllTemplates(): Observable<LearningMaterialTemplate[]> {
-    return this.http.get<LearningMaterialTemplate[]>(environment.learningTemplatesUrl);
+    return this.http.get<LearningMaterialTemplate[]>(this.learningTemplatesUrl);
   }
 
   getTemplateById(id: string): Observable<LearningMaterialTemplate> {
-    return this.http.get<LearningMaterialTemplate>(`${environment.learningTemplatesUrl}/${id}`);
+    return this.http.get<LearningMaterialTemplate>(`${this.learningTemplatesUrl}/${id}`);
   }
 
 

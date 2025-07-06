@@ -1,0 +1,32 @@
+<div class="modal-backdrop" (click)="close.emit()"></div>
+<div class="modal">
+  <h2>{{ template.title }}</h2>
+  <p>{{ template.description }}</p>
+
+  <div *ngFor="let section of template.sections; let i = index">
+    <h3>{{ section.title }}</h3>
+    <p><strong>Instructions:</strong> {{ section.instructions }}</p>
+
+    <div *ngIf="section.content">
+      <p><strong>Content:</strong></p>
+      <p [innerHTML]="convertNewlines(section.content)"></p>
+    </div>
+
+    <ng-container *ngIf="sectionsAttachmentData[i]">
+      <img *ngIf="sectionsAttachmentData[i].type === 'image'" [src]="sectionsAttachmentData[i].url" />
+      <video *ngIf="sectionsAttachmentData[i].type === 'video'" [src]="sectionsAttachmentData[i].url" controls></video>
+      <a *ngIf="sectionsAttachmentData[i].type === 'document'" [href]="sectionsAttachmentData[i].url" target="_blank">Open Document</a>
+    </ng-container>
+
+    <div *ngIf="section.requiresSubmission">
+      <label>Submit Answer:</label>
+      <textarea rows="3" [(ngModel)]="submissionText[section.id!]"></textarea>
+      <input type="file" (change)="onFileSelected($event, section.id!)" />
+    </div>
+
+    <hr />
+  </div>
+
+  <button (click)="submit()" class="submit-btn">Submit</button>
+  <button (click)="close.emit()" class="close-btn">Close</button>
+</div>

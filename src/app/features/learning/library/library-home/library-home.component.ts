@@ -9,12 +9,20 @@ import { LearningMaterialTemplateService } from '../services/learning-material-t
 import { LearningMaterialTemplate } from '../models/learning-material-template.model';
 import { LearningDocumentService } from '../services/learning-document.service';
 import { LearningSectionTemplate } from '../models/learning-section-template.model';
+import { FormsModule } from '@angular/forms';
+import { LearningSubmissionService } from '../services/learning-submission.service';
+import { combineLatest, map, of } from 'rxjs';
+import { LearningSectionResponseDTO, LearningSubmissionDTO } from '../models/learning-submission.model';
+import { SubmissionStatus } from '../models/submission-status.model';
+import { LearningTemplateModalComponent } from '../learning-template-modal/learning-template-modal.component';
+import { EntryModalComponent } from '../entry-modal/entry-modal.component';
+import { SubmittedLearningModalComponent } from '../submitted-learning-modal/submitted-learning-modal.component';
 
 @Component({
   selector: 'app-library-home',
   templateUrl: './library-home.component.html',
   styleUrls: ['./library-home.component.css'],
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule, LearningTemplateModalComponent, EntryModalComponent, SubmittedLearningModalComponent],
 })
 export class LibraryHomeComponent implements OnInit {
   blogs: BlogWikiDTO[] = [];
@@ -22,31 +30,81 @@ export class LibraryHomeComponent implements OnInit {
   learningMaterials: LearningMaterialTemplate[] = [];
   selectedLearningMaterial: LearningMaterialTemplate | null = null;
   selectedType: 'blogs' | 'wikis' | 'learning' | null = null;
-  currentUser: User | null = null;  
+  currentUser: User | null = null;
   selectedEntry: BlogWikiDTO | null = null;
   attachmentType: 'image' | 'video' | 'document' | null = null;
   attachmentUrl: string | null = null;
   sectionsAttachmentData: { [sectionId: string]: { url: string, type: 'image' | 'video' | 'document' | null } } = {};
+  submissionText: { [sectionId: string]: string } = {};
+  submissionFiles: { [sectionId: string]: File | null } = {};
+  selectedSubmittedSubmission: LearningSubmissionDTO | null = null;
+  submittedSectionMap: { [sectionId: string]: LearningSectionResponseDTO } = {};
+  submittedAttachmentData: { [sectionId: string]: { url: string; type: 'image' | 'video' | 'document' | null } } = {};
+  viewingUnsubmitted = true;
+  submittedMaterials: LearningMaterialTemplate[] = [];
+  unsubmittedMaterials: LearningMaterialTemplate[] = [];
 
-
-
-  constructor(private blogWikiService: BlogWikiService, private userService: UserService, private learningMaterialTemplateService: LearningMaterialTemplateService, private learningDocumentService: LearningDocumentService) { }
+  constructor(private blogWikiService: BlogWikiService,
+    private userService: UserService,
+    private learningMaterialTemplateService: LearningMaterialTemplateService,
+    private learningDocumentService: LearningDocumentService,
+    private learningSubmissionService: LearningSubmissionService) { }
 
   ngOnInit(): void {
     this.loadBlogs();
     this.loadWikis();
-    this.loadLearningMaterials();
     this.userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
+      this.loadLearningMaterials();
     });
   }
 
 
-  loadLearningMaterials() {
-    this.learningMaterialTemplateService.getAllTemplates().subscribe(data => {
-      this.learningMaterials = data;
+  openSubmittedModal(template: LearningMaterialTemplate): void {
+    if (!this.currentUser) return;
+
+    this.learningSubmissionService.getSubmissionByTemplateAndUser(template.id!, this.currentUser.id)
+      .subscribe(submission => {
+        this.selectedLearningMaterial = template;
+        this.selectedSubmittedSubmission = submission;
+
+        this.submittedSectionMap = {};
+        submission.sectionResponses.forEach(response => {
+          this.submittedSectionMap[response.sectionTemplateId] = response;
+        });
+
+        // load attachments for each response
+        template.sections.forEach(section => {
+          const attachmentId = this.submittedSectionMap[section.id!]?.documentId;
+          if (attachmentId) {
+            this.learningDocumentService.getAttachmentBlobAndType(attachmentId).subscribe(data => {
+              this.submittedAttachmentData[section.id!] = {
+                url: data.blobUrl,
+                type: data.type
+              };
+            });
+          }
+        });
+      });
+  }
+
+
+  convertNewlinesToBreaks(content: string): string {
+    return content.replace(/\n/g, '<br/>');
+  }
+  loadLearningMaterials(): void {
+    if (!this.currentUser) return;
+
+    combineLatest([
+      this.learningMaterialTemplateService.getAllTemplates(),
+      this.learningSubmissionService.getSubmissionsByUser(this.currentUser.id)
+    ]).subscribe(([templates, submissions]) => {
+      const submittedIds = new Set(submissions.map(sub => sub.templateId));
+      this.submittedMaterials = templates.filter(t => submittedIds.has(t.id!));
+      this.unsubmittedMaterials = templates.filter(t => !submittedIds.has(t.id!));
     });
   }
+
 
   loadBlogs(): void {
     this.blogWikiService.getBlogs().subscribe(data => this.blogs = data);
@@ -77,6 +135,57 @@ export class LibraryHomeComponent implements OnInit {
     this.attachmentType = null;
   }
 
+  onFileSelected(event: Event, sectionId: string) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.submissionFiles[sectionId] = file;
+    }
+  }
+
+  submitLearningMaterial(): void {
+    if (!this.selectedLearningMaterial || !this.currentUser) return;
+
+    const sections = this.selectedLearningMaterial.sections;
+
+    const uploadObservables = sections.map(section => {
+      const file = this.submissionFiles[section.id!] || null;
+      if (file) {
+        return this.learningDocumentService.uploadAttachment(file, this.currentUser!.id, 'submission');
+      } else {
+        return of(null);
+      }
+    });
+
+    combineLatest(uploadObservables).subscribe(attachmentIds => {
+      const sectionResponses: LearningSectionResponseDTO[] = sections.map((section, i) => ({
+        sectionTemplateId: section.id!,
+        userInput: this.submissionText[section.id!] || '',
+        attachmentId: attachmentIds[i] || undefined
+      }));
+
+      const payload: LearningSubmissionDTO = {
+        userId: this.currentUser!.id,
+        templateId: this.selectedLearningMaterial!.id!,
+        sectionResponses,
+      };
+
+      this.learningSubmissionService.submitLearningMaterial(payload).subscribe({
+        next: () => {
+          alert('Submission successful!');
+          this.closeLearningModal();
+        },
+        error: (err) => {
+          console.error('Submission error:', err);
+          alert('Failed to submit.');
+        }
+      });
+    });
+  }
+
+  setSubmissionView(unsubmitted: boolean) {
+    this.viewingUnsubmitted = unsubmitted;
+  }
+
 
   loadAttachment(attachmentId: string): void {
     this.learningDocumentService.getProtectedAttachment(attachmentId).subscribe(blob => {
@@ -87,36 +196,39 @@ export class LibraryHomeComponent implements OnInit {
   }
 
   loadAttachmentsForSections(sections: LearningSectionTemplate[]): void {
-sections.forEach((section, i) => {
-  if (section.attachmentId) {
-    this.learningDocumentService.getAttachmentBlobAndType(section.attachmentId).subscribe(data => {
-      this.sectionsAttachmentData[i] = {
-        url: data.blobUrl,
-        type: data.type
-      };
+    sections.forEach((section, i) => {
+      if (section.attachmentId) {
+        this.learningDocumentService.getAttachmentBlobAndType(section.attachmentId).subscribe(data => {
+          this.sectionsAttachmentData[i] = {
+            url: data.blobUrl,
+            type: data.type
+          };
+        });
+      }
     });
   }
-});
-}
-openLearningTemplate(template: LearningMaterialTemplate): void {
-  this.selectedLearningMaterial = template;
-  this.loadAttachmentsForSections(template.sections);
-}
-
-closeLearningModal(): void {
-  this.selectedLearningMaterial = null;
-}
-
-getAttachmentType(attachmentId: string): 'image' | 'video' | 'document' {
-  ///TODO fix this
-  const url = this.getAttachmentUrl(attachmentId);
-  if (url.endsWith('.jpg') || url.endsWith('.png')) return 'image';
-  if (url.endsWith('.mp4') || url.endsWith('.webm')) return 'video';
-  return 'document';
-}
+  openLearningTemplate(template: LearningMaterialTemplate): void {
+    this.selectedLearningMaterial = template;
+    this.loadAttachmentsForSections(template.sections);
+  }
 
 
-  isAdmin(): boolean {
-    return this.currentUser?.role === 'ADMIN';
+  closeSubmittedModal(): void {
+    this.selectedLearningMaterial = null;
+    this.selectedSubmittedSubmission = null;
+    this.submittedSectionMap = {};
+    this.submittedAttachmentData = {};
+    console.log('Closed submitted modal');
+    console.log('selected submittion submission', this.selectedSubmittedSubmission);
+  }
+
+  closeLearningModal(): void {
+    this.selectedLearningMaterial = null;
+  }
+
+
+
+  getUserRole(): string | null {
+    return this.currentUser?.role ?? null;
   }
 }

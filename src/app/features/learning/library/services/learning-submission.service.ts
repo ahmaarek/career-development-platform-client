@@ -9,24 +9,41 @@ import { environment } from '../../../../../environments/environment';
 })
 export class LearningSubmissionService {
 
-  constructor(private http: HttpClient) {}
+
+  private readonly learningSubmissionsUrl = environment.learningServiceBaseUrl + '/submissions';
+  constructor(private http: HttpClient) { }
 
   submitLearningMaterial(submission: LearningSubmissionDTO): Observable<LearningSubmissionDTO> {
-    console.log('Submitting learning material:', submission);
-    return this.http.post<LearningSubmissionDTO>(environment.learningSubmissionsUrl, submission);
+    return this.http.post<LearningSubmissionDTO>(this.learningSubmissionsUrl, submission);
+  }
+
+
+  getSubmissionByTemplateAndUser(templateId: string, userId: string) {
+    return this.http.get<LearningSubmissionDTO>(`${this.learningSubmissionsUrl}/user/${userId}/template/${templateId}`);
   }
 
 
   getSubmissionsByUser(userId: string): Observable<LearningSubmissionDTO[]> {
-    return this.http.get<LearningSubmissionDTO[]>(`${environment.learningSubmissionsUrl}/user/${userId}`);
+    return this.http.get<LearningSubmissionDTO[]>(`${this.learningSubmissionsUrl}/user/${userId}`);
+  }
+
+  reviewSubmission(submissionId: string, accepted: boolean): Observable<LearningSubmissionDTO> {
+    return this.http.put<LearningSubmissionDTO>(
+      `${this.learningSubmissionsUrl}/${submissionId}/review?accepted=${accepted}`,
+      {}
+    );
   }
 
 
+  getSubmissionsByManager(managerId: string): Observable<LearningSubmissionDTO[]> {
+    return this.http.get<LearningSubmissionDTO[]>(`${this.learningSubmissionsUrl}/manager/${managerId}`);
+  }
+
   getSubmissionsByTemplate(templateId: string): Observable<LearningSubmissionDTO[]> {
-    return this.http.get<LearningSubmissionDTO[]>(`${environment.learningSubmissionsUrl}/template/${templateId}`);
+    return this.http.get<LearningSubmissionDTO[]>(`${this.learningSubmissionsUrl}/template/${templateId}`);
   }
 
   getSubmissionById(id: string): Observable<LearningSubmissionDTO> {
-    return this.http.get<LearningSubmissionDTO>(`${environment.learningSubmissionsUrl}/${id}`);
+    return this.http.get<LearningSubmissionDTO>(`${this.learningSubmissionsUrl}/${id}`);
   }
 }
