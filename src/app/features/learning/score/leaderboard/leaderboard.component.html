@@ -15,7 +15,7 @@
       <tr *ngFor="let user of leaderboard; index as i">
         <td>{{ i + 1 }}</td>
         <td>
-          <img *ngIf="user.photoUrl" [src]="user.photoUrl" alt="User Photo" class="user-photo" />
+          <img *ngIf="user.imageUrl" [src]="user.imageUrl" alt="User Photo" class="user-photo" />
         </td>
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>

@@ -39,3 +39,11 @@ svg {
   text-overflow: ellipsis;
   max-width: 40px;
 }
+
+image {
+  border-radius: 50%;
+}
+
+text {
+  font-family: Arial, sans-serif;
+}

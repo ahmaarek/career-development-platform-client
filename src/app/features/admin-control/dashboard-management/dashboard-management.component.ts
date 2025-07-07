@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 export class DashboardManagementComponent implements OnInit {
 
   form: FormGroup;
+  maxPoints = 2000;
 
   constructor(
     private fb: FormBuilder,

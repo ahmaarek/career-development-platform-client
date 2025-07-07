@@ -14,7 +14,6 @@ import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-
 export class NavbarComponent implements OnInit {
   dropdownOpen = false;
   notificationDropdownOpen = false;
@@ -26,79 +25,91 @@ export class NavbarComponent implements OnInit {
   unreadCount: number = 0;
   userId!: string;
   senderNames: Record<string, string> = {};
+  imageUrl: string | null = "/user-default-logo.webp";
 
   constructor(
     private router: Router,
     private userService: UserService,
     private notificationService: NotificationService,
     private learningScoreService: LearningScoreService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-  const userString = sessionStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-  const token = user?._token || "";
+    const userString = sessionStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+    const token = user?._token || "";
+    if (!token) return;
 
-  if (!token) return;
+    this.userService.getCurrentUser().pipe(
+      tap(user => {
+        this.role = user.role;
+        this.userName = user.name;
+        this.userId = user.id;
+        if (user.imageId) {
+          this.loadImagePreview(user.imageId);
+        }
+      }),
+      switchMap(user => this.learningScoreService.getUserScore(user.id)),
+      tap(score => {
+        this.currentPoints = score.points;
+        this.fetchNotifications();
+      })
+    ).subscribe({
+      error: (err) => {
+        console.error('Initialization failed:', err);
+      }
+    });
+  }
 
-  this.userService.getCurrentUser().pipe(
-    tap(user => {
-      this.role = user.role;
-      this.userName = user.name;
-      this.userId = user.id;
-    }),
-    switchMap(user => this.learningScoreService.getUserScore(user.id)),
-    tap(score => {
-      this.currentPoints = score.points;
-      this.fetchNotifications(); 
-    })
-  ).subscribe({
-    error: (err) => {
-      console.error('Initialization failed:', err);
-    }
-  });
-}
-
+  private loadImagePreview(imageId: string): void {
+    this.userService.getProtectedImage(imageId).subscribe({
+      next: (blob) => {
+        this.imageUrl = URL.createObjectURL(blob);
+      },
+      error: (err) => {
+        console.error('Failed to load image preview:', err);
+        this.imageUrl = "/user-default-logo.webp";
+      }
+    });
+  }
 
   fetchNotifications(): void {
-  this.notificationService.getNotifications(this.userId).pipe(
-    tap(notifications => {
-      this.notifications = notifications;
-      this.unreadCount = notifications.filter(n => !n.read).length;
-    }),
-    switchMap(notifications => {
-      const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
-      const missingSenderIds = uniqueSenderIds.filter(id => !this.senderNames[id]);
+    this.notificationService.getNotifications(this.userId).pipe(
+      tap(notifications => {
+        this.notifications = notifications;
+        this.unreadCount = notifications.filter(n => !n.read).length;
+      }),
+      switchMap(notifications => {
+        const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
+        const missingSenderIds = uniqueSenderIds.filter(id => !this.senderNames[id]);
 
-      if (missingSenderIds.length === 0) {
-        return of([]);
-      }
+        if (missingSenderIds.length === 0) {
+          return of([]);
+        }
 
-      return forkJoin(
-        missingSenderIds.map(senderId =>
-          this.userService.getUserById(senderId).pipe(
-            catchError(err => {
-              console.error(`Failed to fetch sender name for ID ${senderId}`, err);
-              return of({ id: senderId, name: 'Unknown' });
-            }),
-            map(user => ({ id: senderId, name: user.name }))
+        return forkJoin(
+          missingSenderIds.map(senderId =>
+            this.userService.getUserById(senderId).pipe(
+              catchError(err => {
+                console.error(`Failed to fetch sender name for ID ${senderId}`, err);
+                return of({ id: senderId, name: 'Unknown' });
+              }),
+              map(user => ({ id: senderId, name: user.name }))
+            )
           )
-        )
-      );
-    })
-  ).subscribe({
-    next: (senderDataArray) => {
-      senderDataArray.forEach(data => {
-        this.senderNames[data.id] = data.name;
-      });
-    },
-    error: (err) => {
-      console.error('Error loading notifications:', err);
-    }
-  });
-}
-
-
+        );
+      })
+    ).subscribe({
+      next: (senderDataArray) => {
+        senderDataArray.forEach(data => {
+          this.senderNames[data.id] = data.name;
+        });
+      },
+      error: (err) => {
+        console.error('Error loading notifications:', err);
+      }
+    });
+  }
 
   markAsRead(notification: any) {
     this.notificationService.markAsRead(notification.id).subscribe({
@@ -124,14 +135,17 @@ export class NavbarComponent implements OnInit {
     });
   }
 
-
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
   }
 
   toggleNotificationDropdown() {
     this.notificationDropdownOpen = !this.notificationDropdownOpen;
+  }
 
+  navigateTo(path: string) {
+    this.router.navigate([path]);
+    this.dropdownOpen = false;
   }
 
   logout() {
