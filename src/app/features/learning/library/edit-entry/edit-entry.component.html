@@ -1,0 +1,68 @@
+<h2>Edit Learning Material Template</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <!-- General Info -->
+  <div class="general-info">
+    <label>Title:
+      <input formControlName="title" />
+    </label>
+
+    <label>Description:
+      <textarea formControlName="description"></textarea>
+    </label>
+
+    <label>Career Package:
+      <select formControlName="careerPackageTemplate" required>
+        <option *ngFor="let cp of careerPackageTemplates" [value]="cp.id">{{ cp.title }}</option>
+      </select>
+    </label>
+
+    <label>Points:
+      <input type="number" formControlName="points" />
+    </label>
+  </div>
+
+  <!-- Sections -->
+  <div formArrayName="sections">
+    <div *ngFor="let section of sections.controls; let i = index" [formGroupName]="i" class="section-card">
+      <h3>Section {{ i + 1 }}</h3>
+
+      <label>Title:
+        <input formControlName="title" />
+      </label>
+
+      <label>Type:
+        <select formControlName="type">
+          <option *ngFor="let type of sectionTypeOptions" [value]="type">{{ type }}</option>
+        </select>
+      </label>
+
+      <label>Instructions:
+        <textarea formControlName="instructions"></textarea>
+      </label>
+
+      <label>Content:
+        <textarea formControlName="content"></textarea>
+      </label>
+
+      <label>Requires Submission:
+        <input type="checkbox" formControlName="requiresSubmission" />
+      </label>
+
+      <div *ngIf="section.value.previewUrl">
+        <ng-container [ngSwitch]="section.value.previewType">
+          <img *ngSwitchCase="'image'" [src]="section.value.previewUrl" style="max-width: 100px;" />
+          <video *ngSwitchCase="'video'" [src]="section.value.previewUrl" controls width="150"></video>
+          <a *ngSwitchCase="'document'" [href]="section.value.previewUrl" target="_blank">View Document</a>
+        </ng-container>
+      </div>
+
+      <label>Upload New Attachment:
+        <input type="file" (change)="onFileChange($event, i)" />
+      </label>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="form.invalid">Update Template</button>
+</form>

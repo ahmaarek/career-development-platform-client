@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { combineLatest, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, combineLatest, forkJoin, map, Observable, of } from 'rxjs';
 import { LearningMaterialTemplate } from '../models/learning-material-template.model';
 import { environment } from '../../../../../environments/environment';
 
@@ -30,6 +30,20 @@ export class LearningMaterialTemplateService {
     return this.http.get<LearningMaterialTemplate>(`${this.learningTemplatesUrl}/${id}`);
   }
 
+  deleteTemplate(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.learningTemplatesUrl}/${id}`).pipe(
+      map(() => {
+        return;
+      }),
+      catchError(error => {
+        console.error('Error deleting learning material template:', error);
+        return of(undefined);
+      })
+    );
+  }
 
+  updateTemplate(template: LearningMaterialTemplate): Observable<void> {
+    return this.http.put<void>(`${this.learningTemplatesUrl}/${template.id}`, template);
+  }
 
 }

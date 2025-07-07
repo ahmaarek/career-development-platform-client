@@ -17,6 +17,9 @@ import { LibraryContainerComponent } from './features/learning/library/library-c
 import { TemplateBuilderComponent } from './features/learning/library/template-builder/template-builder.component';
 import { ReviewSubmissionsComponent } from './features/learning/library/review-submissions/review-submissions.component';
 import { LearningManagementComponent } from './features/admin-control/learning-management/learning-management.component';
+import { EditOrDeleteComponent } from './features/learning/library/edit-or-delete/edit-or-delete.component';
+import { EditEntryComponent } from './features/learning/library/edit-entry/edit-entry.component';
+import { DashboardManagementComponent } from './features/admin-control/dashboard-management/dashboard-management.component';
 
 export const routes: Routes = [
     {
@@ -41,7 +44,8 @@ export const routes: Routes = [
                 children: [
                     { path: 'user-management', component: UserManagementComponent },
                     { path: 'career-package-management', component: CareerPackagesComponent },
-                    {path: 'learning-management', component: LearningManagementComponent} 
+                    {path: 'learning-management', component: LearningManagementComponent} ,
+                    {path: 'dashboard-management', component: DashboardManagementComponent}
                 ]
             },
             {
@@ -58,7 +62,9 @@ export const routes: Routes = [
                     {path: '', component: LibraryHomeComponent},
                     {path: 'create', component: CreateEntryComponent},
                     {path : 'learning-material/review-submissions', component: ReviewSubmissionsComponent},
-                    {path: 'learning-material/create', component: TemplateBuilderComponent}
+                    {path: 'learning-material/create', component: TemplateBuilderComponent},
+                    {path: 'edit', component: EditOrDeleteComponent},
+                    {path: 'edit/:type/:id', component: EditEntryComponent},
                 ]
             }
         ]

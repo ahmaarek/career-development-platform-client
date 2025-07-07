@@ -26,4 +26,22 @@ export class BlogWikiService {
             return this.http.post(`${this.blogWikiUrl}/wikis`, entry);
     }
 
+    deleteEntry(id: string): Observable<any> {
+        return this.http.delete(`${this.blogWikiUrl}/entry/${id}`).pipe(
+            catchError(error => {
+                console.error('Error deleting blog entry:', error);
+                return of(null);
+            })
+        );
+    }
+
+    getEntryById(id: string): Observable<BlogWikiDTO> {
+        return this.http.get<BlogWikiDTO>(`${this.blogWikiUrl}/entry/${id}`);
+    }
+
+    updateEntry(entry: BlogWikiDTO): Observable<void> {
+        return this.http.put<void>(`${this.blogWikiUrl}/${entry.id}`, entry);
+    }
+
+
 }

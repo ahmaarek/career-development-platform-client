@@ -1,0 +1,143 @@
+.edit-delete-wrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.category {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.category-header {
+  background: #f7f7f7;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: background 0.2s;
+}
+
+.category-header:hover {
+  background-color: #e8f0fe;
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  transition: background 0.2s;
+}
+
+li:hover {
+  background-color: #fafafa;
+}
+
+li span {
+  flex-grow: 1;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #a71d2a;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 998;
+}
+
+.modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.confirm-delete {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.cancel {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+}

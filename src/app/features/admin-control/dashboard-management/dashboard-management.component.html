@@ -1,0 +1,19 @@
+
+<h2 class="headline">Manage Ranks</h2>
+<div>
+    <div *ngIf="rankGroups.length > 0; else noRanks">
+    <div *ngFor="let rank of rankGroups; let i = index" [formGroup]="rank" class="rank-entry">
+      <input type="text" formControlName="name" placeholder="Rank Name" />
+      <input type="range" min="0" max="10000" formControlName="pointsRequired" />
+      <span>{{ rank.value.pointsRequired }} points</span>
+      <button (click)="deleteRank(i)">Delete</button>
+    </div>
+  </div>
+
+  <ng-template #noRanks>
+    <p>No ranks yet. Add your first one!</p>
+  </ng-template>
+
+  <button (click)="addRank()">Add Rank</button>
+  <button (click)="confirm()" [disabled]="rankGroups.length === 0">Confirm</button>
+</div>

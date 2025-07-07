@@ -1,0 +1,69 @@
+form {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+  gap: 0.3rem;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fdfdfd;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.section-card {
+  background-color: #f9f9f9;
+  padding: 1rem 1.2rem;
+  border-left: 4px solid #007bff;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.section-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s;
+}
+
+button[type="submit"]:hover {
+  background-color: #218838;
+}
