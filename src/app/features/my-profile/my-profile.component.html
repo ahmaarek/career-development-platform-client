@@ -1,29 +1,26 @@
 <div class="profile-container">
-  <h2>My Profile</h2>
+  <div class="profile-header">
+    <div class="profile-image">
+      <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl" alt="Profile Picture" />
+    </div>
+    <div class="profile-header-text">
+      <h2>{{ user?.name }}</h2>
+      <p>{{ user?.email }}</p>
+      <p class="role-badge">{{ user?.role }}</p>
+    </div>
+  </div>
 
-  <form *ngIf="user && form" [formGroup]="form" (ngSubmit)="saveChanges()">
+  <form *ngIf="user && form" [formGroup]="form" (ngSubmit)="saveChanges()" class="profile-form">
     <!-- Name -->
     <div class="form-group">
       <label>Full Name</label>
       <input type="text" formControlName="name" [readonly]="!isEditing" />
     </div>
 
-    <!-- Email -->
+    <!-- Photo Upload -->
     <div class="form-group">
-      <label>Email</label>
-      <input type="email" [value]="user.email" readonly />
-    </div>
-
-    <!-- Role -->
-    <div class="form-group">
-      <label>Role</label>
-      <input type="text" [value]="user.role" readonly />
-    </div>
-
-    <!-- Photo URL -->
-    <div class="form-group">
-      <label>Photo URL</label>
-      <input type="text" formControlName="photoUrl" [readonly]="!isEditing" />
+      <label>Profile Photo</label>
+      <input type="file" (change)="onFileSelected($event)" [disabled]="!isEditing" />
     </div>
 
     <!-- Buttons -->

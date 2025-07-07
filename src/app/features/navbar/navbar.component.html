@@ -63,11 +63,11 @@
 
     <!-- User Icon -->
     <div class="user-icon" (click)="toggleDropdown()" tabindex="0">
-      <img src="/user-default-logo.webp" alt="User" class="user-icon" />
+      <img [src]="imageUrl" alt="User" class="user-icon" />
       @if (dropdownOpen) {
       <div class="dropdown-menu">
-        <div class="dropdown-user-info">
-          <img src="/user-default-logo.webp" alt="User" />
+        <div class="dropdown-user-info" (click)="navigateTo('/my-profile')">
+          <img [src]="imageUrl" alt="User"/>
           <span>{{ userName }}</span>
         </div>
           <div class="user-points" *ngIf="currentPoints !== null">

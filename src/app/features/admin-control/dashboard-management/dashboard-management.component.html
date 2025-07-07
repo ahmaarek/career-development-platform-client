@@ -4,7 +4,7 @@
     <div *ngIf="rankGroups.length > 0; else noRanks">
     <div *ngFor="let rank of rankGroups; let i = index" [formGroup]="rank" class="rank-entry">
       <input type="text" formControlName="name" placeholder="Rank Name" />
-      <input type="range" min="0" max="10000" formControlName="pointsRequired" />
+      <input type="range" min="0" [max]="maxPoints" formControlName="pointsRequired" />
       <span>{{ rank.value.pointsRequired }} points</span>
       <button (click)="deleteRank(i)">Delete</button>
     </div>

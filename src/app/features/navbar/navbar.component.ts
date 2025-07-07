@@ -25,6 +25,7 @@ export class NavbarComponent implements OnInit {
   unreadCount: number = 0;
   userId!: string;
   senderNames: Record<string, string> = {};
+  imageUrl: string | null = "/user-default-logo.webp";
 
   constructor(
     private router: Router,
@@ -45,6 +46,9 @@ export class NavbarComponent implements OnInit {
           this.userName = user.name;
           this.userId = user.id;
 
+          if (user.imageId) {
+            this.loadImagePreview(user.imageId);
+          }
           this.fetchNotifications();
           this.learningScoreService.getUserScore(this.userId).subscribe({
             next: (score) => {
@@ -62,33 +66,45 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  private loadImagePreview(imageId: string): void {
+    this.userService.getProtectedImage(imageId).subscribe({
+      next: (blob) => {
+        this.imageUrl = URL.createObjectURL(blob);
+      },
+      error: (err) => {
+        console.error('Failed to load image preview:', err);
+        this.imageUrl = null;
+      }
+    });
+  }
+
   fetchNotifications() {
-  this.notificationService.getNotifications(this.userId).subscribe({
-    next: (notifications) => {
-      this.notifications = notifications;
-      this.unreadCount = notifications.filter(n => !n.read).length;
+    this.notificationService.getNotifications(this.userId).subscribe({
+      next: (notifications) => {
+        this.notifications = notifications;
+        this.unreadCount = notifications.filter(n => !n.read).length;
 
-      const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
+        const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
 
-      uniqueSenderIds.forEach(senderId => {
-        if (!this.senderNames[senderId]) {
-          this.userService.getUserById(senderId).subscribe({
-            next: user => {
-              this.senderNames[senderId] = user.name;
-            },
-            error: err => {
-              console.error(`Failed to fetch sender name for ID ${senderId}`, err);
-              this.senderNames[senderId] = 'Unknown';
-            }
-          });
-        }
-      });
-    },
-    error: (err) => {
-      console.error('Error loading notifications:', err);
-    }
-  });
-}
+        uniqueSenderIds.forEach(senderId => {
+          if (!this.senderNames[senderId]) {
+            this.userService.getUserById(senderId).subscribe({
+              next: user => {
+                this.senderNames[senderId] = user.name;
+              },
+              error: err => {
+                console.error(`Failed to fetch sender name for ID ${senderId}`, err);
+                this.senderNames[senderId] = 'Unknown';
+              }
+            });
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error loading notifications:', err);
+      }
+    });
+  }
 
 
   markAsRead(notification: any) {
@@ -123,6 +139,11 @@ export class NavbarComponent implements OnInit {
   toggleNotificationDropdown() {
     this.notificationDropdownOpen = !this.notificationDropdownOpen;
 
+  }
+
+  navigateTo(path: string) {
+    this.router.navigate([path]);
+    this.dropdownOpen = false;
   }
 
   logout() {

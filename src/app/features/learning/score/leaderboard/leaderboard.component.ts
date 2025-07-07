@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LearningScoreService } from '../learning.score.service';
 import { UserService } from '../../../../user/user.service';
-import { User, UserWithScore } from '../../../../user/user.model';
+import { User, FullUser } from '../../../../user/user.model';
 import { forkJoin, switchMap, map } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
@@ -12,32 +12,56 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 export class LeaderboardComponent implements OnInit {
-  leaderboard: UserWithScore[] = [];
+  leaderboard: FullUser[] = [];
 
   constructor(
     private learningScoreService: LearningScoreService,
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadLeaderboard();
   }
 
-  loadLeaderboard(): void {
-    this.learningScoreService.getLeaderboard().pipe(
-      switchMap(scores => {
-        const userRequests = scores.map(score =>
-          this.userService.getUserById(score.userId).pipe(
-            map(user => ({
-              ...user,
-              points: score.points
-            }))
-          )
-        );
-        return forkJoin(userRequests);
-      })
-    ).subscribe(usersWithScores => {
-      this.leaderboard = usersWithScores;
-    });
-  }
+loadLeaderboard(): void {
+  this.learningScoreService.getLeaderboard().pipe(
+    switchMap(scores => {
+      const userRequests = scores.map(score =>
+        this.userService.getUserById(score.userId).pipe(
+          switchMap(user => {
+            if (user.imageId) {
+              return this.userService.getProtectedImage(user.imageId).pipe(
+                map(blob => {
+                   console.log(`Fetched blob for ${user.name}:`, blob); // 
+                  const imageUrl = URL.createObjectURL(blob);
+                  return {
+                    ...user,
+                    points: score.points,
+                    imageUrl
+                  } as FullUser;
+                }),
+              );
+            } else {
+              return new Promise<FullUser>(resolve => {
+                resolve({
+                  ...user,
+                  points: score.points,
+                  imageUrl: '/user-default-logo.webp'
+                });
+              });
+            }
+          })
+        )
+      );
+      return forkJoin(userRequests);
+    })
+  ).subscribe({
+    next: (usersWithImages) => {
+      this.leaderboard = usersWithImages;
+    },
+    error: (err) => {
+      console.error('Failed to load leaderboard:', err);
+    }
+  });
+}
 }

@@ -1,49 +1,47 @@
-<div class="rank-map-container">
-  
-  <svg width="800" height="200" style="position: absolute; top: 0; left: 0;">
+<svg width="100%" height="300" viewBox="0 0 1000 300">
 
-    <!-- lines -->
-    @for (rank of rankThresholds; track rank) {
-      @if ($index < rankThresholds.length - 1) {
-        <line
-          [attr.x1]="$index * rankSpacing + 50"
-          y1="100"
-          [attr.x2]="($index + 1) * rankSpacing + 50"
-          y2="100"
-          stroke="#aaa"
-          stroke-width="4" />
-      }
-    }
+  <!-- Curved path connecting ranks -->
+  <path #pathRef d="M 50 250 C 250 50, 750 50, 950 250" stroke="#ccc" stroke-width="6" fill="none" />
 
-    <!-- rank nodes -->
-    @for (rank of rankThresholds; track rank) {
-      <circle
-        [attr.cx]="$index * rankSpacing + 50"
-        cy="100"
-        r="20"
-        fill="#007bff" />
-    }
+  <!-- Rank nodes -->
+  <g *ngFor="let rank of ranks; let i = index">
+    <title>{{ rank.name }} — Requires {{ rank.pointsRequired }} points</title>
+    <rect [attr.x]="getPointAtRank(i).x - 14" [attr.y]="getPointAtRank(i).y - 14" width="28" height="28" fill="#fdd835"
+      stroke="#333" rx="6" ry="6" />
+    <text [attr.x]="getPointAtRank(i).x" [attr.y]="getPointAtRank(i).y + 35" font-size="12" text-anchor="middle"
+      fill="#333">
+      {{ rank.name }}
+    </text>
+  </g>
 
-    <!-- rank names -->
-    @for (rank of rankThresholds; track rank) {
-      <text
-        [attr.x]="$index * rankSpacing + 50"
-        y="135"
-        text-anchor="middle"
-        font-size="12"
-        fill="#333">
-        {{rank.name }}
-      </text>
-    }
-  </svg>
+<g *ngFor="let user of otherUsers">
+  <g *ngIf="getAnimatedPosition(user.id) as pos">
+    <image
+      [attr.xlink:href]="userImageMap.get(user.id) || '/user-default-logo.webp'"
+      [attr.x]="pos.x - 10"
+      [attr.y]="pos.y - 10"
+      width="20"
+      height="20"
+      clip-path="circle(10px at center)"
+    >
+      <title>{{ user.fullName + "\nScore: " + user.score}}</title>
+    </image>
+  </g>
+</g>
 
-  <!-- users -->
-  @for (entry of usersWithScore; track entry.user.id) {
-    <div class="user-marker"
-         [style.left.px]="entry.x - 20"
-         [style.top.px]="30">
-      <img [src]="'assets/default-user.png'" alt="user" class="user-img" />
-      <div class="user-name">{{ entry.user.name || entry.user.email }}</div>
-    </div>
-  }
-</div>
+
+  <g *ngIf="animatedCurrentUser as pos">
+    <circle [attr.cx]="pos.x" [attr.cy]="pos.y" r="18" fill="none" stroke="#007BFF" stroke-width="3"></circle>
+  <image
+    [attr.xlink:href]="userImageMap.get(currentUser?.id || '') || '/user-default-logo.webp'"
+    [attr.x]="pos.x - 15"
+    [attr.y]="pos.y - 15"
+    width="30"
+    height="30"
+    clip-path="circle(15px at center)"
+  >
+      <title>{{ currentUser?.fullName + "\nScore: " + currentUser?.score}}</title>
+  </image>
+  </g>
+
+</svg>

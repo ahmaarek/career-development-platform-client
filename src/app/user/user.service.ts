@@ -1,13 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, switchMap } from 'rxjs';
-import { User } from './user.model'; 
+import { User } from './user.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private readonly imageUrl = environment.userBaseUrl + '/images';
   private userSubject = new BehaviorSubject<User | null>(null);
   public user$ = this.userSubject.asObservable();
 
@@ -17,7 +18,6 @@ export class UserService {
     console.log('getUser called', this.userSubject.value);
     return this.userSubject.value;
   }
-
 
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(environment.userBaseUrl);
@@ -91,8 +91,56 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    console.log("🔐 Using token:", token);
     return this.http.get<User[]>(`${environment.userBaseUrl}/by-manager/${managerId}`, { headers });
   }
+
+  uploadImage(file: File, userId: string): Observable<{ imageId: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', userId);
+
+    return this.http.post(`${this.imageUrl}/upload`, formData, {
+      responseType: 'text'
+    }).pipe(
+
+      switchMap((responseText: string) => {
+        return new Observable<{ imageId: string }>(observer => {
+          observer.next({ imageId: responseText });
+          observer.complete();
+        });
+      })
+    );
+  }
+
+
+  getUserImage(userId: string): Observable<string> {
+    const url = `${this.imageUrl}/${userId}`;
+
+
+    return this.http.get(url, { responseType: 'blob' }).pipe(
+      switchMap(blob => {
+        return new Observable<string>(observer => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            observer.next(reader.result as string);
+            observer.complete();
+          };
+          reader.onerror = err => {
+            observer.error(err);
+          };
+          reader.readAsDataURL(blob);
+        });
+      })
+    );
+  }
+
+  getProtectedImage(imageId: string): Observable<Blob> {
+  return this.http.get(`${this.imageUrl}/${imageId}`, {
+    responseType: 'blob'
+  });
+}
+
+
+
 
 }
