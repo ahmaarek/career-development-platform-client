@@ -6,6 +6,7 @@ import { NotificationService } from '../notification/notification.service';
 import { Notification } from '../notification/notification.model';
 import { MatIconModule } from '@angular/material/icon';
 import { LearningScoreService } from '../learning/score/learning.score.service';
+import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -34,54 +35,61 @@ export class NavbarComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const userString = sessionStorage.getItem("user");
-    const user = userString ? JSON.parse(userString) : null;
-    const token = user?._token || "";
+  const userString = sessionStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const token = user?._token || "";
 
-    if (token) {
-      this.userService.getCurrentUser().subscribe({
-        next: (user) => {
-          this.role = user.role;
-          this.userName = user.name;
-          this.userId = user.id;
+  if (!token) return;
 
-          this.fetchNotifications();
-          this.learningScoreService.getUserScore(this.userId).subscribe({
-            next: (score) => {
-              this.currentPoints = score.points;
-            },
-            error: (err) => {
-              console.error('Failed to fetch user score:', err);
-            }
-          });
-        },
-        error: (err) => {
-          console.error('Failed to fetch current user:', err);
-        }
-      });
+  this.userService.getCurrentUser().pipe(
+    tap(user => {
+      this.role = user.role;
+      this.userName = user.name;
+      this.userId = user.id;
+    }),
+    switchMap(user => this.learningScoreService.getUserScore(user.id)),
+    tap(score => {
+      this.currentPoints = score.points;
+      this.fetchNotifications(); 
+    })
+  ).subscribe({
+    error: (err) => {
+      console.error('Initialization failed:', err);
     }
-  }
+  });
+}
 
-  fetchNotifications() {
-  this.notificationService.getNotifications(this.userId).subscribe({
-    next: (notifications) => {
+
+  fetchNotifications(): void {
+  this.notificationService.getNotifications(this.userId).pipe(
+    tap(notifications => {
       this.notifications = notifications;
       this.unreadCount = notifications.filter(n => !n.read).length;
-
+    }),
+    switchMap(notifications => {
       const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
+      const missingSenderIds = uniqueSenderIds.filter(id => !this.senderNames[id]);
 
-      uniqueSenderIds.forEach(senderId => {
-        if (!this.senderNames[senderId]) {
-          this.userService.getUserById(senderId).subscribe({
-            next: user => {
-              this.senderNames[senderId] = user.name;
-            },
-            error: err => {
+      if (missingSenderIds.length === 0) {
+        return of([]);
+      }
+
+      return forkJoin(
+        missingSenderIds.map(senderId =>
+          this.userService.getUserById(senderId).pipe(
+            catchError(err => {
               console.error(`Failed to fetch sender name for ID ${senderId}`, err);
-              this.senderNames[senderId] = 'Unknown';
-            }
-          });
-        }
+              return of({ id: senderId, name: 'Unknown' });
+            }),
+            map(user => ({ id: senderId, name: user.name }))
+          )
+        )
+      );
+    })
+  ).subscribe({
+    next: (senderDataArray) => {
+      senderDataArray.forEach(data => {
+        this.senderNames[data.id] = data.name;
       });
     },
     error: (err) => {
@@ -89,6 +97,7 @@ export class NavbarComponent implements OnInit {
     }
   });
 }
+
 
 
   markAsRead(notification: any) {

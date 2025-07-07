@@ -6,6 +6,7 @@ import { CareerPackageService } from '../../career-package/career-package.servic
 import { CareerPackageTemplate } from '../../career-package/models/career-package-template.interface';
 import { FormsModule } from '@angular/forms';
 import { UserCareerPackage } from '../../career-package/models/user-career-package.interface';
+import { catchError, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-career-package-review',
@@ -37,35 +38,38 @@ export class CareerPackageReviewComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.userService.getCurrentUser().subscribe(manager => {
-      if (!manager?.id) return;
-      this.managerId = manager.id;
+  this.userService.getCurrentUser().pipe(
+    filter(manager => !!manager?.id),
+    tap(manager => this.managerId = manager.id),
+    switchMap(manager => this.userService.getUsersByManagerId(manager.id)),
+    tap(users => this.employees = users),
+    switchMap(users => {
+      return forkJoin(
+        users.map(user =>
+          this.careerPackageService.getUserCareerPackage(user.id).pipe(
+            map(pkg => {
+              if (pkg.status !== 'APPROVED') {
+                this.enrollmentStatus[user.id] = true;
+                this.userPackages[user.id] = pkg;
+              }
+            }),
+            catchError(err => {
+              if (err.status === 404) {
+                this.enrollmentStatus[user.id] = false;
+              }
+              return of(null);
+            })
+          )
+        )
+      );
+    })
+  ).subscribe();
 
-      this.userService.getUsersByManagerId(manager.id).subscribe(users => {
-        this.employees = users;
+  this.careerPackageService.getAllCareerPackageTemplates().subscribe(templates => {
+    this.careerPackageTemplates = templates;
+  });
+}
 
-        // Check enrollment for each user
-        users.forEach(user => {
-          this.careerPackageService.getUserCareerPackage(user.id).subscribe(pkg => {
-            if (pkg.status !== 'APPROVED') {
-              this.enrollmentStatus[user.id] = true;
-              this.userPackages[user.id] = pkg;
-            }
-          }, err => {
-            if (err.status === 404) {
-              this.enrollmentStatus[user.id] = false;
-            }
-          });
-        });
-      });
-    });
-
-    this.careerPackageService.getAllCareerPackageTemplates().subscribe(templates => {
-      this.careerPackageTemplates = templates;
-    });
-
-    console.log(this.enrollmentStatus);
-  }
 
   openAssignModal(userId: string): void {
     this.assigningUserId = userId;

@@ -4,10 +4,8 @@ import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } 
 import { CareerPackageService } from './career-package.service';
 import { UserService } from '../../user/user.service';
 import { UserCareerPackage } from './models/user-career-package.interface';
-import { CareerPackageTemplate } from './models/career-package-template.interface';
-import { UserSectionResponse } from './models/user-section-response.interface';
-import { UserFieldResponse } from './models/user-field-response.interface';
-import { SectionFieldTemplate } from './models/section-field-template.interface';
+import { UserSectionSubmission } from './models/user-section-submission.interface';
+import { UserFieldSubmission } from './models/user-field-submission.interface';
 import { SectionTemplate } from './models/section-template.interface';
 import { PackageStatus } from './enums/package-status.enum';
 import { CommonModule } from '@angular/common';
@@ -56,7 +54,6 @@ export class CareerPackageComponent implements OnInit {
 
       },
       error: (error) => {
-        this.errorMessage = error.message;
         this.isLoading = false;
       }
     });
@@ -144,8 +141,8 @@ export class CareerPackageComponent implements OnInit {
       const formControls: { [key: string]: FormControl } = {};
 
       section.fields.forEach(field => {
-        const existingResponse = this.getExistingFieldResponse(section.id, field.id);
-        const initialValue = existingResponse ? existingResponse.value : '';
+        const existingSubmission = this.getExistingFieldSubmission(section.id, field.id);
+        const initialValue = existingSubmission ? existingSubmission.value : '';
 
         const validators = [];
         validators.push(Validators.required);
@@ -177,16 +174,16 @@ export class CareerPackageComponent implements OnInit {
   }
 
 
-  getExistingFieldResponse(sectionId: string, fieldId: string): UserFieldResponse | null {
+  getExistingFieldSubmission(sectionId: string, fieldId: string): UserFieldSubmission | null {
     if (!this.userCareerPackage) return null;
 
-    const sectionResponse = this.userCareerPackage.sectionSubmissions.find(
+    const sectionSubmission = this.userCareerPackage.sectionSubmissions.find(
       sr => sr.sectionTemplateId === sectionId
     );
 
-    if (!sectionResponse) return null;
+    if (!sectionSubmission) return null;
 
-    return sectionResponse.fieldSubmissions.find(
+    return sectionSubmission.fieldSubmissions.find(
       fr => fr.fieldTemplateId === fieldId
     ) || null;
   }
@@ -203,14 +200,14 @@ export class CareerPackageComponent implements OnInit {
   getSectionCompletionPercentage(section: SectionTemplate): number {
     if (!this.userCareerPackage) return 0;
 
-    const sectionResponse = this.userCareerPackage.sectionSubmissions.find(
+    const sectionSubmission = this.userCareerPackage.sectionSubmissions.find(
       sr => sr.sectionTemplateId === section.id
     );
 
-    if (!sectionResponse) return 0;
+    if (!sectionSubmission) return 0;
 
     const totalFields = section.fields.length;
-    const completedFields = sectionResponse.fieldSubmissions.filter(fr => fr.value.trim() !== '').length;
+    const completedFields = sectionSubmission.fieldSubmissions.filter(fr => fr.value.trim() !== '').length;
 
     return totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
   }
@@ -272,46 +269,46 @@ export class CareerPackageComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const existingSectionResponse = this.userCareerPackage.sectionSubmissions?.find(
+    const existingSectionSubmission = this.userCareerPackage.sectionSubmissions?.find(
       resp => resp.sectionTemplateId === section.id
     );
 
-    if (existingSectionResponse && existingSectionResponse.id) {
-      const existingResponsesMap: Record<string, string | undefined> = Object.fromEntries(
-        existingSectionResponse.fieldSubmissions.map(resp => [resp.fieldTemplateId, resp.id])
+    if (existingSectionSubmission && existingSectionSubmission.id) {
+      const existingSubmissionsMap: Record<string, string | undefined> = Object.fromEntries(
+        existingSectionSubmission.fieldSubmissions.map(resp => [resp.fieldTemplateId, resp.id])
       );
 
-      const fieldResponses: UserFieldResponse[] = [];
-      const newFieldResponses: UserFieldResponse[] = [];
+      const fieldSubmissions: UserFieldSubmission[] = [];
+      const newFieldSubmissions: UserFieldSubmission[] = [];
 
       section.fields.forEach(field => {
         const value = form.get(field.fieldKey)?.value || '';
-        const existingId = existingResponsesMap[field.id];
+        const existingId = existingSubmissionsMap[field.id];
 
-        const response: UserFieldResponse = {
+        const submission: UserFieldSubmission = {
           fieldTemplateId: field.id,
           value
         };
 
         if (existingId) {
-          response.id = existingId;
-          fieldResponses.push(response);
+          submission.id = existingId;
+          fieldSubmissions.push(submission);
         } else {
-          newFieldResponses.push(response);
+          newFieldSubmissions.push(submission);
         }
       });
 
-      this.careerPackageService.updateSectionResponse(
-        existingSectionResponse.id,
+      this.careerPackageService.updateSectionSubmission(
+        existingSectionSubmission.id,
         {
           userCareerPackageId: this.userCareerPackage.id,
           sectionTemplateId: section.id,
-          fieldSubmissions: fieldResponses,
-          newFieldSubmissions: newFieldResponses
+          fieldSubmissions: fieldSubmissions,
+          newFieldSubmissions: newFieldSubmissions
         }
       ).subscribe({
-        next: updatedResponse => {
-          this.updateLocalSectionResponse(section.id, updatedResponse);
+        next: updatedSubmission => {
+          this.updateLocalSectionSubmission(section.id, updatedSubmission);
           this.successMessage = `${section.title} section updated successfully!`;
           this.isLoading = false;
           setTimeout(() => this.successMessage = '', 3000);
@@ -324,7 +321,7 @@ export class CareerPackageComponent implements OnInit {
 
     } else {
       // First-time submission
-      const fieldResponses: UserFieldResponse[] = section.fields.map(field => {
+      const fieldSubmissions: UserFieldSubmission[] = section.fields.map(field => {
         const value = form.get(field.fieldKey)?.value || '';
         return {
           fieldTemplateId: field.id,
@@ -332,14 +329,14 @@ export class CareerPackageComponent implements OnInit {
         };
       });
 
-      console.log(fieldResponses);
+      console.log(fieldSubmissions);
       this.careerPackageService.submitCompleteSection(
         this.userCareerPackage.id,
         section.id,
-        fieldResponses
+        fieldSubmissions
       ).subscribe({
-        next: newSectionResponse => {
-          this.addLocalSectionResponse(newSectionResponse);
+        next: newSectionSubmission => {
+          this.addLocalSectionSubmission(newSectionSubmission);
           this.successMessage = `${section.title} section submitted successfully!`;
           this.isLoading = false;
           setTimeout(() => this.successMessage = '', 3000);
@@ -376,39 +373,39 @@ export class CareerPackageComponent implements OnInit {
   getSectionSubmitButtonText(section: SectionTemplate): string {
     if (!this.userCareerPackage) return 'Submit Section';
 
-    const existingSectionResponse = this.userCareerPackage.sectionSubmissions.find(
+    const existingSectionSubmission = this.userCareerPackage.sectionSubmissions.find(
       sr => sr.sectionTemplateId === section.id
     );
 
-    return existingSectionResponse && existingSectionResponse.id ? 'Update Section' : 'Submit Section';
+    return existingSectionSubmission && existingSectionSubmission.id ? 'Update Section' : 'Submit Section';
   }
 
 
-  private updateLocalSectionResponse(sectionId: string, updatedSectionResponse: UserSectionResponse): void {
+  private updateLocalSectionSubmission(sectionId: string, updatedSectionSubmission: UserSectionSubmission): void {
     if (!this.userCareerPackage) return;
 
-    const sectionResponseIndex = this.userCareerPackage.sectionSubmissions.findIndex(
+    const sectionSubmissionIndex = this.userCareerPackage.sectionSubmissions.findIndex(
       sr => sr.sectionTemplateId === sectionId
     );
 
-    if (sectionResponseIndex !== -1) {
-      this.userCareerPackage.sectionSubmissions[sectionResponseIndex] = updatedSectionResponse;
+    if (sectionSubmissionIndex !== -1) {
+      this.userCareerPackage.sectionSubmissions[sectionSubmissionIndex] = updatedSectionSubmission;
     }
   }
 
 
-  private addLocalSectionResponse(newSectionResponse: UserSectionResponse): void {
+  private addLocalSectionSubmission(newSectionSubmission: UserSectionSubmission): void {
     if (!this.userCareerPackage) return;
 
     const existingIndex = this.userCareerPackage.sectionSubmissions.findIndex(
-      sr => sr.sectionTemplateId === newSectionResponse.sectionTemplateId
+      sr => sr.sectionTemplateId === newSectionSubmission.sectionTemplateId
     );
 
     if (existingIndex !== -1) {
-      this.userCareerPackage.sectionSubmissions[existingIndex] = newSectionResponse;
+      this.userCareerPackage.sectionSubmissions[existingIndex] = newSectionSubmission;
     } else {
 
-      this.userCareerPackage.sectionSubmissions.push(newSectionResponse);
+      this.userCareerPackage.sectionSubmissions.push(newSectionSubmission);
     }
   }
 
@@ -435,14 +432,14 @@ export class CareerPackageComponent implements OnInit {
       // Skip LEARNING sections from this check
       if (section.type === 'LEARNING') return true;
 
-      const sectionResponse = this.userCareerPackage!.sectionSubmissions.find(
+      const sectionSubmission = this.userCareerPackage!.sectionSubmissions.find(
         sr => sr.sectionTemplateId === section.id
       );
 
-      if (!sectionResponse) return false;
+      if (!sectionSubmission) return false;
 
       // Check if all fields have non-empty values
-      return sectionResponse.fieldSubmissions.every(fr => fr.value.trim() !== '');
+      return sectionSubmission.fieldSubmissions.every(fr => fr.value.trim() !== '');
     });
 
     // Ensure all learning templates are approved

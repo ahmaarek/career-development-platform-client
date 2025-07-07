@@ -4,10 +4,10 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { UserCareerPackage } from './models/user-career-package.interface';
 import { CareerPackageTemplate } from './models/career-package-template.interface';
-import { UserFieldResponse } from './models/user-field-response.interface';
+import { UserFieldSubmission } from './models/user-field-submission.interface';
 import { PackageStatus } from './enums/package-status.enum';
 import { UserService } from '../../user/user.service';
-import { UserSectionResponse } from './models/user-section-response.interface';
+import { UserSectionSubmission } from './models/user-section-submission.interface';
 import { idText } from 'typescript';
 import { environment } from '../../../environments/environment';
 
@@ -43,37 +43,37 @@ export class CareerPackageService {
   submitCompleteSection(
     userCareerPackageId: string,
     sectionTemplateId: string,
-    fieldSubmissions: UserFieldResponse[]
-  ): Observable<UserSectionResponse> {
-    const sectionResponseData = {
+    fieldSubmissions: UserFieldSubmission[]
+  ): Observable<UserSectionSubmission> {
+    const sectionSubmissionData = {
       userCareerPackageId: userCareerPackageId,
       sectionTemplateId: sectionTemplateId,
       fieldSubmissions: fieldSubmissions
     };
 
-    console.log('Submitting complete section:', sectionResponseData);
+    console.log('Submitting complete section:', sectionSubmissionData);
 
-    return this.http.post<UserSectionResponse>(`${environment.careerPackageBaseUrl}/user-section-response`, sectionResponseData)
+    return this.http.post<UserSectionSubmission>(`${environment.careerPackageBaseUrl}/user-section-response`, sectionSubmissionData)
       .pipe(
         catchError(this.handleError)
       );
   }
 
 
-  updateSectionResponse(
-    sectionResponseId: string,
-    sectionResponse: UserSectionResponse & { newFieldSubmissions?: UserFieldResponse[] }
-  ): Observable<UserSectionResponse> {
+  updateSectionSubmission(
+    sectionSubmissionId: string,
+    sectionSubmission: UserSectionSubmission & { newFieldSubmissions?: UserFieldSubmission[] }
+  ): Observable<UserSectionSubmission> {
 
     const body = {
-      userCareerPackageId: sectionResponse.userCareerPackageId,
-      sectionTemplateId: sectionResponse.sectionTemplateId,
-      fieldSubmissions: sectionResponse.fieldSubmissions.map(fr => ({
+      userCareerPackageId: sectionSubmission.userCareerPackageId,
+      sectionTemplateId: sectionSubmission.sectionTemplateId,
+      fieldSubmissions: sectionSubmission.fieldSubmissions.map(fr => ({
         id: fr.id,
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value
       })),
-      newFieldSubmissions: (sectionResponse.newFieldSubmissions || []).map(fr => ({
+      newFieldSubmissions: (sectionSubmission.newFieldSubmissions || []).map(fr => ({
         fieldTemplateId: fr.fieldTemplateId,
         value: fr.value
       }))
@@ -81,8 +81,8 @@ export class CareerPackageService {
 
     console.log('Updating section response:', body);
 
-    return this.http.put<UserSectionResponse>(
-      `${environment.careerPackageBaseUrl}/user-section-response/${sectionResponseId}`,
+    return this.http.put<UserSectionSubmission>(
+      `${environment.careerPackageBaseUrl}/user-section-response/${sectionSubmissionId}`,
       body
     ).pipe(
       catchError(this.handleError)
