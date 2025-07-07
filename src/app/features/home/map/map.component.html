@@ -1,0 +1,49 @@
+<div class="rank-map-container">
+  
+  <svg width="800" height="200" style="position: absolute; top: 0; left: 0;">
+
+    <!-- lines -->
+    @for (rank of rankThresholds; track rank) {
+      @if ($index < rankThresholds.length - 1) {
+        <line
+          [attr.x1]="$index * rankSpacing + 50"
+          y1="100"
+          [attr.x2]="($index + 1) * rankSpacing + 50"
+          y2="100"
+          stroke="#aaa"
+          stroke-width="4" />
+      }
+    }
+
+    <!-- rank nodes -->
+    @for (rank of rankThresholds; track rank) {
+      <circle
+        [attr.cx]="$index * rankSpacing + 50"
+        cy="100"
+        r="20"
+        fill="#007bff" />
+    }
+
+    <!-- rank names -->
+    @for (rank of rankThresholds; track rank) {
+      <text
+        [attr.x]="$index * rankSpacing + 50"
+        y="135"
+        text-anchor="middle"
+        font-size="12"
+        fill="#333">
+        {{rank.name }}
+      </text>
+    }
+  </svg>
+
+  <!-- users -->
+  @for (entry of usersWithScore; track entry.user.id) {
+    <div class="user-marker"
+         [style.left.px]="entry.x - 20"
+         [style.top.px]="30">
+      <img [src]="'assets/default-user.png'" alt="user" class="user-img" />
+      <div class="user-name">{{ entry.user.name || entry.user.email }}</div>
+    </div>
+  }
+</div>
