@@ -1,3 +1,17 @@
+@if (errorMessage) {
+  <div class="alert alert-error">
+    <strong>Error:</strong> {{ errorMessage }}
+    <button type="button" class="close-btn" (click)="clearMessages()">&times;</button>
+  </div>
+  }
+
+  @if (successMessage) {
+  <div class="alert alert-success">
+    <strong>Success:</strong> {{ successMessage }}
+    <button type="button" class="close-btn" (click)="clearMessages()">&times;</button>
+  </div>
+  }
+
 @for (user of employees; track user.id) {
 <div class="user-section">
   <div class="user-header" (click)="toggleUser(user.id)">

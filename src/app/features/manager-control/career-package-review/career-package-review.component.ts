@@ -30,6 +30,9 @@ export class CareerPackageReviewComponent implements OnInit {
   savedComments: Record<string, string> = {};
   showCommentBox: Record<string, boolean> = {};
 
+  errorMessage: string = '';
+  successMessage: string = '';
+
   constructor(private userService: UserService, private careerPackageService: CareerPackageService) { }
 
 
@@ -111,9 +114,10 @@ export class CareerPackageReviewComponent implements OnInit {
         delete this.userPackages[userId];
         this.enrollmentStatus[userId] = false;
         this.closeReviewModal();
+        this.successMessage = `Career package approved successfully!`;
       },
       error: (error) => {
-        console.error('Error approving career package:', error);
+        this.errorMessage = 'Error approving career package: ' + error.message;
       }
     });
   }
@@ -124,9 +128,10 @@ export class CareerPackageReviewComponent implements OnInit {
         this.userPackages[userId] = response;
         this.enrollmentStatus[userId] = true;
         this.closeReviewModal();
+        this.successMessage = `Career package rejected successfully!`;
       },
       error: (error) => {
-        console.error('Error rejecting career package:', error);
+        this.errorMessage = 'Error rejecting career package: ' + error.message;
       }
     });
 
@@ -146,9 +151,10 @@ export class CareerPackageReviewComponent implements OnInit {
       next: (response: UserCareerPackage) => {
         this.enrollmentStatus[this.assigningUserId!] = true;
         this.closeAssignModal();
+        this.successMessage = `Career package assigned successfully!`;
       },
       error: (error) => {
-        console.error('Error assigning career package:', error);
+        this.errorMessage = 'Error assigning career package: ' + error.message;
       }
     });
   }
@@ -173,5 +179,10 @@ export class CareerPackageReviewComponent implements OnInit {
       }
     }
     return 'Unnamed Field';
+  }
+
+   clearMessages(): void {
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 }

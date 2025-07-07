@@ -11,6 +11,9 @@ import { SectionFieldTemplate } from './models/section-field-template.interface'
 import { SectionTemplate } from './models/section-template.interface';
 import { PackageStatus } from './enums/package-status.enum';
 import { CommonModule } from '@angular/common';
+import { LearningSubmissionService } from '../learning/library/services/learning-submission.service';
+import { LearningMaterialTemplate } from '../learning/library/models/learning-material-template.model';
+import { SubmissionStatus } from '../learning/library/models/submission-status.model';
 
 
 @Component({
@@ -31,9 +34,16 @@ export class CareerPackageComponent implements OnInit {
 
   expandedSections: { [sectionId: string]: boolean } = {};
 
+  learningTemplates: {
+    template: LearningMaterialTemplate;
+    status: SubmissionStatus;
+  }[] = [];
+
+
   constructor(
     private careerPackageService: CareerPackageService,
     private userService: UserService,
+    private learningSubmissionService: LearningSubmissionService,
     private formBuilder: FormBuilder
   ) { }
 
@@ -43,6 +53,7 @@ export class CareerPackageComponent implements OnInit {
         this.currentUserId = user.id;
         console.log('current user id:', this.currentUserId);
         this.checkEnrollmentAndLoadData();
+
       },
       error: (error) => {
         this.errorMessage = error.message;
@@ -51,6 +62,38 @@ export class CareerPackageComponent implements OnInit {
     });
 
   }
+
+  loadLearningTemplates(): void {
+    if (!this.userCareerPackage) return;
+
+    const userId = this.userCareerPackage.userId;
+    const careerPackageId = this.userCareerPackage.template.id;
+
+    this.learningSubmissionService.getSubmittedAndUnsubmittedTemplates(userId, careerPackageId)
+      .subscribe(({ submittedTemplates, unsubmittedTemplates, allTemplates }) => {
+        const result: {
+          template: LearningMaterialTemplate;
+          status: SubmissionStatus;
+        }[] = [];
+
+        for (const template of unsubmittedTemplates) {
+          result.push({ template, status: SubmissionStatus.PENDING });
+        }
+
+        for (const submission of submittedTemplates) {
+          const matchedTemplate = allTemplates.find(t => t.id === submission.templateId);
+          if (matchedTemplate) {
+            result.push({
+              template: matchedTemplate,
+              status: submission.status ?? SubmissionStatus.PENDING
+            });
+          }
+        }
+
+        this.learningTemplates = result;
+      });
+  }
+
 
   private checkEnrollmentAndLoadData(): void {
     this.isLoading = true;
@@ -63,6 +106,9 @@ export class CareerPackageComponent implements OnInit {
         if (isEnrolled) {
 
           this.loadUserCareerPackage();
+        }
+        else{
+          this.isLoading = false;
         }
       },
       error: (error) => {
@@ -78,6 +124,7 @@ export class CareerPackageComponent implements OnInit {
     this.careerPackageService.getUserCareerPackage(this.currentUserId).subscribe({
       next: (userPackage) => {
         this.userCareerPackage = userPackage;
+        this.loadLearningTemplates();
         console.log('User Career Package:', this.userCareerPackage);
         this.initializeSectionForms();
         this.isLoading = false;
@@ -168,19 +215,43 @@ export class CareerPackageComponent implements OnInit {
     return totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
   }
 
+  getLearningSectionCompletionPercentage(): number {
+    if (!this.learningTemplates || this.learningTemplates.length === 0) {
+      return 0;
+    }
+
+    const approvedCount = this.learningTemplates.filter(
+      lt => lt.status === SubmissionStatus.APPROVED
+    ).length;
+
+    return Math.round((approvedCount / this.learningTemplates.length) * 100);
+  }
+
+
 
   getOverallCompletionPercentage(): number {
     if (!this.userCareerPackage) return 0;
 
-    const sections = this.userCareerPackage.template.sections;
-    if (sections.length === 0) return 0;
+    const nonLearningSections = this.userCareerPackage.template.sections.filter(
+      section => section.type !== 'LEARNING'
+    );
 
-    const totalPercentage = sections.reduce((sum, section) => {
+    const sectionCount = nonLearningSections.length + (this.learningTemplates?.length ? 1 : 0);
+    if (sectionCount === 0) return 0;
+
+    const totalSectionPercentage = nonLearningSections.reduce((sum, section) => {
       return sum + this.getSectionCompletionPercentage(section);
     }, 0);
 
-    return Math.round(totalPercentage / sections.length);
+    const learningPercentage = this.learningTemplates?.length
+      ? this.getLearningSectionCompletionPercentage()
+      : 0;
+
+    const totalPercentage = totalSectionPercentage + learningPercentage;
+
+    return Math.round(totalPercentage / sectionCount);
   }
+
 
   clearMessages(): void {
     this.errorMessage = '';
@@ -236,7 +307,7 @@ export class CareerPackageComponent implements OnInit {
           userCareerPackageId: this.userCareerPackage.id,
           sectionTemplateId: section.id,
           fieldSubmissions: fieldResponses,
-          newFieldResponses: newFieldResponses
+          newFieldSubmissions: newFieldResponses
         }
       ).subscribe({
         next: updatedResponse => {
@@ -282,8 +353,6 @@ export class CareerPackageComponent implements OnInit {
 
     this.ngOnInit();
   }
-
-
 
   isSectionSubmitDisabled(sectionId: string): boolean {
     if (this.isLoading) return true;
@@ -356,23 +425,34 @@ export class CareerPackageComponent implements OnInit {
   canSubmitCompletePackage(): boolean {
     if (!this.userCareerPackage || this.isLoading) return false;
 
-    // Check if package is already submitted or under review
+    // Prevent submission if package is already under review
     if (this.userCareerPackage.status === PackageStatus.UNDER_REVIEW) {
       return false;
     }
 
+    // Ensure all required sections are filled
+    const allSectionsComplete = this.userCareerPackage.template.sections.every(section => {
+      // Skip LEARNING sections from this check
+      if (section.type === 'LEARNING') return true;
 
-    return this.userCareerPackage.template.sections.every(section => {
       const sectionResponse = this.userCareerPackage!.sectionSubmissions.find(
         sr => sr.sectionTemplateId === section.id
       );
 
       if (!sectionResponse) return false;
 
-      // Check if all fields in the section have values
+      // Check if all fields have non-empty values
       return sectionResponse.fieldSubmissions.every(fr => fr.value.trim() !== '');
     });
+
+    // Ensure all learning templates are approved
+    const allLearningApproved = this.learningTemplates?.every(
+      lt => lt.status === SubmissionStatus.APPROVED
+    );
+
+    return allSectionsComplete && allLearningApproved;
   }
+
 
 
   submitCompleteCareerPackage(): void {

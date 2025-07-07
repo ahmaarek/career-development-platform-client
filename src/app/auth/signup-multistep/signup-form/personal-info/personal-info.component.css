@@ -22,7 +22,7 @@
 
 /* Cursor color */
 .mat-mdc-input-element {
-  caret-color: #6a1b9a !important;
+  caret-color: #007bff!important;
 }
 
 /* error line underneath the input */
