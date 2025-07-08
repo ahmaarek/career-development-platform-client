@@ -18,8 +18,8 @@ export class CareerPackagesComponent implements OnInit {
   constructor(private careerPackageService: CareerPackageService) {}
 
   ngOnInit(): void {
-    this.careerPackageService.getAllCareerPackageTemplates().subscribe(pkgs => {
-      this.careerPackages = pkgs;
+    this.careerPackageService.getAllCareerPackageTemplates().subscribe(packages => {
+      this.careerPackages = packages;
     });
   }
 

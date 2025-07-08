@@ -53,11 +53,54 @@ export class CareerPackageComponent implements OnInit {
         this.checkEnrollmentAndLoadData();
 
       },
-      error: (error) => {
+      error: () => {
         this.isLoading = false;
       }
     });
 
+  }
+
+
+
+  private checkEnrollmentAndLoadData(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.careerPackageService.checkUserEnrollment(this.currentUserId).subscribe({
+      next: (isEnrolled) => {
+        this.isEnrolled = isEnrolled;
+
+        if (isEnrolled) {
+
+          this.loadUserCareerPackage();
+        }
+        else {
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        console.log('User is enrolled in a career package');
+        this.errorMessage = error.message;
+        this.isLoading = false;
+      }
+    });
+  }
+
+
+  private loadUserCareerPackage(): void {
+    this.careerPackageService.getUserCareerPackage(this.currentUserId).subscribe({
+      next: (userPackage) => {
+        this.userCareerPackage = userPackage;
+        this.loadLearningTemplates();
+        console.log('User Career Package:', this.userCareerPackage);
+        this.initializeSectionForms();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = error.message;
+        this.isLoading = false;
+      }
+    });
   }
 
   loadLearningTemplates(): void {
@@ -89,48 +132,6 @@ export class CareerPackageComponent implements OnInit {
 
         this.learningTemplates = result;
       });
-  }
-
-
-  private checkEnrollmentAndLoadData(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.careerPackageService.checkUserEnrollment(this.currentUserId).subscribe({
-      next: (isEnrolled) => {
-        this.isEnrolled = isEnrolled;
-
-        if (isEnrolled) {
-
-          this.loadUserCareerPackage();
-        }
-        else{
-          this.isLoading = false;
-        }
-      },
-      error: (error) => {
-        console.log('User is enrolled in a career package');
-        this.errorMessage = error.message;
-        this.isLoading = false;
-      }
-    });
-  }
-
-
-  private loadUserCareerPackage(): void {
-    this.careerPackageService.getUserCareerPackage(this.currentUserId).subscribe({
-      next: (userPackage) => {
-        this.userCareerPackage = userPackage;
-        this.loadLearningTemplates();
-        console.log('User Career Package:', this.userCareerPackage);
-        this.initializeSectionForms();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.errorMessage = error.message;
-        this.isLoading = false;
-      }
-    });
   }
 
 
@@ -308,7 +309,14 @@ export class CareerPackageComponent implements OnInit {
         }
       ).subscribe({
         next: updatedSubmission => {
-          this.updateLocalSectionSubmission(section.id, updatedSubmission);
+          const sectionSubmissionIndex = this.userCareerPackage!.sectionSubmissions.findIndex(
+            sr => sr.sectionTemplateId === section.id
+          );
+
+          if (sectionSubmissionIndex !== -1) {
+            this.userCareerPackage!.sectionSubmissions[sectionSubmissionIndex] = updatedSubmission;
+          }
+
           this.successMessage = `${section.title} section updated successfully!`;
           this.isLoading = false;
           setTimeout(() => this.successMessage = '', 3000);
@@ -328,7 +336,6 @@ export class CareerPackageComponent implements OnInit {
           value
         };
       });
-
       console.log(fieldSubmissions);
       this.careerPackageService.submitCompleteSection(
         this.userCareerPackage.id,
@@ -336,7 +343,16 @@ export class CareerPackageComponent implements OnInit {
         fieldSubmissions
       ).subscribe({
         next: newSectionSubmission => {
-          this.addLocalSectionSubmission(newSectionSubmission);
+          const existingIndex = this.userCareerPackage!.sectionSubmissions.findIndex(
+            sr => sr.sectionTemplateId === newSectionSubmission.sectionTemplateId
+          );
+
+          if (existingIndex !== -1) {
+            this.userCareerPackage!.sectionSubmissions[existingIndex] = newSectionSubmission;
+          } else {
+            this.userCareerPackage!.sectionSubmissions.push(newSectionSubmission);
+          }
+
           this.successMessage = `${section.title} section submitted successfully!`;
           this.isLoading = false;
           setTimeout(() => this.successMessage = '', 3000);
@@ -380,36 +396,6 @@ export class CareerPackageComponent implements OnInit {
     return existingSectionSubmission && existingSectionSubmission.id ? 'Update Section' : 'Submit Section';
   }
 
-
-  private updateLocalSectionSubmission(sectionId: string, updatedSectionSubmission: UserSectionSubmission): void {
-    if (!this.userCareerPackage) return;
-
-    const sectionSubmissionIndex = this.userCareerPackage.sectionSubmissions.findIndex(
-      sr => sr.sectionTemplateId === sectionId
-    );
-
-    if (sectionSubmissionIndex !== -1) {
-      this.userCareerPackage.sectionSubmissions[sectionSubmissionIndex] = updatedSectionSubmission;
-    }
-  }
-
-
-  private addLocalSectionSubmission(newSectionSubmission: UserSectionSubmission): void {
-    if (!this.userCareerPackage) return;
-
-    const existingIndex = this.userCareerPackage.sectionSubmissions.findIndex(
-      sr => sr.sectionTemplateId === newSectionSubmission.sectionTemplateId
-    );
-
-    if (existingIndex !== -1) {
-      this.userCareerPackage.sectionSubmissions[existingIndex] = newSectionSubmission;
-    } else {
-
-      this.userCareerPackage.sectionSubmissions.push(newSectionSubmission);
-    }
-  }
-
-
   isFieldInvalid(sectionId: string, fieldKey: string): boolean {
     const form = this.sectionForms[sectionId];
     if (!form) return false;
@@ -422,14 +408,11 @@ export class CareerPackageComponent implements OnInit {
   canSubmitCompletePackage(): boolean {
     if (!this.userCareerPackage || this.isLoading) return false;
 
-    // Prevent submission if package is already under review
     if (this.userCareerPackage.status === PackageStatus.UNDER_REVIEW) {
       return false;
     }
 
-    // Ensure all required sections are filled
     const allSectionsComplete = this.userCareerPackage.template.sections.every(section => {
-      // Skip LEARNING sections from this check
       if (section.type === 'LEARNING') return true;
 
       const sectionSubmission = this.userCareerPackage!.sectionSubmissions.find(
@@ -438,11 +421,10 @@ export class CareerPackageComponent implements OnInit {
 
       if (!sectionSubmission) return false;
 
-      // Check if all fields have non-empty values
       return sectionSubmission.fieldSubmissions.every(fr => fr.value.trim() !== '');
     });
 
-    // Ensure all learning templates are approved
+
     const allLearningApproved = this.learningTemplates?.every(
       lt => lt.status === SubmissionStatus.APPROVED
     );

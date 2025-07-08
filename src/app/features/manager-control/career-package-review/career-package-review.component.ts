@@ -20,9 +20,9 @@ export class CareerPackageReviewComponent implements OnInit {
   enrollmentStatus: Record<string, boolean> = {};
   careerPackageTemplates: CareerPackageTemplate[] = [];
   userPackages: Record<string, UserCareerPackage> = {};
+  
   reviewingUserId: string | null = null;
   viewingUserId: string | null = null;
-
   assigningUserId: string | null = null;
   selectedTemplateId: string | null = null;
   managerId: string = "";

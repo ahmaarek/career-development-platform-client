@@ -6,9 +6,7 @@ import { UserCareerPackage } from './models/user-career-package.interface';
 import { CareerPackageTemplate } from './models/career-package-template.interface';
 import { UserFieldSubmission } from './models/user-field-submission.interface';
 import { PackageStatus } from './enums/package-status.enum';
-import { UserService } from '../../user/user.service';
 import { UserSectionSubmission } from './models/user-section-submission.interface';
-import { idText } from 'typescript';
 import { environment } from '../../../environments/environment';
 
 
@@ -17,7 +15,7 @@ import { environment } from '../../../environments/environment';
 })
 export class CareerPackageService {
 
-  constructor(private http: HttpClient, private userService: UserService) { }
+  constructor(private http: HttpClient) { }
 
   checkUserEnrollment(userId: string): Observable<boolean> {
     return this.http.get<UserCareerPackage>(`${environment.careerPackageBaseUrl}/user-career-package/user/${userId}`)
