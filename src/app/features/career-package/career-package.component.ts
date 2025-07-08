@@ -328,7 +328,7 @@ export class CareerPackageComponent implements OnInit {
       });
 
     } else {
-      // First-time submission
+      
       const fieldSubmissions: UserFieldSubmission[] = section.fields.map(field => {
         const value = form.get(field.fieldKey)?.value || '';
         return {
@@ -440,8 +440,6 @@ export class CareerPackageComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    
-    // Submit the complete package
     this.careerPackageService.submitCompleteCareerPackage(this.userCareerPackage).subscribe({
       next: (updatedPackage) => {
         this.userCareerPackage = updatedPackage;

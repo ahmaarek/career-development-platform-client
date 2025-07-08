@@ -2,7 +2,7 @@
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-  <!-- General Info -->
+  
   <div class="general-info">
     <label>Title:
       <input formControlName="title" />
@@ -23,7 +23,7 @@
     </label>
   </div>
 
-  <!-- Sections -->
+  
   <div formArrayName="sections">
     <div *ngFor="let section of sections.controls; let i = index" [formGroupName]="i" class="section-card">
       <h3>Section {{ i + 1 }}</h3>

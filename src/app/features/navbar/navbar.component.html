@@ -1,17 +1,17 @@
 <nav class="navbar">
-  <!-- Logo -->
+  
   <div class="navbar-logo">
     <img src="/sumerge-logo.webp" alt="Logo" />
   </div>
 
-  <!-- Main Links -->
+  
   <div class="navbar-links">
     <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
     <a routerLink="/library" routerLinkActive="active">Learning & Wiki</a>
     <a routerLink="/career-package" routerLinkActive="active">Career Package</a>
   </div>
 
-  <!-- Notification Bell Icon -->
+  
   <div class="notification-icon" (click)="toggleNotificationDropdown()" tabindex="0">
     <mat-icon>notifications</mat-icon>
 
@@ -27,7 +27,6 @@
       @for (notification of notifications; track notification.id) {
       <div class="notification-item">
 
-        <!-- Display Sender Name if available -->
         <div class="notification-sender">
           <small><strong>From: {{ senderNames[notification.senderId] || 'Unknown Sender' }}</strong></small>
         </div>
@@ -48,8 +47,6 @@
     }
   </div>
 
-
-  <!-- Role-based Links + User -->
   <div class="navbar-actions">
     @if (role === 'ADMIN') {
     <a routerLink="/admin">Admin Panel</a>
@@ -61,7 +58,6 @@
     <a routerLink="/my-profile">My Profile</a>
     }
 
-    <!-- User Icon -->
     <div class="user-icon" (click)="toggleDropdown()" tabindex="0">
       <img [src]="imageUrl" alt="User" class="user-icon" />
       @if (dropdownOpen) {

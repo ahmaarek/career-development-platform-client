@@ -13,7 +13,7 @@
     }
   </div>
 
-  <!-- Section details -->
+  
   @if (isEditing) {
     <label class="form-label">Instructions</label>
     <textarea [(ngModel)]="section.instructions" class="section-textarea" placeholder="Add instructions..."></textarea>
@@ -37,7 +37,7 @@
   <br>
   <h4>Fields</h4>
 
-  <!-- Fields details -->
+  
   @for (field of section.fields; track field.id) {
     <div class="field-group">
       @if (isEditing) {
@@ -62,7 +62,7 @@
     </div>
   }
 
-  <!-- Pending fields details -->
+  
   @for (field of pendingNewFields; track field.label) {
     <div class="field-group">
       <div class="field-inline">

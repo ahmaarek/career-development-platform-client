@@ -1,6 +1,6 @@
 <div class="user-section">
 
-  <!-- EMPLOYEES -->
+  
   <div class="role-header" (click)="toggle('EMPLOYEE')">
     <h2>Employees</h2>
     <span>{{ roleVisibility['EMPLOYEE'] ? '▲' : '▼' }}</span>
@@ -20,7 +20,7 @@
     }
   }
 
-  <!-- MANAGERS -->
+  
   <div class="role-header" (click)="toggle('MANAGER')">
     <h2>Managers</h2>
     <span>{{ roleVisibility['MANAGER'] ? '▲' : '▼' }}</span>
@@ -39,7 +39,7 @@
     }
   }
 
-  <!-- ADMINS -->
+  
   <div class="role-header" (click)="toggle('ADMIN')">
     <h2>Admins</h2>
     <span>{{ roleVisibility['ADMIN'] ? '▲' : '▼' }}</span>
@@ -58,9 +58,9 @@
     }
   }
 
-  <!-- MODALS -->
+  
 
-  <!-- Assign Manager Modal -->
+  
   @if (selectedEmployee) {
     <div class="modal-backdrop">
       <div class="modal">
@@ -80,7 +80,7 @@
     </div>
   }
 
-  <!-- View Employees Modal -->
+  
   @if (selectedManager) {
     <div class="modal-backdrop">
       <div class="modal">
@@ -99,7 +99,7 @@
     </div>
   }
 
-  <!-- Edit Role Modal -->
+  
   @if (selectedUserForRoleEdit) {
     <div class="modal-backdrop">
       <div class="modal">

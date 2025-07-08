@@ -11,19 +11,19 @@
   </div>
 
   <form *ngIf="user && form" [formGroup]="form" (ngSubmit)="saveChanges()" class="profile-form">
-    <!-- Name -->
+    
     <div class="form-group">
       <label>Full Name</label>
       <input type="text" formControlName="name" [readonly]="!isEditing" />
     </div>
 
-    <!-- Photo Upload -->
+    
     <div class="form-group">
       <label>Profile Photo</label>
       <input type="file" (change)="onFileSelected($event)" [disabled]="!isEditing" />
     </div>
 
-    <!-- Buttons -->
+    
     <div class="button-group">
       <button type="button" (click)="enableEdit()" *ngIf="!isEditing">Edit Profile</button>
       <button type="button" (click)="cancelChanges()" *ngIf="isEditing">Cancel</button>

@@ -23,7 +23,7 @@ export class CareerPackageService {
         map(userPackage => !!userPackage),
         catchError(error => {
           if (error.status === 404) {
-            return [false]; // User not enrolled
+            return [false];
           }
           return this.handleError(error);
         })
@@ -168,13 +168,12 @@ export class CareerPackageService {
     let errorMessage = 'An unknown error occurred!';
 
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
+      
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // Server-side error
+      
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
 
-      // Customize error messages based on status codes
       switch (error.status) {
         case 400:
           errorMessage = 'Bad request. Please check your input.';

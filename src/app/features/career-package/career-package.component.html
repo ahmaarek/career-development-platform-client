@@ -33,7 +33,7 @@
   @if (!isLoading && isEnrolled && userCareerPackage) {
   <div class="career-package-content">
 
-    <!-- Package Header -->
+    
     <div class="card package-header">
       <h2>{{ userCareerPackage.template.title }}</h2>
       <p class="package-description">{{ userCareerPackage.template.description }}</p>
@@ -51,12 +51,12 @@
       </div>
     </div>
 
-    <!-- Sections -->
+    
     <div class="sections-container">
       @for (section of userCareerPackage.template.sections; track section.id) {
       @if (section.type === 'LEARNING') {
       <div class="section-card card">
-        <!-- Section Header -->
+        
         <div class="section-header" (click)="toggleSection(section.id)">
           <h3>{{ section.title }}</h3>
           <div class="section-meta">
@@ -65,7 +65,7 @@
           </div>
         </div>
 
-        <!-- Section Content -->
+        
         <div class="section-content" [class.expanded]="isSectionExpanded(section.id)">
           @if (learningTemplates!.length > 0) {
           <ul>
@@ -86,7 +86,7 @@
       } @else {
       <div class="section-card card">
         
-          <!-- Section Header -->
+          
           <div class="section-header" (click)="toggleSection(section.id)">
             <h3>{{ section.title }}</h3>
             <div class="section-meta">
@@ -95,12 +95,10 @@
             </div>
           </div>
 
-          <!-- Section Progress Bar -->
           <div class="section-progress-bar">
             <div class="progress-fill" [style.width.%]="getSectionCompletionPercentage(section)"></div>
           </div>
 
-          <!-- Section Content -->
           <div class="section-content" [class.expanded]="isSectionExpanded(section.id)">
 
             @if (section.instructions) {
@@ -172,10 +170,8 @@
       }
       }
 
-
     </div>
 
-    <!-- Reviewer Comment Section -->
     <div class="card reviewer-comment-section">
       <h3>Reviewer Comment</h3>
       @if (userCareerPackage.reviewerComment && userCareerPackage.reviewerComment !== 'null') {
@@ -185,8 +181,6 @@
       }
     </div>
 
-
-    <!-- Submit All Section -->
     <div class="submit-all-section card">
       <div class="submit-all-header">
         <h3>Package Submission</h3>

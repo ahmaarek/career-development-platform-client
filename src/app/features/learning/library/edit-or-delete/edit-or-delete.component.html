@@ -1,5 +1,5 @@
 <div class="edit-delete-wrapper">
-  <!-- Blog Section -->
+  
   <div class="category">
     <div class="category-header" (click)="toggle('blog')">
       <h3>Blogs</h3>
@@ -16,7 +16,7 @@
     </ul>
   </div>
 
-  <!-- Wiki Section -->
+  
   <div class="category">
     <div class="category-header" (click)="toggle('wiki')">
       <h3>Wikis</h3>
@@ -33,7 +33,7 @@
     </ul>
   </div>
 
-  <!-- Learning Material Section -->
+  
   <div class="category">
     <div class="category-header" (click)="toggle('learning')">
       <h3>Learning Materials</h3>
@@ -51,7 +51,7 @@
   </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+
 <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="cancelDelete()"></div>
 <div class="modal" *ngIf="showDeleteModal">
   <h3>Are you sure you want to delete this item?</h3>

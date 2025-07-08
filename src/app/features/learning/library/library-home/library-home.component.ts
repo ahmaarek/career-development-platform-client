@@ -89,7 +89,6 @@ ngOnInit(): void {
           this.submittedSectionMap[response.sectionTemplateId] = response;
         });
 
-        // load attachments for each response
         template.sections.forEach(section => {
           const attachmentId = this.submittedSectionMap[section.id!]?.documentId;
           if (attachmentId) {
