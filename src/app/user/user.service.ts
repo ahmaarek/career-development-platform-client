@@ -61,10 +61,6 @@ export class UserService {
       next: (user) => {
         
         this.userSubject.next(user);
-      },
-      error: (error) => {
-        console.error('Failed to fetch current user:', error);
-        this.userSubject.next(null);
       }
     });
 

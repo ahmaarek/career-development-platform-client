@@ -58,10 +58,8 @@ loadLeaderboard(): void {
   ).subscribe({
     next: (usersWithImages) => {
       this.leaderboard = usersWithImages;
-    },
-    error: (err) => {
-      console.error('Failed to load leaderboard:', err);
     }
+    
   });
 }
 }

@@ -29,7 +29,7 @@ export class BlogWikiService {
     deleteEntry(id: string): Observable<any> {
         return this.http.delete(`${this.blogWikiUrl}/entry/${id}`).pipe(
             catchError(error => {
-                console.error('Error deleting blog entry:', error);
+                
                 return of(null);
             })
         );

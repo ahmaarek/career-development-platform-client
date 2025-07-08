@@ -103,7 +103,7 @@ export class SignupFormComponent {
           verticalPosition: 'top',
           panelClass: ['snackbar-error']
         });
-        console.error('Signup error:', err.message);
+        
       }
     });
   }

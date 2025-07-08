@@ -67,7 +67,7 @@ export class CareerPackagePanelComponent {
         
       },
       error: (err) => {
-        console.error('Delete failed', err);
+        
         alert('Failed to delete package.');
       }
     });
@@ -137,7 +137,7 @@ export class CareerPackagePanelComponent {
 
       },
       error: (err) => {
-        console.error('Update failed', err);
+        
         alert('Failed to submit changes.');
       }
     });

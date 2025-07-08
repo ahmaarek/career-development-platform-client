@@ -36,7 +36,7 @@ export class LearningMaterialTemplateService {
         return;
       }),
       catchError(error => {
-        console.error('Error deleting learning material template:', error);
+        
         return of(undefined);
       })
     );

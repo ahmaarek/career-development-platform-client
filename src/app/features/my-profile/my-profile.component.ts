@@ -88,8 +88,8 @@ export class MyProfileComponent implements OnInit {
           next: (response) => {
             this.uploadedImageId = response.imageId;
             updateUser(this.uploadedImageId);
-          },
-          error: (err) => console.error('Failed to upload image:', err)
+          }
+          
         });
       } else {
         updateUser();
@@ -119,7 +119,7 @@ export class MyProfileComponent implements OnInit {
         this.imagePreviewUrl = URL.createObjectURL(blob);
       },
       error: (err) => {
-        console.error('Failed to load image preview:', err);
+        
         this.imagePreviewUrl = null;
       }
     });

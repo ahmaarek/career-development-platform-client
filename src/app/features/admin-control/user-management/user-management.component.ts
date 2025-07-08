@@ -28,8 +28,7 @@ export class UserManagementComponent {
 
   ngOnInit(): void {
     this.userService.getAllUsers().subscribe({
-      next: (data) => (this.users = data),
-      error: (err) => console.error('Failed to fetch users:', err)
+      next: (data) => (this.users = data)
     });
   }
 
@@ -67,8 +66,8 @@ export class UserManagementComponent {
       next: () => {
         this.selectedEmployee = null;
         this.ngOnInit();
-      },
-      error: (err) => console.error('Failed to assign manager:', err)
+      }
+      
     });
   }
 
@@ -90,8 +89,7 @@ export class UserManagementComponent {
       next: () => {
         this.selectedUserForRoleEdit = null;
         this.ngOnInit();
-      },
-      error: (err) => console.error('Failed to update role:', err)
+      }
     });
   }
 

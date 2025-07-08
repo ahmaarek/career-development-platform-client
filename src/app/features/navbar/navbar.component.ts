@@ -56,11 +56,7 @@ export class NavbarComponent implements OnInit {
         this.currentPoints = score.points;
         this.fetchNotifications();
       })
-    ).subscribe({
-      error: (err) => {
-        console.error('Initialization failed:', err);
-      }
-    });
+    )
   }
 
   private loadImagePreview(imageId: string): void {
@@ -69,7 +65,7 @@ export class NavbarComponent implements OnInit {
         this.imageUrl = URL.createObjectURL(blob);
       },
       error: (err) => {
-        console.error('Failed to load image preview:', err);
+        
         this.imageUrl = "/user-default-logo.webp";
       }
     });
@@ -93,7 +89,7 @@ export class NavbarComponent implements OnInit {
           missingSenderIds.map(senderId =>
             this.userService.getUserById(senderId).pipe(
               catchError(err => {
-                console.error(`Failed to fetch sender name for ID ${senderId}`, err);
+                
                 return of({ id: senderId, name: 'Unknown' });
               }),
               map(user => ({ id: senderId, name: user.name }))
@@ -106,10 +102,8 @@ export class NavbarComponent implements OnInit {
         senderDataArray.forEach(data => {
           this.senderNames[data.id] = data.name;
         });
-      },
-      error: (err) => {
-        console.error('Error loading notifications:', err);
       }
+      
     });
   }
 
@@ -118,10 +112,8 @@ export class NavbarComponent implements OnInit {
       next: () => {
         notification.read = true;
         this.unreadCount = this.notifications.filter(n => !n.read).length;
-      },
-      error: err => {
-        console.error('Failed to mark notification as read:', err);
       }
+      
     });
   }
 
@@ -130,10 +122,8 @@ export class NavbarComponent implements OnInit {
       next: () => {
         this.notifications = this.notifications.filter(n => n.id !== notification.id);
         this.unreadCount = this.notifications.filter(n => !n.read).length;
-      },
-      error: err => {
-        console.error('Failed to delete notification:', err);
       }
+      
     });
   }
 

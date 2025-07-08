@@ -193,7 +193,7 @@ export class CareerPackageService {
       }
     }
 
-    console.error('CareerPackageService Error:', errorMessage);
+    
     return throwError(() => new Error(errorMessage));
   }
 }

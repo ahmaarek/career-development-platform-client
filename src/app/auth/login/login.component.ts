@@ -34,7 +34,7 @@ export class LoginComponent {
           this.router.navigateByUrl('/dashboard', { replaceUrl: true });
         },
         error: (err) => {
-          console.error('Login failed:', err.message);
+          
           alert('Login failed. Please check your credentials.');
         }
       })

@@ -38,7 +38,7 @@ export class LearningDocumentService {
         return 'document';
       }),
       catchError(err => {
-        console.error('Attachment detection failed', err);
+        
         return of(null);
       })
     );
