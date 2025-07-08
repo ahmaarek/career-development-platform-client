@@ -9,7 +9,7 @@
     }
 
     @if (isEditing) {
-      <button class="btn btn-danger btn-small" (click)="onDeleteSection()">🗑️ Delete</button>
+      <button class="btn btn-danger btn-small" (click)="onDeleteSection()">Delete</button>
     }
   </div>
 
@@ -26,7 +26,7 @@
       <option value="PROJECTS">Projects</option>
     </select>
 
-    <button class="btn btn-success btn-small" (click)="onSectionEdit()">✔ Save</button>
+    <button class="btn btn-success btn-small" (click)="onSectionEdit()">Save</button>
   }
 
   @if (!isEditing) {
@@ -52,8 +52,8 @@
             <option value="DATE">Date</option>
           </select>
 
-          <button class="btn btn-success btn-small" (click)="onFieldEdit(field)">✔</button>
-          <button class="btn btn-danger btn-small" (click)="deleteField(section.fields.indexOf(field))">🗑️</button>
+          <button class="btn btn-success btn-small" (click)="onFieldEdit(field)">Save</button>
+          <button class="btn btn-danger btn-small" (click)="deleteField(section.fields.indexOf(field))">Delete</button>
         </div>
       } @else {
         <p>{{ field.label }} ({{ field.fieldType }})</p>
@@ -76,8 +76,8 @@
           <option value="DATE">Date</option>
         </select>
 
-        <button class="btn btn-success btn-small" (click)="confirmAddField(field)">✔</button>
-        <button class="btn btn-danger btn-small" (click)="deletePendingField(pendingNewFields.indexOf(field))">🗑️</button>
+        <button class="btn btn-success btn-small" (click)="confirmAddField(field)">Save</button>
+        <button class="btn btn-danger btn-small" (click)="deletePendingField(pendingNewFields.indexOf(field))">Delete</button>
       </div>
     </div>
   }

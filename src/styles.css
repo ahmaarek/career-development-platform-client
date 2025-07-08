@@ -174,24 +174,36 @@ body {
 }
 
 
-.snackbar-success{
-  background-color: #155724;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  
+.snackbar-success {
+  background-color: #d4edda;
+  color: #155724;
 }
 
-.snackbar-error{
-  background-color: #721c24;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  
+.snackbar-error {
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
-.snackbar-success, .snackbar-error{
-  font-weight: bold;
+.snackbar-success,
+.snackbar-error {
+  font-weight: normal;              
   text-align: center;
-  border-radius: 6px;
+  border-radius: 12px;              
+  padding: 12px 20px;               
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  
+  font-size: 16px;                  
+  max-width: 400px;
+  margin: 10px auto;
+  transition: all 0.3s ease-in-out;
 }
+.snackbar-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.snackbar-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+
