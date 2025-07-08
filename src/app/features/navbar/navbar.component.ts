@@ -34,7 +34,7 @@ export class NavbarComponent implements OnInit {
     private userService: UserService,
     private notificationService: NotificationService,
     private learningScoreService: LearningScoreService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const userString = sessionStorage.getItem("user");
@@ -52,11 +52,12 @@ export class NavbarComponent implements OnInit {
         }
       }),
       switchMap(user => this.learningScoreService.getUserScore(user.id)),
-      tap(score => {
+    ).subscribe({
+      next: (score) => {
         this.currentPoints = score.points;
         this.fetchNotifications();
-      })
-    )
+      }
+    });
   }
 
   private loadImagePreview(imageId: string): void {
@@ -65,7 +66,7 @@ export class NavbarComponent implements OnInit {
         this.imageUrl = URL.createObjectURL(blob);
       },
       error: (err) => {
-        
+
         this.imageUrl = "/user-default-logo.webp";
       }
     });
@@ -79,17 +80,11 @@ export class NavbarComponent implements OnInit {
       }),
       switchMap(notifications => {
         const uniqueSenderIds = [...new Set(notifications.map(n => n.senderId))];
-        const missingSenderIds = uniqueSenderIds.filter(id => !this.senderNames[id]);
-
-        if (missingSenderIds.length === 0) {
-          return of([]);
-        }
 
         return forkJoin(
-          missingSenderIds.map(senderId =>
+          uniqueSenderIds.map(senderId =>
             this.userService.getUserById(senderId).pipe(
               catchError(err => {
-                
                 return of({ id: senderId, name: 'Unknown' });
               }),
               map(user => ({ id: senderId, name: user.name }))
@@ -99,13 +94,14 @@ export class NavbarComponent implements OnInit {
       })
     ).subscribe({
       next: (senderDataArray) => {
+
         senderDataArray.forEach(data => {
           this.senderNames[data.id] = data.name;
         });
       }
-      
     });
   }
+
 
   markAsRead(notification: any) {
     this.notificationService.markAsRead(notification.id).subscribe({
@@ -113,7 +109,7 @@ export class NavbarComponent implements OnInit {
         notification.read = true;
         this.unreadCount = this.notifications.filter(n => !n.read).length;
       }
-      
+
     });
   }
 
@@ -123,7 +119,7 @@ export class NavbarComponent implements OnInit {
         this.notifications = this.notifications.filter(n => n.id !== notification.id);
         this.unreadCount = this.notifications.filter(n => !n.read).length;
       }
-      
+
     });
   }
 
