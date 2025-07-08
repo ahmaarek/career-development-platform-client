@@ -1,0 +1,32 @@
+<div class="edit-wrapper">
+  <h2>Edit {{ entryType }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <label>
+      Title:
+      <input formControlName="title" placeholder="Enter title" />
+    </label>
+
+    <label>
+      Content:
+      <textarea formControlName="content" placeholder="Write your content..."></textarea>
+    </label>
+
+    <label>
+      Attachment (optional):
+      <input type="file" (change)="onFileChange($event)" />
+    </label>
+
+    <div *ngIf="form.value.previewUrl" class="preview-box">
+      <ng-container [ngSwitch]="form.value.previewType">
+        <img *ngSwitchCase="'image'" [src]="form.value.previewUrl" />
+        <video *ngSwitchCase="'video'" [src]="form.value.previewUrl" controls></video>
+        <a *ngSwitchCase="'document'" [href]="form.value.previewUrl" target="_blank">View Document</a>
+      </ng-container>
+    </div>
+
+    <button type="submit" [disabled]="isSubmitting || form.invalid">
+      {{ isSubmitting ? 'Saving...' : 'Update' }}
+    </button>
+  </form>
+</div>

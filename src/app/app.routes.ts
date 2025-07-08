@@ -20,6 +20,7 @@ import { LearningManagementComponent } from './features/admin-control/learning-m
 import { EditOrDeleteComponent } from './features/learning/library/edit-or-delete/edit-or-delete.component';
 import { EditEntryComponent } from './features/learning/library/edit-entry/edit-entry.component';
 import { DashboardManagementComponent } from './features/admin-control/dashboard-management/dashboard-management.component';
+import { EditBlogWikiComponent } from './features/learning/library/edit-blog-wiki/edit-blog-wiki.component';
 
 export const routes: Routes = [
     {
@@ -35,8 +36,8 @@ export const routes: Routes = [
         path: '',
         component: MainLayoutComponent,
         children: [
-            { path: 'dashboard', component: HomeComponent }, 
-            { path: 'career-package', component: CareerPackageComponent }, 
+            { path: 'dashboard', component: HomeComponent },
+            { path: 'career-package', component: CareerPackageComponent },
             { path: 'my-profile', component: MyProfileComponent },
             {
                 path: 'admin',
@@ -44,8 +45,8 @@ export const routes: Routes = [
                 children: [
                     { path: 'user-management', component: UserManagementComponent },
                     { path: 'career-package-management', component: CareerPackagesComponent },
-                    {path: 'learning-management', component: LearningManagementComponent} ,
-                    {path: 'dashboard-management', component: DashboardManagementComponent}
+                    { path: 'learning-management', component: LearningManagementComponent },
+                    { path: 'dashboard-management', component: DashboardManagementComponent }
                 ]
             },
             {
@@ -53,18 +54,19 @@ export const routes: Routes = [
                 component: ManagerControlComponent,
                 children: [
                     { path: 'career-package-review', component: CareerPackageReviewComponent },
-                    {path: 'learning-review', component: ReviewSubmissionsComponent}
+                    { path: 'learning-review', component: ReviewSubmissionsComponent }
                 ]
             },
             {
                 path: 'library', component: LibraryContainerComponent,
-                children:[
-                    {path: '', component: LibraryHomeComponent},
-                    {path: 'create', component: CreateEntryComponent},
-                    {path : 'learning-material/review-submissions', component: ReviewSubmissionsComponent},
-                    {path: 'learning-material/create', component: TemplateBuilderComponent},
-                    {path: 'edit', component: EditOrDeleteComponent},
-                    {path: 'edit/:type/:id', component: EditEntryComponent},
+                children: [
+                    { path: '', component: LibraryHomeComponent },
+                    { path: 'create', component: CreateEntryComponent },
+                    { path: 'learning-material/review-submissions', component: ReviewSubmissionsComponent },
+                    { path: 'learning-material/create', component: TemplateBuilderComponent },
+                    { path: 'edit', component: EditOrDeleteComponent },
+                    { path: 'edit/:id', component: EditEntryComponent },
+                    { path: 'edit-blog-wiki/:id', component: EditBlogWikiComponent },
                 ]
             }
         ]

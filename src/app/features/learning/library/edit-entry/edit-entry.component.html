@@ -27,6 +27,7 @@
   <div formArrayName="sections">
     <div *ngFor="let section of sections.controls; let i = index" [formGroupName]="i" class="section-card">
       <h3>Section {{ i + 1 }}</h3>
+      <button type="button" (click)="removeSection(i)">Remove Section</button>
 
       <label>Title:
         <input formControlName="title" />

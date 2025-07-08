@@ -8,8 +8,8 @@ import { environment } from '../../../../../environments/environment';
 })
 export class LearningDocumentService {
 
-  private readonly learningDocumentsUrl = environment.learningServiceBaseUrl+ '/files';
-  constructor(private http: HttpClient) {}
+  private readonly learningDocumentsUrl = environment.learningServiceBaseUrl + '/files';
+  constructor(private http: HttpClient) { }
 
   getAttachmentUrl(attachmentId: string): string {
     return `${this.learningDocumentsUrl}/${attachmentId}`;
@@ -51,31 +51,40 @@ export class LearningDocumentService {
     formData.append('file', file);
     formData.append('userId', userId);
 
-    return this.http.post(`${this.learningDocumentsUrl}/upload/${type}`, formData, {
+    const endpoint = `${this.learningDocumentsUrl}/upload/${type}`;
+
+    if (type === 'content') {
+      return this.http.post<{ attachmentId: string }>(endpoint, formData).pipe(
+        map(response => response.attachmentId)
+      );
+    }
+
+    return this.http.post(endpoint, formData, {
       responseType: 'text'
     });
   }
 
-getAttachmentBlobAndType(attachmentId: string): Observable<{ blobUrl: string, type: 'image' | 'video' | 'document' | null }> {
-  return this.getProtectedAttachmentResponse(attachmentId).pipe(
-    map(response => {
-      const contentType = response.headers.get('Content-Type') || '';
-      const blob = response.body!;
-      const blobUrl = URL.createObjectURL(blob);
 
-      let type: 'image' | 'video' | 'document' | null = null;
-      if (contentType.startsWith('image')) {
-        type = 'image';
-      } else if (contentType.startsWith('video')) {
-        type = 'video';
-      } else if (contentType) {
-        type = 'document';
-      }
+  getAttachmentBlobAndType(attachmentId: string): Observable<{ blobUrl: string, type: 'image' | 'video' | 'document' | null }> {
+    return this.getProtectedAttachmentResponse(attachmentId).pipe(
+      map(response => {
+        const contentType = response.headers.get('Content-Type') || '';
+        const blob = response.body!;
+        const blobUrl = URL.createObjectURL(blob);
 
-      return { blobUrl, type };
-    })
-  );
-}
+        let type: 'image' | 'video' | 'document' | null = null;
+        if (contentType.startsWith('image')) {
+          type = 'image';
+        } else if (contentType.startsWith('video')) {
+          type = 'video';
+        } else if (contentType) {
+          type = 'document';
+        }
+
+        return { blobUrl, type };
+      })
+    );
+  }
 
 
   uploadAttachmentsForSections(sections: any[], userId: string): Observable<(string | null)[]> {

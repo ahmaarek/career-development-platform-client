@@ -151,3 +151,9 @@ a[routerLink]:hover {
     transform: translate(-50%, 0%);
   }
 }
+
+.fallback-text {
+  font-style: italic;
+  color: #777;
+  margin-top: 1rem;
+}

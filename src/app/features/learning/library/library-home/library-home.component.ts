@@ -11,12 +11,13 @@ import { LearningDocumentService } from '../services/learning-document.service';
 import { LearningSectionTemplate } from '../models/learning-section-template.model';
 import { FormsModule } from '@angular/forms';
 import { LearningSubmissionService } from '../services/learning-submission.service';
-import { combineLatest, map, of } from 'rxjs';
+import { catchError, combineLatest, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { LearningSectionResponseDTO, LearningSubmissionDTO } from '../models/learning-submission.model';
 import { SubmissionStatus } from '../models/submission-status.model';
 import { LearningTemplateModalComponent } from '../learning-template-modal/learning-template-modal.component';
 import { EntryModalComponent } from '../entry-modal/entry-modal.component';
 import { SubmittedLearningModalComponent } from '../submitted-learning-modal/submitted-learning-modal.component';
+import { CareerPackageService } from '../../../career-package/career-package.service';
 
 @Component({
   selector: 'app-library-home',
@@ -42,21 +43,37 @@ export class LibraryHomeComponent implements OnInit {
   viewingUnsubmitted = true;
   submittedMaterials: LearningMaterialTemplate[] = [];
   unsubmittedMaterials: LearningMaterialTemplate[] = [];
+  careerPackageId: string | null = null;
 
   constructor(private blogWikiService: BlogWikiService,
     private userService: UserService,
     private learningMaterialTemplateService: LearningMaterialTemplateService,
     private learningDocumentService: LearningDocumentService,
-    private learningSubmissionService: LearningSubmissionService) { }
+    private learningSubmissionService: LearningSubmissionService,
+    private careerPackageService: CareerPackageService) { }
 
-  ngOnInit(): void {
-    this.loadBlogs();
-    this.loadWikis();
-    this.userService.getCurrentUser().subscribe(user => {
-      this.currentUser = user;
-      this.loadLearningMaterials();
-    });
-  }
+ngOnInit(): void {
+  this.loadBlogs();
+  this.loadWikis();
+
+  this.userService.getCurrentUser().pipe(
+    tap(user => this.currentUser = user),
+    switchMap(user =>
+      this.careerPackageService.getUserCareerPackage(user.id).pipe(
+        tap(cp => this.careerPackageId = cp.id),
+        switchMap(() => this.loadLearningMaterials()),
+        catchError(err => {
+          console.warn('No career package found or failed to load:', err);
+          this.submittedMaterials = [];
+          this.unsubmittedMaterials = [];
+          return of();
+        })
+      )
+    )
+  ).subscribe();
+}
+
+
 
 
   openSubmittedModal(template: LearningMaterialTemplate): void {
@@ -91,19 +108,24 @@ export class LibraryHomeComponent implements OnInit {
   convertNewlinesToBreaks(content: string): string {
     return content.replace(/\n/g, '<br/>');
   }
-  loadLearningMaterials(): void {
-    if (!this.currentUser) return;
 
-    combineLatest([
-      this.learningMaterialTemplateService.getAllTemplates(),
-      this.learningSubmissionService.getSubmissionsByUser(this.currentUser.id)
-    ]).subscribe(([templates, submissions]) => {
-      const submittedIds = new Set(submissions.map(sub => sub.templateId));
-      this.submittedMaterials = templates.filter(t => submittedIds.has(t.id!));
-      this.unsubmittedMaterials = templates.filter(t => !submittedIds.has(t.id!));
-    });
+  loadLearningMaterials(): Observable<void> {
+    if (!this.currentUser || !this.careerPackageId) {
+      return of();
+    }
+
+    return this.learningSubmissionService.getSubmittedAndUnsubmittedTemplates(
+      this.currentUser.id,
+      this.careerPackageId
+    ).pipe(
+      tap(({ submittedTemplates, unsubmittedTemplates, allTemplates }) => {
+        const submittedIds = new Set(submittedTemplates.map(sub => sub.templateId));
+        this.submittedMaterials = allTemplates.filter(t => submittedIds.has(t.id!));
+        this.unsubmittedMaterials = unsubmittedTemplates;
+      }),
+      map(() => void 0)
+    );
   }
-
 
   loadBlogs(): void {
     this.blogWikiService.getBlogs().subscribe(data => this.blogs = data);
@@ -122,7 +144,7 @@ export class LibraryHomeComponent implements OnInit {
     if (entry.attachmentId) {
       this.learningDocumentService.detectAttachmentType(entry.attachmentId).subscribe(type => {
         this.attachmentType = type;
-        this.loadAttachment(entry.attachmentId);
+        this.loadAttachment(entry.attachmentId!);
       });
     } else {
       this.attachmentType = null;

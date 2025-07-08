@@ -38,12 +38,17 @@
         <small class="material-description">
           {{ material.description }}
         </small>
-
         <span class="points-badge" *ngIf="material.points">
           ⭐ {{ material.points }} points
         </span>
       </li>
     </ul>
+
+    <!-- Fallback Text -->
+    <p class="fallback-text"
+      *ngIf="(viewingUnsubmitted ? unsubmittedMaterials.length : submittedMaterials.length) === 0">
+      No {{ viewingUnsubmitted ? 'unsubmitted' : 'submitted' }} learning materials to display.
+    </p>
   </div>
 </div>
 

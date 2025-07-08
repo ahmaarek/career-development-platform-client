@@ -1,0 +1,75 @@
+.edit-wrapper {
+  max-width: 700px;
+  margin: auto;
+  background: #fdfdfd;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.edit-wrapper h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+label {
+  display: block;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+input[type="text"],
+textarea,
+input[type="file"],
+select {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 0.25rem;
+}
+
+textarea {
+  height: 120px;
+  resize: vertical;
+}
+
+.preview-box {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.preview-box img {
+  max-width: 150px;
+  border-radius: 8px;
+}
+
+.preview-box video {
+  width: 100%;
+  max-width: 250px;
+  border-radius: 8px;
+}
+
+button {
+  background-color: #0077cc;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}

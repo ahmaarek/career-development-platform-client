@@ -5,6 +5,7 @@ import { BlogWikiService } from '../services/blog-wiki.service';
 import { CommonModule } from '@angular/common';
 import { BlogWikiDTO } from '../models/blog-wiki.model';
 import { LearningMaterialTemplate } from '../models/learning-material-template.model';
+import { forkJoin, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-edit-or-delete',
@@ -31,7 +32,7 @@ export class EditOrDeleteComponent implements OnInit {
     private router: Router,
     private blogWikiService: BlogWikiService,
     private learningService: LearningMaterialTemplateService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.blogWikiService.getBlogs().subscribe(b => this.blogs = b);
@@ -44,7 +45,10 @@ export class EditOrDeleteComponent implements OnInit {
   }
 
   edit(entry: any, type: 'blog-wiki' | 'learning') {
-    this.router.navigate([`library/edit/${type}/${entry.id}`]);
+    if (type === 'learning')
+      this.router.navigate([`library/edit/${entry.id}`]);
+    else
+      this.router.navigate([`library/edit-blog-wiki/${entry.id}`])
   }
 
   delete(entry: any, type: 'blog-wiki' | 'learning') {
@@ -63,13 +67,21 @@ export class EditOrDeleteComponent implements OnInit {
     const { id, type } = this.entryToDelete;
 
     if (type === 'blog-wiki') {
-      this.blogWikiService.deleteEntry(id).subscribe(() => {
-        this.blogs = this.blogs.filter(b => b.id !== id);
+      this.blogWikiService.deleteEntry(id).pipe(
+        switchMap(() => forkJoin([
+          this.blogWikiService.getBlogs(),
+          this.blogWikiService.getWikis()
+        ]))
+      ).subscribe(([blogs, wikis]) => {
+        this.blogs = blogs;
+        this.wikis = wikis;
       });
-    }  else if (type === 'learning') {
-      this.learningService.deleteTemplate(id).subscribe(() => {
-        this.learningMaterials = this.learningMaterials.filter(m => m.id !== id);
-      });
+
+    } else if (type === 'learning') {
+      this.learningService.deleteTemplate(id).pipe(
+        switchMap(() => this.learningService.getAllTemplates())
+      ).subscribe(learningMaterials => this.learningMaterials= learningMaterials);
+
     }
 
     this.cancelDelete();

@@ -100,6 +100,14 @@ export class EditEntryComponent implements OnInit {
     }
   }
 
+  removeSection(index: number): void {
+    if (this.sections.length > 1) {
+      this.sections.removeAt(index);
+    } else {
+      alert('At least one section is required.');
+    }
+  }
+
   onSubmit(): void {
     if (this.form.invalid || !this.currentUser) return;
 
@@ -136,8 +144,8 @@ export class EditEntryComponent implements OnInit {
       this.templateService.updateTemplate(payload).subscribe({
         next: () => {
           alert('Template updated successfully');
-          this.router.navigate(['/edit-or-delete']);
-        },
+           this.router.navigate([`library/edit/`]);
+ },
         error: () => alert('Update failed')
       });
     });

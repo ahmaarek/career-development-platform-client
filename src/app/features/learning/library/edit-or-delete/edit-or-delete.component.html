@@ -55,6 +55,7 @@
 <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="cancelDelete()"></div>
 <div class="modal" *ngIf="showDeleteModal">
   <h3>Are you sure you want to delete this item?</h3>
+  <p><strong>Note:</strong> Deleting a learning material will also delete all associated submissions.</p>
   <div class="modal-actions">
     <button class="confirm-delete" (click)="deleteConfirmed()">Yes, Delete</button>
     <button class="cancel" (click)="cancelDelete()">Cancel</button>
