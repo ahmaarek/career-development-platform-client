@@ -7,6 +7,7 @@
   @if (expanded) {
     <div class="package-body">
       <button class="edit-button" (click)="toggleEdit()">Edit</button>
+      <button class="delete-button" (click)="deletePackage()">Delete</button>
       @if (isEditing) {
         <button (click)="addSection()" class="add-section-btn">+ Add Section</button>
 

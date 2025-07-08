@@ -161,6 +161,13 @@ export class CareerPackageService {
     return this.http.post<CareerPackageTemplate>(`${environment.careerPackageBaseUrl}/user-career-package/assign`, request);
   }
 
+  deleteCareerPackage(id: string): Observable<any> {
+    return this.http.delete(`${environment.careerPackageBaseUrl}/career-package-template/${id}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred!';
 

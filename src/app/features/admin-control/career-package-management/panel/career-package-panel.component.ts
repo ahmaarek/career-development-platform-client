@@ -29,9 +29,9 @@ export class CareerPackagePanelComponent {
   newFields: SectionFieldTemplate[] = [];
   deletedFieldIds: string[] = [];
 
-  constructor(private careerPackageService: CareerPackageService,private snackBar: MatSnackBar) {
+  constructor(private careerPackageService: CareerPackageService, private snackBar: MatSnackBar) {
     this.resetTrackingData();
-   }
+  }
 
 
   toggleExpand() {
@@ -52,13 +52,27 @@ export class CareerPackagePanelComponent {
       fields: []
     };
     this.package.sections.unshift(newSection); //add to the beginning of the sections array
-    this.newSections.unshift(newSection); 
+    this.newSections.unshift(newSection);
   }
 
   deleteSection(index: number) {
     const deleted = this.package.sections.splice(index, 1)[0];
     if (deleted?.id) this.deletedSectionIds.push(deleted.id);
   }
+
+  deletePackage() {
+    this.careerPackageService.deleteCareerPackage(this.package.id).subscribe({
+      next: () => {
+        alert('Package deleted successfully!');
+        
+      },
+      error: (err) => {
+        console.error('Delete failed', err);
+        alert('Failed to delete package.');
+      }
+    });
+  }
+
 
   trackSectionUpdate(section: SectionTemplate) {
     if (!this.newSections.includes(section) && !this.updatedSections.find(s => s.id === section.id)) {
