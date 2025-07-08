@@ -32,7 +32,7 @@ loadLeaderboard(): void {
             if (user.imageId) {
               return this.userService.getProtectedImage(user.imageId).pipe(
                 map(blob => {
-                   console.log(`Fetched blob for ${user.name}:`, blob); // 
+                  
                   const imageUrl = URL.createObjectURL(blob);
                   return {
                     ...user,

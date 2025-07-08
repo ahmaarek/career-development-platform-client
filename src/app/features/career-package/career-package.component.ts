@@ -49,7 +49,7 @@ export class CareerPackageComponent implements OnInit {
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.currentUserId = user.id;
-        console.log('current user id:', this.currentUserId);
+        
         this.checkEnrollmentAndLoadData();
 
       },
@@ -79,7 +79,7 @@ export class CareerPackageComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.log('User is enrolled in a career package');
+        
         this.errorMessage = error.message;
         this.isLoading = false;
       }
@@ -92,7 +92,7 @@ export class CareerPackageComponent implements OnInit {
       next: (userPackage) => {
         this.userCareerPackage = userPackage;
         this.loadLearningTemplates();
-        console.log('User Career Package:', this.userCareerPackage);
+        
         this.initializeSectionForms();
         this.isLoading = false;
       },
@@ -336,7 +336,7 @@ export class CareerPackageComponent implements OnInit {
           value
         };
       });
-      console.log(fieldSubmissions);
+      
       this.careerPackageService.submitCompleteSection(
         this.userCareerPackage.id,
         section.id,
@@ -440,7 +440,7 @@ export class CareerPackageComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    console.log(this.userCareerPackage);
+    
     // Submit the complete package
     this.careerPackageService.submitCompleteCareerPackage(this.userCareerPackage).subscribe({
       next: (updatedPackage) => {

@@ -26,7 +26,7 @@ export class MyProfileComponent implements OnInit {
   ngOnInit(): void {
     this.userService.user$.subscribe((currentUser) => {
       if (currentUser) {
-        console.log(currentUser);
+      
         this.user = { ...currentUser };
         this.originalUser = { ...currentUser };
 

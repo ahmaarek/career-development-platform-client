@@ -107,7 +107,4 @@ export class UserManagementComponent {
     this.selectedManager = null;
   }
 
-  deleteUser(user: User) {
-    console.log(`Delete user ${user.name}`);
-  }
 }

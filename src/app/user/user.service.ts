@@ -15,7 +15,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(): User | null {
-    console.log('getUser called', this.userSubject.value);
+    
     return this.userSubject.value;
   }
 
@@ -54,12 +54,12 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    console.log('Fetched current user:', user);
+    
     const userRequest$ = this.http.get<User>(`${environment.userBaseUrl}/by-token`, { headers });
 
     userRequest$.subscribe({
       next: (user) => {
-        console.log('Fetched current user:', user);
+        
         this.userSubject.next(user);
       },
       error: (error) => {

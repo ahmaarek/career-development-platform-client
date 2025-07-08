@@ -49,8 +49,7 @@ export class CareerPackageService {
       fieldSubmissions: fieldSubmissions
     };
 
-    console.log('Submitting complete section:', sectionSubmissionData);
-
+    
     return this.http.post<UserSectionSubmission>(`${environment.careerPackageBaseUrl}/user-section-response`, sectionSubmissionData)
       .pipe(
         catchError(this.handleError)
@@ -77,8 +76,7 @@ export class CareerPackageService {
       }))
     };
 
-    console.log('Updating section response:', body);
-
+    
     return this.http.put<UserSectionSubmission>(
       `${environment.careerPackageBaseUrl}/user-section-response/${sectionSubmissionId}`,
       body
@@ -96,7 +94,7 @@ export class CareerPackageService {
       reviewerId: userCareerPackage.reviewerId,
       status: PackageStatus.UNDER_REVIEW
     };
-    console.log('Submitting complete career package:', submissionData);
+
 
     return this.http.patch<UserCareerPackage>(`${environment.careerPackageBaseUrl}/user-career-package/${userCareerPackage.id}`, submissionData)
       .pipe(

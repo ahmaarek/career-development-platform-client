@@ -129,7 +129,7 @@ export class CareerPackagePanelComponent {
       deletedFieldIds: this.deletedFieldIds
     };
 
-    console.log('Submitting changes:', payload);
+    
     this.careerPackageService.updatePackage(this.package.id, payload).subscribe({
       next: () => {
         alert('Changes submitted successfully!');
