@@ -7,6 +7,7 @@ import { Notification } from '../notification/notification.model';
 import { MatIconModule } from '@angular/material/icon';
 import { LearningScoreService } from '../learning/score/learning.score.service';
 import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -29,6 +30,7 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private authService: AuthService,
     private userService: UserService,
     private notificationService: NotificationService,
     private learningScoreService: LearningScoreService
@@ -149,7 +151,6 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    sessionStorage.clear();
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }
