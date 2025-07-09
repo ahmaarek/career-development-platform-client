@@ -14,8 +14,16 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent {
   title = 'career-development-platform';
-   constructor (private authService: AuthService) {}
+  alert: AlertData | null = null;
+    constructor(private authService: AuthService, private alertService: AlertService) {
+    this.alertService.alert$.subscribe(alert => {
+      this.alert = alert;
+    });
+  }
 
+  clearAlert() {
+    this.alertService.clearAlert();
+  }
   ngOnInit() {
     this.authService.autoLogin();
   }

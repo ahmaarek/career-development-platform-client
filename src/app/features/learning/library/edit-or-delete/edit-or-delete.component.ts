@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { BlogWikiDTO } from '../models/blog-wiki.model';
 import { LearningMaterialTemplate } from '../models/learning-material-template.model';
 import { forkJoin, switchMap } from 'rxjs';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-edit-or-delete',
@@ -31,7 +32,8 @@ export class EditOrDeleteComponent implements OnInit {
   constructor(
     private router: Router,
     private blogWikiService: BlogWikiService,
-    private learningService: LearningMaterialTemplateService
+    private learningService: LearningMaterialTemplateService,
+    private alertService: AlertService
   ) { }
 
   ngOnInit(): void {
@@ -75,7 +77,7 @@ export class EditOrDeleteComponent implements OnInit {
         this.ngOnInit();
         this.cancelDelete();
       },
-      error: () => alert('Deletion failed.')
+      error: () => this.alertService.showAlert('error','Deletion failed.')
     });
   }
 

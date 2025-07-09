@@ -16,6 +16,7 @@ import { UserService } from '../../../../user/user.service';
 import { User } from '../../../../user/user.model';
 import { SectionType } from '../models/section-type.model';
 import { CareerPackageTemplate } from '../../../career-package/models/career-package-template.interface';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-edit-entry',
@@ -38,7 +39,8 @@ export class EditEntryComponent implements OnInit {
     private templateService: LearningMaterialTemplateService,
     private userService: UserService,
     private documentService: LearningDocumentService,
-    private careerPackageService: CareerPackageService
+    private careerPackageService: CareerPackageService,
+    private alertService: AlertService
   ) {
     this.form = this.buildForm();
   }
@@ -118,7 +120,7 @@ export class EditEntryComponent implements OnInit {
     if (this.sections.length > 1) {
       this.sections.removeAt(index);
     } else {
-      alert('At least one section is required.');
+      this.alertService.showAlert('warning','At least one section is required.');
     }
   }
 
@@ -156,10 +158,10 @@ export class EditEntryComponent implements OnInit {
 
       this.templateService.updateTemplate(payload).subscribe({
         next: () => {
-          alert('Template updated successfully');
+          this.alertService.showAlert('success','Template updated successfully');
           this.router.navigate([`library/edit/`]);
         },
-        error: () => alert('Update failed')
+        error: () => this.alertService.showAlert('error','Update failed')
       });
     });
   }
