@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 
@@ -11,10 +11,10 @@ import { AuthService } from './auth/auth.service';
 })
 export class AppComponent {
   title = 'career-development-platform';
-  authService = inject(AuthService);
+
+  constructor (private authService: AuthService) {}
 
   ngOnInit() {
-    
     this.authService.autoLogin();
   }
 }

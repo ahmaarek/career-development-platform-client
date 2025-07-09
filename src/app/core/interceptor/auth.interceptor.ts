@@ -11,7 +11,7 @@ export function tokenInterceptor(
 ) {
   const authService = inject(AuthService);
  
-
+  
   return authService.user$.pipe(
     take(1),
     switchMap((user) => {
