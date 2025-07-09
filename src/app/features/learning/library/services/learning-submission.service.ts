@@ -32,7 +32,6 @@ export class LearningSubmissionService {
       templates: this.learningMaterialService.getTemplatesByCareerPackageId(careerPackageId)
     }).pipe(
       map(({ submissions, templates }) => {
-        console.log("templates and id: " + careerPackageId);
         const submissionMap = new Map(
           submissions.map(sub => [sub.templateId, sub])
         );

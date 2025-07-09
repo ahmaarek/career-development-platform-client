@@ -110,7 +110,6 @@ ngOnInit(): void {
 
   loadLearningMaterials(): Observable<void> {
     if (!this.currentUser || !this.careerPackageId) {
-      console.log("i was here");
       return of();
     }
 
