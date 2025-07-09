@@ -16,7 +16,7 @@
 <div class="user-section">
   <div class="user-header" (click)="toggleUser(user.id)">
     <div class="user-header-info">
-      <img [src]="user.photoUrl || '/user-default-logo.webp'" alt="User" />
+      <img [src]="getImageUrlByUserId(user)" alt="User" />
       <strong>{{ user.name }}</strong>
     </div>
     <span>{{ expandedUsers[user.id] ? '▲' : '▼' }}</span>

@@ -20,7 +20,7 @@ export class CareerPackageReviewComponent implements OnInit {
   enrollmentStatus: Record<string, boolean> = {};
   careerPackageTemplates: CareerPackageTemplate[] = [];
   userPackages: Record<string, UserCareerPackage> = {};
-  
+
   reviewingUserId: string | null = null;
   viewingUserId: string | null = null;
   assigningUserId: string | null = null;
@@ -37,39 +37,77 @@ export class CareerPackageReviewComponent implements OnInit {
   constructor(private userService: UserService, private careerPackageService: CareerPackageService) { }
 
 
+  usersWithImages: { user: any, imageUrl: string }[] = [];
+
   ngOnInit(): void {
-  this.userService.getCurrentUser().pipe(
-    filter(manager => !!manager?.id),
-    tap(manager => this.managerId = manager.id),
-    switchMap(manager => this.userService.getUsersByManagerId(manager.id)),
-    tap(users => this.employees = users),
-    switchMap(users => {
-      return forkJoin(
-        users.map(user =>
-          this.careerPackageService.getUserCareerPackage(user.id).pipe(
-            map(pkg => {
-              if (pkg.status !== 'APPROVED') {
-                this.enrollmentStatus[user.id] = true;
-                this.userPackages[user.id] = pkg;
-              }
-            }),
-            catchError(err => {
-              if (err.status === 404) {
-                this.enrollmentStatus[user.id] = false;
-              }
-              return of(null);
-            })
+    this.userService.getCurrentUser().pipe(
+      filter(manager => !!manager?.id),
+      tap(manager => this.managerId = manager.id),
+      switchMap(manager => this.userService.getUsersByManagerId(manager.id)),
+      tap(users => this.employees = users),
+
+      // Add user image logic
+      switchMap(users => {
+        return forkJoin(
+          users.map(user => {
+            if (user.imageId) {
+              return this.userService.getProtectedImage(user.imageId).pipe(
+                map(blob => ({
+                  user,
+                  imageUrl: URL.createObjectURL(blob)
+                })),
+                catchError(() =>
+                  of({
+                    user,
+                    imageUrl: "/user-default-logo.webp"
+                  })
+                )
+              );
+            } else {
+              return of({
+                user,
+                imageUrl: "/user-default-logo.webp"
+              });
+            }
+          })
+        ).pipe(
+          tap(usersWithImages => this.usersWithImages = usersWithImages),
+          map(() => users) // pass users to next switchMap
+        );
+      }),
+
+      // Keep existing career package logic untouched
+      switchMap(users => {
+        return forkJoin(
+          users.map(user =>
+            this.careerPackageService.getUserCareerPackage(user.id).pipe(
+              map(pkg => {
+                if (pkg.status !== 'APPROVED') {
+                  this.enrollmentStatus[user.id] = true;
+                  this.userPackages[user.id] = pkg;
+                }
+              }),
+              catchError(err => {
+                if (err.status === 404) {
+                  this.enrollmentStatus[user.id] = false;
+                }
+                return of(null);
+              })
+            )
           )
-        )
-      );
-    })
-  ).subscribe();
+        );
+      })
+    ).subscribe();
 
-  this.careerPackageService.getAllCareerPackageTemplates().subscribe(templates => {
-    this.careerPackageTemplates = templates;
-  });
-}
+    this.careerPackageService.getAllCareerPackageTemplates().subscribe(templates => {
+      this.careerPackageTemplates = templates;
+    });
+  }
 
+  getImageUrlByUserId(user: User): string {
+    const entry = this.usersWithImages.find(u => u.user.id === user.id);
+    return entry?.imageUrl || '/user-default-logo.webp';
+  }
 
   openAssignModal(userId: string): void {
     this.assigningUserId = userId;
@@ -185,7 +223,7 @@ export class CareerPackageReviewComponent implements OnInit {
     return 'Unnamed Field';
   }
 
-   clearMessages(): void {
+  clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
   }
