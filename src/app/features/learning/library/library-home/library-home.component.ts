@@ -60,7 +60,7 @@ ngOnInit(): void {
     tap(user => this.currentUser = user),
     switchMap(user =>
       this.careerPackageService.getUserCareerPackage(user.id).pipe(
-        tap(cp => this.careerPackageId = cp.id),
+        tap(cp => this.careerPackageId = cp.template.id),
         switchMap(() => this.loadLearningMaterials()),
         catchError(err => {
           console.warn('No career package found or failed to load:', err);
@@ -110,6 +110,7 @@ ngOnInit(): void {
 
   loadLearningMaterials(): Observable<void> {
     if (!this.currentUser || !this.careerPackageId) {
+      console.log("i was here");
       return of();
     }
 

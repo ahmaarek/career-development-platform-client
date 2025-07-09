@@ -20,38 +20,39 @@ export class LearningSubmissionService {
   }
 
   getSubmittedAndUnsubmittedTemplates(
-  userId: string,
-  careerPackageId: string
-): Observable<{
-  submittedTemplates: LearningSubmissionDTO[];
-  unsubmittedTemplates: LearningMaterialTemplate[];
-  allTemplates: LearningMaterialTemplate[];
-}> {
-  return forkJoin({
-    submissions: this.getSubmissionsByUser(userId),
-    templates: this.learningMaterialService.getTemplatesByCareerPackageId(careerPackageId)
-  }).pipe(
-    map(({ submissions, templates }) => {
-      const submissionMap = new Map(
-        submissions.map(sub => [sub.templateId, sub])
-      );
+    userId: string,
+    careerPackageId: string
+  ): Observable<{
+    submittedTemplates: LearningSubmissionDTO[];
+    unsubmittedTemplates: LearningMaterialTemplate[];
+    allTemplates: LearningMaterialTemplate[];
+  }> {
+    return forkJoin({
+      submissions: this.getSubmissionsByUser(userId),
+      templates: this.learningMaterialService.getTemplatesByCareerPackageId(careerPackageId)
+    }).pipe(
+      map(({ submissions, templates }) => {
+        console.log("templates and id: " + careerPackageId);
+        const submissionMap = new Map(
+          submissions.map(sub => [sub.templateId, sub])
+        );
 
-      const submittedTemplates: LearningSubmissionDTO[] = [];
-      const unsubmittedTemplates: LearningMaterialTemplate[] = [];
+        const submittedTemplates: LearningSubmissionDTO[] = [];
+        const unsubmittedTemplates: LearningMaterialTemplate[] = [];
 
-      for (const template of templates) {
-        const submission = submissionMap.get(template.id!);
-        if (submission) {
-          submittedTemplates.push(submission);
-        } else {
-          unsubmittedTemplates.push(template);
+        for (const template of templates) {
+          const submission = submissionMap.get(template.id!);
+          if (submission) {
+            submittedTemplates.push(submission);
+          } else {
+            unsubmittedTemplates.push(template);
+          }
         }
-      }
 
-      return { submittedTemplates, unsubmittedTemplates, allTemplates: templates };
-    })
-  );
-}
+        return { submittedTemplates, unsubmittedTemplates, allTemplates: templates };
+      })
+    );
+  }
 
 
 
