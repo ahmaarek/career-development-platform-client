@@ -4,6 +4,7 @@ import { SectionFieldTemplate } from '../../../career-package/models/section-fie
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-section-editor',
@@ -24,7 +25,7 @@ export class SectionEditorComponent {
 
   pendingNewFields: SectionFieldTemplate[] = [];
 
-  constructor(private snackBar: MatSnackBar) {
+  constructor(private snackBar: MatSnackBar, private alertService: AlertService) {
   }
 
   addField() {
@@ -42,7 +43,7 @@ export class SectionEditorComponent {
   confirmAddField(field: SectionFieldTemplate) {
 
     if (!field.label) {
-      alert('Field label is required.');
+      this.alertService.showAlert('warning','Field label is required.');
       return;
     }
     field.fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
