@@ -136,6 +136,11 @@ export class NavbarComponent implements OnInit {
     this.dropdownOpen = false;
   }
 
+  toggleMenu() {
+    const navbar = document.querySelector('.navbar');
+    navbar?.classList.toggle('show-menu');
+  }
+
   logout() {
     this.authService.logout();
   }

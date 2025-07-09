@@ -112,14 +112,14 @@
             <form [formGroup]="sectionForms[section.id]" class="section-form">
               @for (field of section.fields; track field.id) {
               <div class="field-group">
-                <label class="form-label" [for]="'field_' + field.id">
+                <label class="form-label">
                   {{ field.label }}
                   @if (field.required) {
                   <span class="required-asterisk">*</span>
                   }
                 </label>
 
-                @if (field.fieldType === 'TEXT' || field.fieldType === 'EMAIL' || field.fieldType === 'NUMBER') {
+                @if (field.fieldType === 'TEXT' || field.fieldType === 'NUMBER') {
                 <input [type]="field.fieldType.toLowerCase()" [id]="'field_' + field.id"
                   [formControlName]="field.fieldKey" class="form-control"
                   [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)"
@@ -132,16 +132,7 @@
                   [placeholder]="'Enter ' + field.label.toLowerCase()" [disabled]="isPackageSubmitted()">
                         </textarea>
                 }
-
-                @if (field.fieldType === 'SELECT') {
-                <select [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control"
-                  [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()">
-                  <option value="">Select {{ field.label.toLowerCase() }}</option>
-                  <option value="option1">Option 1</option>
-                  <option value="option2">Option 2</option>
-                </select>
-                }
-
+                
                 @if (field.fieldType === 'DATE') {
                 <input type="date" [id]="'field_' + field.id" [formControlName]="field.fieldKey" class="form-control"
                   [class.is-invalid]="isFieldInvalid(section.id, field.fieldKey)" [disabled]="isPackageSubmitted()" />

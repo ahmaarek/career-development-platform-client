@@ -1,17 +1,17 @@
 <nav class="navbar">
-  
+
   <div class="navbar-logo">
     <img src="/sumerge-logo.webp" alt="Logo" />
   </div>
 
-  
+
   <div class="navbar-links">
     <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
     <a routerLink="/library" routerLinkActive="active">Learning & Wiki</a>
     <a routerLink="/career-package" routerLinkActive="active">Career Package</a>
   </div>
 
-  
+
   <div class="notification-icon" (click)="toggleNotificationDropdown()" tabindex="0">
     <mat-icon>notifications</mat-icon>
 
@@ -63,17 +63,21 @@
       @if (dropdownOpen) {
       <div class="dropdown-menu">
         <div class="dropdown-user-info" (click)="navigateTo('/my-profile')">
-          <img [src]="imageUrl" alt="User"/>
+          <img [src]="imageUrl" alt="User" />
           <span>{{ userName }}</span>
         </div>
-          <div class="user-points" *ngIf="currentPoints !== null">
-            <mat-icon>stars</mat-icon>
-            <span>{{ currentPoints }} pts</span>
-          </div>
+        <div class="user-points" *ngIf="currentPoints !== null">
+          <mat-icon>stars</mat-icon>
+          <span>{{ currentPoints }} pts</span>
+        </div>
         <hr />
         <button (click)="logout()">Logout</button>
       </div>
       }
     </div>
+  </div>
+
+  <div class="menu-toggle" (click)="toggleMenu()">
+    <mat-icon>menu</mat-icon>
   </div>
 </nav>
