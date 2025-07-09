@@ -46,7 +46,6 @@ export class CareerPackageReviewComponent implements OnInit {
       switchMap(manager => this.userService.getUsersByManagerId(manager.id)),
       tap(users => this.employees = users),
 
-      // Add user image logic
       switchMap(users => {
         return forkJoin(
           users.map(user => {
@@ -72,11 +71,10 @@ export class CareerPackageReviewComponent implements OnInit {
           })
         ).pipe(
           tap(usersWithImages => this.usersWithImages = usersWithImages),
-          map(() => users) // pass users to next switchMap
+          map(() => users) 
         );
       }),
 
-      // Keep existing career package logic untouched
       switchMap(users => {
         return forkJoin(
           users.map(user =>
