@@ -9,7 +9,7 @@
     @for (user of employees; track user.id) {
       <div class="user-card">
         <div class="user-info">
-          <img [src]="user.photoUrl" alt="User" />
+          <img [src]="getImageUrlByUserId(user)" alt="User" />
           <span>{{ user.name }}</span>
         </div>
         <div class="user-actions">
@@ -29,7 +29,7 @@
     @for (user of managers; track user.id) {
       <div class="user-card">
         <div class="user-info">
-          <img [src]="user.photoUrl" alt="User" />
+          <img [src]="getImageUrlByUserId(user)" alt="User" />
           <span>{{ user.name }}</span>
         </div>
         <div class="user-actions">
@@ -48,7 +48,7 @@
     @for (user of admins; track user.id) {
       <div class="user-card">
         <div class="user-info">
-          <img [src]="user.photoUrl" alt="User" />
+          <img [src]="getImageUrlByUserId(user)" alt="User" />
           <span>{{ user.name }}</span>
         </div>
         <div class="user-actions">

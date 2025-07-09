@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../user/user.service';
 import { User } from '../../../user/user.model';
+import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-user-management',
@@ -24,11 +25,45 @@ export class UserManagementComponent {
   selectedUserForRoleEdit: User | null = null;
   selectedRole: 'EMPLOYEE' | 'MANAGER' | 'ADMIN' = 'EMPLOYEE';
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
+
+  usersWithImages: { user: any, imageUrl: string }[] = [];
 
   ngOnInit(): void {
-    this.userService.getAllUsers().subscribe({
-      next: (data) => (this.users = data)
+    this.userService.getAllUsers().pipe(
+      tap(users => {
+        this.users = users;
+        this.usersWithImages = [];
+      }),
+      switchMap(users => {
+        return forkJoin(
+          users.map(user => {
+            if (user.imageId) {
+              return this.userService.getProtectedImage(user.imageId).pipe(
+                map(blob => ({
+                  user,
+                  imageUrl: URL.createObjectURL(blob)
+                })),
+                catchError(() =>
+                  of({
+                    user,
+                    imageUrl: "/user-default-logo.webp"
+                  })
+                )
+              );
+            } else {
+              return of({
+                user,
+                imageUrl: "/user-default-logo.webp"
+              });
+            }
+          })
+        );
+      })
+    ).subscribe({
+      next: userWithImages => {
+        this.usersWithImages = userWithImages;
+      }
     });
   }
 
@@ -49,6 +84,11 @@ export class UserManagementComponent {
     return this.users.filter(user => user.managerId === this.selectedManager!.id);
   }
 
+  getImageUrlByUserId(user: User): string {
+    const entry = this.usersWithImages.find(u => u.user.id === user.id);
+    return entry?.imageUrl || '/user-default-logo.webp';
+  }
+
   toggle(role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN') {
     this.roleVisibility[role] = !this.roleVisibility[role];
   }
@@ -67,7 +107,7 @@ export class UserManagementComponent {
         this.selectedEmployee = null;
         this.ngOnInit();
       }
-      
+
     });
   }
 
