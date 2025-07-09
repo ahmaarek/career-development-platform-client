@@ -221,7 +221,6 @@
   background-color: #d32f2f;
 }
 
-/* Mobile menu toggle */
 .menu-toggle {
   display: none;
   cursor: pointer;
@@ -229,7 +228,6 @@
   margin-left: 16px;
 }
 
-/* Hide certain elements on small screens */
 @media (max-width: 768px) {
   .navbar {
     flex-wrap: wrap;
