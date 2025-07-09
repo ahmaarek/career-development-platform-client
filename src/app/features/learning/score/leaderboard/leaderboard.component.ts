@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LearningScoreService } from '../learning.score.service';
 import { UserService } from '../../../../user/user.service';
 import { User, FullUser } from '../../../../user/user.model';
-import { forkJoin, switchMap, map } from 'rxjs';
+import { forkJoin, switchMap, map, concatMap, from, toArray, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -23,43 +23,40 @@ export class LeaderboardComponent implements OnInit {
     this.loadLeaderboard();
   }
 
-loadLeaderboard(): void {
-  this.learningScoreService.getLeaderboard().pipe(
-    switchMap(scores => {
-      const userRequests = scores.map(score =>
+  loadLeaderboard(): void {
+    this.learningScoreService.getLeaderboard().pipe(
+      switchMap(scores => from(scores)),
+      concatMap(score =>
         this.userService.getUserById(score.userId).pipe(
-          switchMap(user => {
+          concatMap(user => {
             if (user.imageId) {
               return this.userService.getProtectedImage(user.imageId).pipe(
-                map(blob => {
-                  
-                  const imageUrl = URL.createObjectURL(blob);
-                  return {
-                    ...user,
-                    points: score.points,
-                    imageUrl
-                  } as FullUser;
-                }),
-              );
-            } else {
-              return new Promise<FullUser>(resolve => {
-                resolve({
+                map(blob => ({
                   ...user,
                   points: score.points,
-                  imageUrl: '/user-default-logo.webp'
-                });
-              });
+                  imageUrl: URL.createObjectURL(blob)
+                }) as FullUser)
+              );
+            } else {
+              return of({
+                ...user,
+                points: score.points,
+                imageUrl: '/user-default-logo.webp'
+              } as FullUser);
             }
           })
         )
-      );
-      return forkJoin(userRequests);
-    })
-  ).subscribe({
-    next: (usersWithImages) => {
-      this.leaderboard = usersWithImages;
-    }
-    
-  });
-}
+      ),
+      toArray()
+    ).subscribe({
+      next: (usersWithImages) => {
+        this.leaderboard = usersWithImages;
+      },
+      error: (err) => {
+        console.error('Failed to load leaderboard:', err);
+      }
+    });
+  }
+
+
 }

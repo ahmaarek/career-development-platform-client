@@ -63,7 +63,6 @@ ngOnInit(): void {
         tap(cp => this.careerPackageId = cp.template.id),
         switchMap(() => this.loadLearningMaterials()),
         catchError(err => {
-          console.warn('No career package found or failed to load:', err);
           this.submittedMaterials = [];
           this.unsubmittedMaterials = [];
           return of();

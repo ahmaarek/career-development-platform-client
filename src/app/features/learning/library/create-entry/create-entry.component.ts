@@ -76,7 +76,11 @@ export class CreateEntryComponent {
       } else {
         createEntry();
       }
+    } else {
+      createEntry();
     }
+
+
   }
 
 
