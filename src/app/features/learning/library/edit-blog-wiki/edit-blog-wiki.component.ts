@@ -7,6 +7,7 @@ import { User } from '../../../../user/user.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BlogWikiDTO } from '../models/blog-wiki.model';
 import { CommonModule } from '@angular/common';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-edit-blog-wiki',
@@ -31,7 +32,8 @@ export class EditBlogWikiComponent implements OnInit {
     private userService: UserService,
     private documentService: LearningDocumentService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {
     this.form = this.fb.group({
       title: ['', Validators.required],
@@ -85,10 +87,10 @@ export class EditBlogWikiComponent implements OnInit {
 
       this.blogWikiService.updateEntry(payload).subscribe({
         next: () => {
-          alert(`${this.entryType} updated successfully!`);
+          this.alertService.showAlert('success',`${this.entryType} updated successfully!`);
           this.router.navigate(['/edit']);
         },
-        error: () => alert('Error updating entry.'),
+        error: () => this.alertService.showAlert('error','Error updating entry.'),
         complete: () => this.isSubmitting = false
       });
     };
@@ -97,7 +99,7 @@ export class EditBlogWikiComponent implements OnInit {
       this.documentService.uploadAttachment(attachment, this.currentUser!.id, 'content').subscribe({
         next: (newAttachmentId) => submitWithAttachmentId(newAttachmentId),
         error: () => {
-          alert('Failed to upload new attachment.');
+          this.alertService.showAlert('error','Failed to upload new attachment.');
           this.isSubmitting = false;
         }
       });

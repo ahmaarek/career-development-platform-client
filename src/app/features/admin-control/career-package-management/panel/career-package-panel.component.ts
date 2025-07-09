@@ -8,6 +8,7 @@ import { SectionEditorComponent } from '../section-editor/section-editor.compone
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-career-package-panel',
@@ -29,7 +30,7 @@ export class CareerPackagePanelComponent {
   newFields: SectionFieldTemplate[] = [];
   deletedFieldIds: string[] = [];
 
-  constructor(private careerPackageService: CareerPackageService, private snackBar: MatSnackBar) {
+  constructor(private careerPackageService: CareerPackageService, private snackBar: MatSnackBar, private alertService: AlertService) {
     this.resetTrackingData();
   }
 
@@ -63,12 +64,12 @@ export class CareerPackagePanelComponent {
   deletePackage() {
     this.careerPackageService.deleteCareerPackage(this.package.id).subscribe({
       next: () => {
-        alert('Package deleted successfully!');
+        this.alertService.showAlert('success', 'Package deleted successfully!');
         
       },
       error: (err) => {
         
-        alert('Failed to delete package.');
+        this.alertService.showAlert('error','Failed to delete package.');
       }
     });
   }
@@ -132,13 +133,13 @@ export class CareerPackagePanelComponent {
     
     this.careerPackageService.updatePackage(this.package.id, payload).subscribe({
       next: () => {
-        alert('Changes submitted successfully!');
+        this.alertService.showAlert('success','Changes submitted successfully!');
         this.isEditing = false;
 
       },
       error: (err) => {
         
-        alert('Failed to submit changes.');
+        this.alertService.showAlert('error','Failed to submit changes.');
       }
     });
     this.resetTrackingData();

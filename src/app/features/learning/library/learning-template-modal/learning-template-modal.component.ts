@@ -9,6 +9,7 @@ import { LearningSubmissionService } from '../services/learning-submission.servi
 import { LearningSectionResponseDTO, LearningSubmissionDTO } from '../models/learning-submission.model';
 import { SubmissionStatus } from '../models/submission-status.model';
 import { UserService } from '../../../../user/user.service';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-learning-template-modal',
@@ -30,6 +31,7 @@ export class LearningTemplateModalComponent {
   constructor(
     private documentService: LearningDocumentService,
     private submissionService: LearningSubmissionService,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -87,11 +89,11 @@ export class LearningTemplateModalComponent {
 
       this.submissionService.submitLearningMaterial(payload).subscribe({
         next: () => {
-          alert('Submitted successfully!');
+          this.alertService.showAlert('success','Submitted successfully!');
           this.close.emit();
           this.submitted.emit();
         },
-        error: () => alert('Submission failed.')
+        error: () => this.alertService.showAlert('success','Submission failed.')
       });
     });
   }

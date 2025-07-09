@@ -66,24 +66,17 @@ export class EditOrDeleteComponent implements OnInit {
 
     const { id, type } = this.entryToDelete;
 
-    if (type === 'blog-wiki') {
-      this.blogWikiService.deleteEntry(id).pipe(
-        switchMap(() => forkJoin([
-          this.blogWikiService.getBlogs(),
-          this.blogWikiService.getWikis()
-        ]))
-      ).subscribe(([blogs, wikis]) => {
-        this.blogs = blogs;
-        this.wikis = wikis;
-      });
+    const delete$ = type === 'blog-wiki'
+      ? this.blogWikiService.deleteEntry(id)
+      : this.learningService.deleteTemplate(id);
 
-    } else if (type === 'learning') {
-      this.learningService.deleteTemplate(id).pipe(
-        switchMap(() => this.learningService.getAllTemplates())
-      ).subscribe(learningMaterials => this.learningMaterials= learningMaterials);
-
-    }
-
-    this.cancelDelete();
+    delete$.subscribe({
+      next: () => {
+        this.ngOnInit();
+        this.cancelDelete();
+      },
+      error: () => alert('Deletion failed.')
+    });
   }
+
 }

@@ -9,6 +9,7 @@ import { SectionFormModel } from '../models/section-form.model';
 import { LearningDocumentService } from '../services/learning-document.service';
 import { CareerPackageService } from '../../../career-package/career-package.service';
 import { CareerPackageTemplate } from '../../../career-package/models/career-package-template.interface';
+import { AlertService } from '../../../alert/alert.service';
 
 
 @Component({
@@ -27,13 +28,14 @@ export class TemplateBuilderComponent {
     private learningMaterialTemplateService: LearningMaterialTemplateService,
     private userService: UserService,
     private learningDocumentService: LearningDocumentService,
-    private careerPackageService: CareerPackageService) {
+    private careerPackageService: CareerPackageService,
+    private alertService: AlertService) {
     this.form = this.fb.group({
       title: ['', Validators.required],
       description: [''],
       careerPackageTemplate: [null, Validators.required],
       points: [0, [Validators.required, Validators.min(0)]],
-      sections: this.fb.array([], this.minLengthArray(1)) 
+      sections: this.fb.array([], this.minLengthArray(1))
     });
     this.userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
@@ -49,11 +51,11 @@ export class TemplateBuilderComponent {
 
 
   minLengthArray(min: number) {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control as FormArray;
-    return value && value.length >= min ? null : { minLengthArray: true };
-  };
-}
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control as FormArray;
+      return value && value.length >= min ? null : { minLengthArray: true };
+    };
+  }
 
   addSection(): void {
     const sectionGroup = this.fb.group({
@@ -109,12 +111,12 @@ export class TemplateBuilderComponent {
 
         this.learningMaterialTemplateService.createTemplate(finalPayload).subscribe({
           next: () => {
-            alert('Material created!');
+            this.alertService.showAlert('success','Material created!');
             this.form.reset();
             this.sections.clear();
           },
           error: (err) => {
-            alert('Submission failed.');
+            this.alertService.showAlert('success','Submission failed.');
           }
         });
       });

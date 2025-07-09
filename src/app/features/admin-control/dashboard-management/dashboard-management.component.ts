@@ -3,6 +3,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular
 import { RankConfigService } from '../../learning/library/services/rank-config.service';
 import { RankConfig } from '../../learning/library/models/rank-config.model';
 import { CommonModule } from '@angular/common';
+import { AlertService } from '../../alert/alert.service';
 
 @Component({
   selector: 'app-dashboard-management',
@@ -18,7 +19,8 @@ export class DashboardManagementComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private rankService: RankConfigService
+    private rankService: RankConfigService,
+    private alertService: AlertService
   ) {
     this.form = this.fb.group({
       ranks: this.fb.array([])
@@ -59,9 +61,9 @@ export class DashboardManagementComponent implements OnInit {
   confirm(): void {
     const rankList: RankConfig[] = this.ranks.value;
     this.rankService.replaceAllRanks(rankList).subscribe(() => {
-      alert('Ranks updated successfully!');
+      this.alertService.showAlert('success','Ranks updated successfully!');
     }, err => {
-      alert('Failed to update ranks: ' + err.error);
+      this.alertService.showAlert('error','Failed to update ranks: ' + err.error);
     });
   }
 }

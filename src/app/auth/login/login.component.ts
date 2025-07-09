@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { AlertService } from '../../features/alert/alert.service';
 
 
 @Component({
@@ -13,7 +14,7 @@ import { AuthService } from '../auth.service';
 })
 export class LoginComponent {
   
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router, private alertService: AlertService) { }
   
   loginForm = new FormGroup({
     email: new FormControl('',{
@@ -35,7 +36,7 @@ export class LoginComponent {
         },
         error: (err) => {
           
-          alert('Login failed. Please check your credentials.');
+          this.alertService.showAlert('error', 'Login failed. Please check your credentials.');
         }
       })
     }

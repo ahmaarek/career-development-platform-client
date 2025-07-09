@@ -55,7 +55,7 @@
 
 <app-learning-template-modal *ngIf="selectedLearningMaterial && currentUser && !selectedSubmittedSubmission"
   [template]="selectedLearningMaterial" [currentUser]="currentUser" (close)="closeLearningModal()"
-  (submitted)="loadLearningMaterials()" />
+  (submitted)="ngOnInit()" />
 
 <app-entry-modal *ngIf="selectedEntry" [entry]="selectedEntry" [attachmentType]="attachmentType"
   [attachmentUrl]="attachmentUrl" (close)="closeModal()">

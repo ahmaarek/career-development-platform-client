@@ -52,25 +52,25 @@ export class LibraryHomeComponent implements OnInit {
     private learningSubmissionService: LearningSubmissionService,
     private careerPackageService: CareerPackageService) { }
 
-ngOnInit(): void {
-  this.loadBlogs();
-  this.loadWikis();
+  ngOnInit(): void {
+    this.loadBlogs();
+    this.loadWikis();
 
-  this.userService.getCurrentUser().pipe(
-    tap(user => this.currentUser = user),
-    switchMap(user =>
-      this.careerPackageService.getUserCareerPackage(user.id).pipe(
-        tap(cp => this.careerPackageId = cp.template.id),
-        switchMap(() => this.loadLearningMaterials()),
-        catchError(err => {
-          this.submittedMaterials = [];
-          this.unsubmittedMaterials = [];
-          return of();
-        })
+    this.userService.getCurrentUser().pipe(
+      tap(user => this.currentUser = user),
+      switchMap(user =>
+        this.careerPackageService.getUserCareerPackage(user.id).pipe(
+          tap(cp => this.careerPackageId = cp.template.id),
+          switchMap(() => this.loadLearningMaterials()),
+          catchError(err => {
+            this.submittedMaterials = [];
+            this.unsubmittedMaterials = [];
+            return of();
+          })
+        )
       )
-    )
-  ).subscribe();
-}
+    ).subscribe();
+  }
 
 
 
@@ -161,44 +161,6 @@ ngOnInit(): void {
     }
   }
 
-  submitLearningMaterial(): void {
-    if (!this.selectedLearningMaterial || !this.currentUser) return;
-
-    const sections = this.selectedLearningMaterial.sections;
-
-    const uploadObservables = sections.map(section => {
-      const file = this.submissionFiles[section.id!] || null;
-      if (file) {
-        return this.learningDocumentService.uploadAttachment(file, this.currentUser!.id, 'submission');
-      } else {
-        return of(null);
-      }
-    });
-
-    combineLatest(uploadObservables).subscribe(attachmentIds => {
-      const sectionResponses: LearningSectionResponseDTO[] = sections.map((section, i) => ({
-        sectionTemplateId: section.id!,
-        userInput: this.submissionText[section.id!] || '',
-        attachmentId: attachmentIds[i] || undefined
-      }));
-
-      const payload: LearningSubmissionDTO = {
-        userId: this.currentUser!.id,
-        templateId: this.selectedLearningMaterial!.id!,
-        sectionResponses,
-      };
-
-      this.learningSubmissionService.submitLearningMaterial(payload).subscribe({
-        next: () => {
-          alert('Submission successful!');
-          this.closeLearningModal();
-        },
-        error: (err) => {
-          alert('Failed to submit.');
-        }
-      });
-    });
-  }
 
   setSubmissionView(unsubmitted: boolean) {
     this.viewingUnsubmitted = unsubmitted;

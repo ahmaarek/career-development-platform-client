@@ -7,7 +7,12 @@
   
   <div class="navbar-links">
     <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    @if (role === 'ADMIN') {
+    <a routerLink="/admin/learning-management">Learning & Wiki</a>
+    }
+    @else {
     <a routerLink="/library" routerLinkActive="active">Learning & Wiki</a>
+  }
     <a routerLink="/career-package" routerLinkActive="active">Career Package</a>
   </div>
 
