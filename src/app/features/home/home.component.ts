@@ -16,39 +16,52 @@ import { LeaderboardComponent } from '../learning/score/leaderboard/leaderboard.
 })
 export class HomeComponent implements OnInit {
   ranks: RankConfig[] = [];
-  currentUser: { id: string; fullName: string; score: number, imageId: string | null} | null = null;
-  otherUsers: { id: string; fullName: string; score: number , imageId: string | null}[] = [];
+  currentUser: { id: string; fullName: string; score: number, imageId: string | null } | null = null;
+  otherUsers: { id: string; fullName: string; score: number, imageId: string | null }[] = [];
 
   constructor(
     private userService: UserService,
     private scoreService: LearningScoreService,
     private rankConfigService: RankConfigService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     forkJoin({
       users: this.userService.getAllUsers(),
-      scores: this.scoreService.getLeaderboard(),
-      ranks: this.rankConfigService.getAllRanks(),
-      current: this.userService.getCurrentUser()
-    }).subscribe(({ users, scores, ranks, current }) => {
+      leaderboard: this.scoreService.getLeaderboard(),
+      allScores: this.scoreService.getAllScores(),
+      current: this.userService.getCurrentUser(),
+      ranks: this.rankConfigService.getAllRanks()
+    }).subscribe(({ users, leaderboard, allScores, current, ranks }) => {
       this.ranks = ranks;
 
-      const scoreMap = new Map<string, number>();
-      for (const score of scores) {
-        scoreMap.set(score.userId, score.points);
+      const userMap = new Map(users.map(u => [u.id, u]));
+
+      const fullScoreMap = new Map<string, number>();
+      for (const score of allScores) {
+        fullScoreMap.set(score.userId, score.points);
       }
 
-      const mergedUsers = users.map((user: User) => ({
-        id: user.id,
-        fullName: user.name,
-        score: scoreMap.get(user.id) ?? 0,
-        imageId: user.imageId || null, 
-      }));
+      const currentUserData = userMap.get(current.id);
+      this.currentUser = {
+        id: current.id,
+        fullName: currentUserData?.name || '',
+        imageId: currentUserData?.imageId || null,
+        score: fullScoreMap.get(current.id) ?? 0
+      };
 
-      const currentUserId = current.id;
-      this.currentUser = mergedUsers.find(u => u.id === currentUserId) || null;
-      this.otherUsers = mergedUsers.filter(u => u.id !== currentUserId);
+      this.otherUsers = leaderboard
+        .filter(score => score.userId !== current.id)
+        .map(score => {
+          const user = userMap.get(score.userId);
+          return {
+            id: score.userId,
+            fullName: user?.name || '',
+            imageId: user?.imageId || null,
+            score: score.points
+          };
+        });
     });
   }
+
 }

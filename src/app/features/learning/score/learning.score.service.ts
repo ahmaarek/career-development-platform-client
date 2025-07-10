@@ -20,4 +20,8 @@ export class LearningScoreService {
   getUserScore(userId: string): Observable<LearningScore> {
     return this.http.get<LearningScore>(`${this.learningScoresUrl}/user/${userId}`);
   }
+
+  getAllScores(): Observable<LearningScore[]> {
+    return this.http.get<LearningScore[]>(this.learningScoresUrl);
+  }
 }
