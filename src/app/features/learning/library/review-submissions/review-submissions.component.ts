@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin, of, switchMap } from 'rxjs';
 import { LearningSubmissionService } from '../services/learning-submission.service';
 import { LearningMaterialTemplateService } from '../services/learning-material-template.service';
 import { LearningDocumentService } from '../services/learning-document.service';
@@ -9,82 +10,84 @@ import { UserService } from '../../../../user/user.service';
 import { User } from '../../../../user/user.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AlertService } from '../../../alert/alert.service';
 
 @Component({
   selector: 'app-review-submissions',
   templateUrl: './review-submissions.component.html',
   styleUrls: ['./review-submissions.component.css'],
+  standalone: true,
   imports: [CommonModule, FormsModule]
 })
 export class ReviewSubmissionsComponent implements OnInit {
   submissions: LearningSubmissionDTO[] = [];
-  templates: { [templateId: string]: LearningMaterialTemplate } = {};
+  templates: Record<string, LearningMaterialTemplate> = {};
+  attachments: Record<string, Record<string, { url: string; type: 'image' | 'video' | 'document' | null }>> = {};
+  users: Record<string, { user: User | null }> = {};
   currentUser: User | null = null;
+
   templateFilter = '';
   statusFilter: SubmissionStatus | 'ALL' = 'ALL';
-
-  attachments: {
-    [submissionId: string]: {
-      [sectionId: string]: { url: string; type: 'image' | 'video' | 'document' | null };
-    };
-  } = {};
-
-  users: {
-    [submissionId: string]:
-    { user: User | null };
-  } = {};
-
 
   constructor(
     private submissionService: LearningSubmissionService,
     private templateService: LearningMaterialTemplateService,
     private documentService: LearningDocumentService,
-    private userService: UserService
+    private userService: UserService,
+    private alertService: AlertService
   ) { }
 
   ngOnInit(): void {
-    this.userService.getCurrentUser().subscribe(user => {
-      this.currentUser = user;
-      if (user?.role === 'MANAGER') {
-        this.submissionService.getSubmissionsByManager(user.id).subscribe(subs => {
-          this.submissions = subs;
+    this.userService.getCurrentUser().pipe(
+      switchMap(user => {
+        this.currentUser = user;
+        if (user?.role !== 'MANAGER') return of([]);
+        return this.submissionService.getSubmissionsByManager(user.id);
+      })
+    ).subscribe(subs => {
+      this.submissions = subs;
+      this.loadTemplates(subs);
+      this.loadUsersAndAttachments(subs);
+    });
+  }
 
-          const templateIds = Array.from(new Set(subs.map(s => s.templateId)));
-          templateIds.forEach(id => {
-            this.templateService.getTemplateById(id).subscribe(template => {
-              this.templates[template.id!] = template;
-            });
-          });
+  private loadTemplates(subs: LearningSubmissionDTO[]) {
+    const templateIds = Array.from(new Set(subs.map(s => s.templateId)));
+    forkJoin(
+      templateIds.map(id => this.templateService.getTemplateById(id))
+    ).subscribe(results => {
+      results.forEach(t => this.templates[t.id!] = t);
+    });
+  }
 
-          subs.forEach(submission => {
-            this.attachments[submission.id!] = {};
-            if (submission.userId) {
-              this.userService.getUserById(submission.userId).subscribe(user => {
-                this.users[submission.id!] = { user: user };
-              });
-            }
-            submission.sectionResponses.forEach(response => {
-              if (response.documentId) {
-                this.documentService.getAttachmentBlobAndType(response.documentId).subscribe(data => {
-                  this.attachments[submission.id!][response.sectionTemplateId] = {
-                    url: data.blobUrl,
-                    type: data.type
-                  };
-                });
-              }
-            });
-          });
+  private loadUsersAndAttachments(subs: LearningSubmissionDTO[]) {
+    subs.forEach(sub => {
+      this.attachments[sub.id!] = {};
+
+      if (sub.userId) {
+        this.userService.getUserById(sub.userId).subscribe(user => {
+          this.users[sub.id!] = { user };
         });
       }
+
+      sub.sectionResponses.forEach(resp => {
+        if (resp.documentId) {
+          this.documentService.getAttachmentBlobAndType(resp.documentId).subscribe(data => {
+            this.attachments[sub.id!][resp.sectionTemplateId] = {
+              url: data.blobUrl,
+              type: data.type
+            };
+          });
+        }
+      });
     });
   }
 
   getFilteredSubmissions(): LearningSubmissionDTO[] {
-    return this.submissions.filter(s => {
-      const matchesStatus = this.statusFilter === 'ALL' || s.status === this.statusFilter;
-      const template = this.templates[s.templateId];
-      const matchesTemplate = !this.templateFilter || template?.title?.toLowerCase().includes(this.templateFilter.toLowerCase());
-
+    return this.submissions.filter(sub => {
+      const matchesStatus = this.statusFilter === 'ALL' || sub.status === this.statusFilter;
+      const matchesTemplate = !this.templateFilter ||
+        this.templates[sub.templateId]?.title?.toLowerCase().includes(this.templateFilter.toLowerCase());
       return matchesStatus && matchesTemplate;
     });
   }
@@ -94,11 +97,24 @@ export class ReviewSubmissionsComponent implements OnInit {
   }
 
   reviewSubmission(id: string, accepted: boolean) {
-    this.submissionService.reviewSubmission(id, accepted).subscribe(() => {
-      const submission = this.submissions.find(s => s.id === id);
-      if (submission) {
-        submission.status = accepted ? SubmissionStatus.APPROVED : SubmissionStatus.REJECTED;
+    this.submissionService.reviewSubmission(id, accepted).subscribe({
+      next: () => {
+        const sub = this.submissions.find(s => s.id === id);
+        if (sub) {
+          sub.status = accepted ? SubmissionStatus.APPROVED : SubmissionStatus.REJECTED;
+        }
+
+        this.alertService.showAlert(
+          'success',
+          `Submission ${accepted ? 'approved' : 'rejected'} successfully.`
+        );
+
+        this.ngOnInit();
+      },
+      error: () => {
+        this.alertService.showAlert('error', 'Review failed. Please try again.');
       }
     });
   }
+
 }
