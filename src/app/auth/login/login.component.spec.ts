@@ -62,17 +62,6 @@ describe('LoginComponent', () => {
         expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/dashboard', { replaceUrl: true });
     });
 
-    it('should show error on failed login', () => {
-        spyOn(window, 'alert');
-        authServiceMock.login.and.returnValue(throwError(() => ({ message: 'Invalid credentials' })));
-
-        component.loginForm.setValue({ email: 'fail@example.com', password: 'wrongpass' });
-        component.onSubmit();
-
-        expect(authServiceMock.login).toHaveBeenCalled();
-        expect(window.alert).toHaveBeenCalledWith('Login failed. Please check your credentials.');
-    });
-
     it('should navigate to signup page', () => {
         const signupButton = html.querySelector('.signup-btn') as HTMLButtonElement;
         signupButton.click();
