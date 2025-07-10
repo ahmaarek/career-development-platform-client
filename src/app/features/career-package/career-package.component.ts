@@ -446,13 +446,14 @@ export class CareerPackageComponent implements OnInit {
         this.successMessage = 'Career package submitted successfully for review!';
         this.isLoading = false;
         setTimeout(() => this.successMessage = '', 5000);
+        this.ngOnInit();
       },
       error: (error) => {
         this.errorMessage = error.message;
         this.isLoading = false;
       }
     });
-    this.ngOnInit();
+    
   }
 
   getSubmissionStatusMessage(): string {
