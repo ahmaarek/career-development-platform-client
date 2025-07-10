@@ -75,6 +75,7 @@ export class EditOrDeleteComponent implements OnInit {
     delete$.subscribe({
       next: () => {
         this.ngOnInit();
+        this.alertService.showAlert('success', 'Content deleted successfully.');
         this.cancelDelete();
       },
       error: () => this.alertService.showAlert('error','Deletion failed.')
