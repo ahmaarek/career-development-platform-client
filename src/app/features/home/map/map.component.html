@@ -1,9 +1,7 @@
 <svg width="100%" height="300" viewBox="0 0 1000 300">
 
-  <!-- Curved path connecting ranks -->
   <path #pathRef d="M 50 250 C 250 50, 750 50, 950 250" stroke="#ccc" stroke-width="6" fill="none" />
 
-  <!-- Rank nodes -->
   <g *ngFor="let rank of ranks; let i = index">
     <title>{{ rank.name }} — Requires {{ rank.pointsRequired }} points</title>
     <rect [attr.x]="getPointAtRank(i).x - 14" [attr.y]="getPointAtRank(i).y - 14" width="28" height="28" fill="#fdd835"
